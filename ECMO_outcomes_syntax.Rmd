@@ -735,7 +735,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(rosc_num = case_when(rosc == "NA"  | ros
                                                      
                                   rosc == "0" |
                                   rosc == "0 - primär Anschluss an HLM währen Kreislaufstillstand" | 
-                                    rosc == "0 \"Anlage der CARDIOHELP durch Wechsel der arteriellen  Schleuse in der linken Leiste und der venösen Schleuse der rechten Leiste. Dabei Kammerflimmern, welches sich  nicht durch Defibrillation terminieren lässt..\""  ~ "0",
+                                    rosc == "0 \"Anlage der CARDIOHELP durch Wechsel der arteriellen  Schleuse in der linken Leiste und der venösen Schleuse der rechten Leiste. Dabei Kammerflimmern, welches sich  nicht durch Defibrillation terminieren lässt.. \""  ~ "0",
                                   
                                     rosc == "kein Anschluss" |
                                   rosc == "unklar" | rosc == "?" | rosc == "intermettierende Reanimation" |
