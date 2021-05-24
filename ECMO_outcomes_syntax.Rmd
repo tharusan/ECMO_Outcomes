@@ -937,5 +937,8 @@ log_mort <- glm(mort ~ ecmella_final,
 summary(log_mort)
 
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
+
+
+
 ```
 
