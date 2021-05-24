@@ -14,8 +14,15 @@ knitr::opts_chunk$set(echo = TRUE)
 2. Chart review
 2.1 Check all patients with "NA" in "ROSC erreicht" variable
 2.2 N-KHK diagnosis for all patients --> create a separate "KHK" variable for chart review
+2.3 check cases with "unclear" ECMO
+2.4 check "unclear" and missing Impella
+2.5 check patients with missing mortality
+2.6 check patients with missing years
+2.7 chart review remaining providers
 ```
 
+
+#Load libraries
 
 ```{r}
 library(dplyr)
@@ -40,6 +47,7 @@ library(ggpubr)
 panderOptions('table.split.table', Inf)
 ```
 
+#Import data
 
 ```{r}
 #Import data
@@ -100,16 +108,11 @@ ecmo_ccm_2016_2019 <- read_excel("ecmo_data1_ccm_2016_2019.xlsx",
 View(ecmo_ccm_2016_2019)
 ```
 
+#merge to one master dataset
 
 ```{r}
-#code is obsolete
-#drop data that has not been chart reviewed yet for ecmo_all_campi
-#ecmo_all_campi2 <- ecmo_all_campi %>% filter(`Aus welcher Klinik` == "CBF" | `Aus welcher Klinik` == "CCM" | `Aus welcher Klinik` == "CVK/CCM")
-
 ecmo_all_campi2 <- ecmo_all_campi %>% select(!"...31") #remove column on the right
-```
 
-```{r}
 #append all datasets
 ecmo_master1 <- rbind(ecmo_all_campi2, ecmo_cbf_2013_2015, ecmo_cbf_2016_2019, ecmo_ccm_2016_2019)
 
@@ -144,10 +147,11 @@ ecmo_master3 <- ecmo_master2 %>% filter(ppci == 0)
 ```
 
 
-#clean data
-
+#crete clean variables
 
 ```{r}
+#campus
+
 count(ecmo_master3, `Aus welcher Klinik`)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(campus = case_when(
@@ -163,7 +167,7 @@ campus <- ggplot(ecmo_master3, aes(x="", y= "", fill=campus)) +
   theme_void()
 
 
-#ECMO yes/no (could also have had impella!)
+#ECMO yes/no character (patient could also have had impella!)
 
 count(ecmo_master3, `ECMO ja/nein`)
 
@@ -174,6 +178,8 @@ ecmo_master3 <- ecmo_master3  %>% mutate(ecmo = case_when(
   `ECMO ja/nein` == "HLM während TAVI?" ~ "Unclear",
    `ECMO ja/nein` == "keine Doku zur Ecmo?" ~ "Unclear"))
 
+#ECMO yes/no numeric
+
 ecmo_master3 <- ecmo_master3  %>% mutate(ecmo_num = case_when(
   `ECMO ja/nein` == "ja" ~ "1",
   `ECMO ja/nein` == "nein" ~ "0",
@@ -182,14 +188,12 @@ ecmo_master3 <- ecmo_master3  %>% mutate(ecmo_num = case_when(
    `ECMO ja/nein` == "keine Doku zur Ecmo?" ~ "."))
 ecmo_master3$ecmo_num <- as.numeric(ecmo_master3$ecmo_num )
 
-##check cases with "unclear"
-
 ecmo <- ggplot(ecmo_master3, aes(x="", y= "", fill=ecmo)) +
    geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
   theme_void()
 
-#Impella yes/no
+#Impella yes/no character
 
 count(ecmo_master3, `Impella ja/nein`)
 
@@ -201,8 +205,7 @@ ecmo_master3 <- ecmo_master3  %>% mutate(impella = case_when(
    `Impella ja/nein` == "nein" ~ "No impella",
   `Impella ja/nein` == "RV-Impella" ~ "RV impella",))
 
-##check "unclear" and missings
-
+#Impella yes/no numeric
 
 ecmo_master3 <- ecmo_master3  %>% mutate(impella_num = case_when(
   `Impella ja/nein` == "?" ~ ".",
@@ -237,14 +240,14 @@ ecmo_master3 <- ecmo_master3 %>% mutate(ec = case_when(ecmo == "VA-ECMO" & impel
                                   ecmo == "VA-ECMO" & impella == "No impella" ~ 0))
 ecmo_master3$ec <- as.logical(ecmo_master3$ec)
 
+
 #mortality
+
 ecmo_master3$mort <- as.character(ecmo_master3$`Sterbezeit (0 = nicht tot)`)
 ecmo_master3$mort[ecmo_master3$mort == "1899-12-31 00:00:00"] <- 0
 ecmo_master3$mort[!(ecmo_master3$mort == 0)] <- 1
 ecmo_master3$mort <- as.numeric(ecmo_master3$mort)
 ecmo_master3$mort <- as.logical(ecmo_master3$mort)
-
-##check missings
 
 
 #rea
@@ -271,9 +274,9 @@ rea <- ggplot(ecmo_master3, aes(x="", y= "", fill=rea)) +
 
 
 #years
+
 ecmo_master3$year <- as.character(ecmo_master3$`Krankenhaus - Aufnahmezeit`)
 ecmo_master3$year <- substr(ecmo_master3$year, 1, 4)
-#check missings
 
 year_ecmo <- ggplot(data = ecmo_master3, aes(x = year, y = ecmo_num, fill= campus)) +
     geom_bar(stat="identity")
@@ -298,7 +301,6 @@ graph <- ggarrange(year_ecmo, year_ecmo_type, year_ecmo_rea, year_impella, year_
                                "2a. Frequency of impellas per hospital site", "2b. Frequency of impellas per impella type",
                                "2c. Frequency of impellas per location of resuscitation"),
           ncol = 3, nrow = 2)
-
 
 
 
@@ -503,8 +505,6 @@ ecmo_master3 <- ecmo_master3 %>% mutate(khk = case_when((diag1 == "koronare Drei
                                                           ) ~ 1))
 ecmo_master3$khk[is.na(ecmo_master3$khk)] <- 0
 
-##chart review of all patients: coronary X vessel disease
-
 
 ecmo_master3 <- ecmo_master3 %>% mutate(khk_num = case_when(diag2 == "koronare Eingefäßerkrankung"  | diag3 == "koronare Eingefäßerkrankung" |
                                                               diag4 == "koronare Eingefäßerkrankung" | diag4 == "koronare Eingefäßkrankheit" ~ 1,
@@ -596,6 +596,7 @@ ecmo_master3$intox[is.na(ecmo_master3$intox)] <- 0
 
 
 
+#ECG rhythm
 
 year_shockable <- ggplot(data = ecmo_master3, aes(x = year, y = shockable, fill= campus)) +
     geom_bar(stat="identity")
@@ -617,6 +618,7 @@ unshockable_impella <- ggplot(data = ecmo_master3, aes(x = campus, y = unshockab
     geom_bar(stat="identity")
 
 
+#plots
 
 year_stemi <- ggplot(data = ecmo_master3, aes(x = year, y = stemi, fill= campus)) +
     geom_bar(stat="identity")
@@ -688,6 +690,7 @@ graph2 <- ggarrange(year_shockable, year_unshockable, year_stemi, year_nstemi, y
 year_khk <- ggplot(data = ecmo_master3, aes(x = year, y = khk, fill= khk_num)) +
     geom_bar(stat="identity")
 
+
 #ef
 
 count(ecmo_master3, `LVEF Aufnahme`)
@@ -727,12 +730,11 @@ graph_ef <- ggarrange(bb1, bb2, bb1_rea, bb2_rea, bb1_stemi, bb2_stemi, bb1_nste
                                "4a. LVEF at ICU admission in patients with NSTE-ACS", "4b. LVEF at ICU discharge in patients with NSTE-ACS"),
           ncol = 2, nrow = 4)
 
+
 #provider
 
-##chart review of remaining providers
 
 #rosc
-##check NA for no rea vs. NA for missing
 
 ecmo_master3 <- rename(ecmo_master3, rosc = `ROSC bei ANSCHLUSS: Ja (1) /nein (0) / keine Reanimation (NA)`)
 
@@ -754,7 +756,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(rosc_num = case_when(rosc == "NA"  | ros
 ecmo_master3$rosc_num[ecmo_master3$rea == "No rea"] <- 1 #If no rea happened, then there was ROSC at Anschluss
 ecmo_master3$rosc_num[(ecmo_master3$rea == "Out-of-hospital" | ecmo_master3$rea == "In-hospital") & ecmo_master3$rosc == "NA"] <- "."
 
-#check all patients where rosc is NA
+##check all patients where rosc is NA
 rea <- ecmo_master3 %>% select(`Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)`, rea, rosc, rosc_num)
 
 ecmo_master3$rosc_num <- as.numeric(ecmo_master3$rosc_num)
