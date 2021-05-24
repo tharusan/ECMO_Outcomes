@@ -21,6 +21,9 @@ Less important:
   3.1 N-KHK diagnosis for all patients --> create a new separate "KHK" variable for chart review (do not use diag1, diag2, diag3)
   3.2 check patients with missing years
   3.3 chart review remaining providers
+  
+  
+4. selet one major diagnosis based on all diagnoses
 
 Questions
 
@@ -820,9 +823,9 @@ n <- ecmo_master3 %>% filter(ecmella_true==T & ecmella_final==F)
 ```{r}
 #check for mortality results
 
-ecmo_master3_test <- ecmo_master3 %>% filter(rosc_num == 0 & (rea == "In-hospital" | rea == "Out-of-hospital")) #check all patients with unclear or missing rea
+ecmo_master3_test <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & ecmo == "VA-ECMO") #check all patients with unclear or missing rea
 
-xtabs(~mort+ecmella_final,data=ecmo_master3_test)
+xtabs(~campus+ecmo,data=ecmo_master3_test)
 
 t.test(mort + ecmella_final, data = ecmo_master3_test)
 
