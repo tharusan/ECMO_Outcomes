@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 2.2 check cases with "unclear" ECMO
 2.3 check "unclear" and missing Impella
 2.4 check patients with missing mortality
+2.5 check patients who have ROSC if they really had ROSC
 
 Less important:
   3.1 N-KHK diagnosis for all patients --> create a new separate "KHK" variable for chart review (do not use diag1, diag2, diag3)
