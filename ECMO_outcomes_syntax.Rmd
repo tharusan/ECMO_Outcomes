@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 1. Check all yellow and orange fields
 
 2. Chart review
-2.1 Check all patients with "NA" in "ROSC erreicht" variable
+2.1 Check all patients with "NA" in "ROSC erreicht" variable if reanimaton is 1 or 2
 2.2 check cases with "unclear" ECMO
 2.3 check "unclear" and missing Impella
 2.4 check patients with missing mortality
@@ -24,6 +24,7 @@ Less important:
   
   
 4. selet one major diagnosis based on all diagnoses
+5. re-think ECMELLA definition: What if there is a small time overlap (e.g. 5 days ECMO, then 20mins Impella - is this ECMELLA?)
 
 Questions
 
