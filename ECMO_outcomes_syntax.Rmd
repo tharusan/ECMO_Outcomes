@@ -13,14 +13,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 2. Chart review
 2.1 Check all patients with "NA" in "ROSC erreicht" variable
-2.2 N-KHK diagnosis for all patients --> create a separate "KHK" variable for chart review
-2.3 check cases with "unclear" ECMO
-2.4 check "unclear" and missing Impella
-2.5 check patients with missing mortality
-2.6 check patients with missing years
-2.7 chart review remaining providers
+2.2 check cases with "unclear" ECMO
+2.3 check "unclear" and missing Impella
+2.4 check patients with missing mortality
+
+Less important:
+  3.1 N-KHK diagnosis for all patients --> create a new separate "KHK" variable for chart review (do not use diag1, diag2, diag3)
+  3.2 check patients with missing years
+  3.3 chart review remaining providers
+
+Questions
+
 ```
-#test test test
 
 #Load libraries
 
@@ -225,20 +229,6 @@ impella <- ggplot(ecmo_master3, aes(x="", y= "", fill=impella)) +
 
 #ECMELLA yes/no
 
-ecmo_master3 <- ecmo_master3 %>% mutate(ecmella = case_when((ecmo == "VA-ECMO" & impella == "LV impella") ~ 1))
-ecmo_master3$ecmella[is.na(ecmo_master3$ecmella)] <- 0
-ecmo_master3$ecmella <- as.logical(ecmo_master3$ecmella)
-
-ecmella <- ggplot(ecmo_master3, aes(x="", y= "", fill=ecmella)) +
-   geom_bar(stat="identity", width=1) +
-  coord_polar("y", start=0) +
-  theme_void()
-
-#ECMELLA vs. ECMO
-
-ecmo_master3 <- ecmo_master3 %>% mutate(ec = case_when(ecmo == "VA-ECMO" & impella == "LV impella" ~ 1,
-                                  ecmo == "VA-ECMO" & impella == "No impella" ~ 0))
-ecmo_master3$ec <- as.logical(ecmo_master3$ec)
 
 
 #mortality
