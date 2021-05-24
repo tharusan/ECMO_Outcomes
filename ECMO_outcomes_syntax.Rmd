@@ -397,6 +397,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(shockable = case_when((diag1 == "Kammerf
                                                              diag3 == "Adäquate Schockabgabe des CRT-D bei Ventrikulärer Tachykardie"
                                                           ) ~ 1))
 ecmo_master3$shockable[is.na(ecmo_master3$shockable)] <- 0
+ecmo_master3$shockable <- as.factor(ecmo_master3$shockable)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(unshockable = case_when((diag1 == "Pulslose elektrische Aktivität" |
                                                            diag1 == "Asystolie" |
@@ -408,7 +409,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(unshockable = case_when((diag1 == "Pulsl
                                                              diag1 == "Pulsloser elektrischer Aktivität"
                                                           ) ~ 1))
 ecmo_master3$unshockable[is.na(ecmo_master3$unshockable)] <- 0
-
+ecmo_master3$unshockable <- as.factor(ecmo_master3$unshockable)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(stemi = case_when((diag1 == "STEMI der Vorderwand" |
                                                            diag1 == "STEMI" |
@@ -445,7 +446,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(stemi = case_when((diag1 == "STEMI der V
                                                             diag4 == "STEMI der Hinterwand"
                                                           ) ~ 1))
 ecmo_master3$stemi[is.na(ecmo_master3$stemi)] <- 0
-
+ecmo_master3$stemi <- as.factor(ecmo_master3$stemi)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(nstemi = case_when((diag1 == "NSTEMI" |
                                                               diag2 == "NSTEMI" |
@@ -457,7 +458,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(nstemi = case_when((diag1 == "NSTEMI" |
                                                               diag4 == "NSTEMI"
                                                           ) ~ 1))
 ecmo_master3$nstemi[is.na(ecmo_master3$nstemi)] <- 0
-
+ecmo_master3$nstemi <- as.factor(ecmo_master3$nstemi)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(mi = case_when((diag2 == "akuter Myokardinfarkt" |
                                                               diag2 == "Myokardinfarkt" |
@@ -493,7 +494,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(mi = case_when((diag2 == "akuter Myokard
                                                           diag4 == "Koronare Herzerkrankung mit thrombotischem Verschluss des Hauptstammes/RIVA/RCX"
                                                           ) ~ 1))
 ecmo_master3$mi[is.na(ecmo_master3$mi)] <- 0
-
+ecmo_master3$mi <- as.factor(ecmo_master3$mi)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(cs = case_when((diag1 == "kardiogener Schock" |
                                                           diag1 == "kardiogener und septischer Schock" |
@@ -506,7 +507,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(cs = case_when((diag1 == "kardiogener Sc
                                                            diag4 == "kardiogener Schock" 
                                                           ) ~ 1))
 ecmo_master3$cs[is.na(ecmo_master3$cs)] <- 0
-
+ecmo_master3$cs <- as.factor(ecmo_master3$cs)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(lae = case_when((diag2 == "beidseitige Lungenarterienembolie" |
                                                           diag2 == "Lungenarterienembolie" |
@@ -517,7 +518,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(lae = case_when((diag2 == "beidseitige L
                                                            diag3 == "Lungenarterienembolie"
                                                           ) ~ 1))
 ecmo_master3$lae[is.na(ecmo_master3$lae)] <- 0
-
+ecmo_master3$lae <- as.factor(ecmo_master3$lae)
 
 
 ecmo_master3 <- ecmo_master3 %>% mutate(pul = case_when((diag1 == "ARDS" |
@@ -535,7 +536,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(pul = case_when((diag1 == "ARDS" |
                                                            diag3 == "Lungenödem"
                                                           ) ~ 1))
 ecmo_master3$pul[is.na(ecmo_master3$pul)] <- 0
-
+ecmo_master3$pul <- as.factor(ecmo_master3$pul)
 
 
 ecmo_master3 <- ecmo_master3 %>% mutate(khk = case_when((diag1 == "koronare Dreigefäßerkrankung" |
@@ -591,14 +592,14 @@ ecmo_master3 <- ecmo_master3 %>% mutate(sepsis = case_when((diag1 == "Septischer
                                                               diag1 == "Urosepsis"
                                                           ) ~ 1))
 ecmo_master3$sepsis[is.na(ecmo_master3$sepsis)] <- 0
-
+ecmo_master3$sepsis <- as.factor(ecmo_master3$sepsis)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(aortdiss = case_when((diag1 == "Aortendissektion Typ A" |
                                                               diag2 == "Typ-A-Dissektion der Aorta ascendens und descendens" |
                                                               diag2 == "Typ A-Dissektion der Aorta"
                                                           ) ~ 1))
 ecmo_master3$aortdiss[is.na(ecmo_master3$aortdiss)] <- 0
-
+ecmo_master3$aortdiss <- as.factor(ecmo_master3$aortdiss)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(hi = case_when((diag1 == "akutes Herzversagen" |
                                                           diag1 == "biventrikuläres Herzversagen" |
@@ -633,7 +634,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(hi = case_when((diag1 == "akutes Herzver
                                                           
                                                           ) ~ 1))
 ecmo_master3$hi[is.na(ecmo_master3$hi)] <- 0
-
+ecmo_master3$hi <- as.factor(ecmo_master3$hi)
 
 ecmo_master3 <- ecmo_master3 %>% mutate(myocarditis = case_when((diag1 == "Myokarditis" |
                                                                    diag2 == "akute lymphozytäre Myokarditis" |
@@ -645,7 +646,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(myocarditis = case_when((diag1 == "Myoka
                                                                    diag4 == "Myokarditis"
                                                           ) ~ 1))
 ecmo_master3$myocarditis[is.na(ecmo_master3$myocarditis)] <- 0
-
+ecmo_master3$myocarditis <- as.factor(ecmo_master3$myocarditis)
 
 
 ecmo_master3 <- ecmo_master3 %>% mutate(intox = case_when((diag2 == "Eiben-Intoxikation" |
@@ -655,7 +656,7 @@ ecmo_master3 <- ecmo_master3 %>% mutate(intox = case_when((diag2 == "Eiben-Intox
                                                              diag3 == "Kokainabusus" 
                                                           ) ~ 1))
 ecmo_master3$intox[is.na(ecmo_master3$intox)] <- 0
-
+ecmo_master3$intox <- as.factor(ecmo_master3$intox)
 
 
 #ECG rhythm
@@ -822,7 +823,7 @@ ecmo_master3$rosc_num[(ecmo_master3$rea == "Out-of-hospital" | ecmo_master3$rea 
 rea <- ecmo_master3 %>% select(`Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)`, rea, rosc, rosc_num)
 
 ecmo_master3$rosc_num <- as.numeric(ecmo_master3$rosc_num)
-
+ecmo_master3$rosc_num <- as.factor(ecmo_master3$rosc_num)
 ```
 
 #length of stay (hospital and ICU)
@@ -863,12 +864,14 @@ n <-count(ecmo_master3, ICU_length_of_stay)
 #duration of ecmo implantation
 ecmo_master3$ecmo_explantation <- as.Date(ecmo_master3$`ECMO wann ausgebaut?`)
 ecmo_master3$ecmo_time <- difftime(ecmo_master3$ecmo_explantation, ecmo_master3$ecmo_implantation, unit="days")
+ecmo_master3$ecmo_time <- as.numeric(ecmo_master3$ecmo_time)
 n <- count(ecmo_master3, ecmo_time)
 #errors have been identified and corrected manually on updated spreadsheet 
 
 #duration of impella implantation
 ecmo_master3$impella_explantation <- as.Date(ecmo_master3$`Impella wann ausgebaut?`)
 ecmo_master3$impella_time <- difftime(ecmo_master3$impella_explantation, ecmo_master3$impella_implantation, unit="days")
+ecmo_master3$impella_time <- as.numeric(ecmo_master3$impella_time)
 n <- count(ecmo_master3, impella_time)
 #errors have been identified and corrected manually on updated spreadsheet 
 
@@ -944,10 +947,96 @@ g
 ecmo_master4 <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1 | trt == 0))
 
 #check diagnoses in final cohort
-n <- ecmo_master4 %>% select(Fallnumer, diag1, diag2, diag3, diag4, shockable, unshockable, stmei, nstemi, mi, cs, lae, pul, khk, khk_num, sepsis, hi, myocarditis, intox)
+
+summary <- ecmo_master4 %>% select(id, Fallnumer, trt, campus, year, diag1, diag2, diag3, diag4, shockable, unshockable, stemi, nstemi, mi, cs, khk, khk_num, aortdiss, hi, myocarditis, lae, pul, sepsis, intox, mort, rosc_num, rea, length_of_stay, ICU_length_of_stay,  ecmo_time, impella_time, ef1, ef2)
 
 
 
+#table1
+library(table1)
+
+##label variables
+
+summary$trt <- factor(summary$trt , levels=c("0", "1"), labels=c("VA-ECMO", "ECMELLA"))
+label(summary$trt) <- "Type of MCS"
+
+summary$campus <- factor(summary$campus , levels=c("cbf", "ccm", "cvk"), labels=c("CBF", "CCM", "CVK"))
+label(summary$campus) <- "Hospital site"
+
+label(summary$year) <- "Years of MCS implantation"
+
+summary$shockable <- factor(summary$shockable , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$shockable) <- "Shockable ECG rhythm"
+
+summary$unshockable <- factor(summary$unshockable , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$unshockable) <- "Unshockable ECG rhythm"
+
+summary$stemi <- factor(summary$stemi , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$stemi) <- "STE-ACS"
+
+summary$nstemi <- factor(summary$nstemi , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$nstemi) <- "NSTE-ACS"
+
+summary$mi <- factor(summary$mi , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$mi) <- "Myocardial infarction (not further specified)"
+
+summary$cs <- factor(summary$cs , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$cs) <- "Cardiogenic shock"
+
+summary$khk_num <- factor(summary$khk_num , levels=c("1", "2", "3"), labels=c("1 vessel", "2 vessels", "3 vessels"))
+label(summary$khk_num) <- "Coronary artery disease"
+
+summary$aortdiss <- factor(summary$aortdiss , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$aortdiss) <- "Aortic dissection"
+
+summary$hi <- factor(summary$hi , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$hi) <- "Heart failure"
+
+summary$mocarditis <- factor(summary$myocarditis , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$myocarditis) <- "Myocarditis"
+
+summary$lae <- factor(summary$lae , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$lae) <- "Pulmonary embolism"
+
+summary$pul <- factor(summary$pul, levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$pul) <- "Pneumonia, respiratory failure or ARDS"
+
+summary$sepsis <- factor(summary$sepsis , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$sepsis) <- "Septic shock"
+
+summary$rosc_num <- factor(summary$rosc_num , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$rosc_num) <- "ROSC at implantantion of MCS device"
+
+summary$intox <- factor(summary$intox , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$intox) <- "Drug intoxication"
+
+label(summary$rea) <- "Location of resuscitation"
+
+label(summary$mort) <- "Hospital mortality"
+
+label(summary$length_of_stay) <- "Hospital length of stay (days)"
+label(summary$ICU_length_of_stay) <- "ICU length of stay (days)"
+label(summary$ecmo_time) <- "Duration of VA-ECMO (days)"
+label(summary$impella_time) <- "Duration of Impella (days)"
+
+label(summary$ef1) <- "Left ventricular EF at ICU admission"
+label(summary$ef2) <- "Left ventricular EF at ICU discharge"
+
+##create table
+ecmo_master4_table1 <-  table1(~ campus +  shockable+ unshockable+ rosc_num +  rea +
+                                 mort +  length_of_stay + ICU_length_of_stay + ecmo_time + impella_time + ef1 + ef2 +
+                                 stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt,
+                               data= summary)
+
+ecmo_master4_table2 <-  table1(~ unshockable+ rosc_num +  rea +
+                                 mort +  length_of_stay + ICU_length_of_stay + ecmo_time + impella_time + ef1 + ef2 +
+                                 stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt*campus,
+                               data= summary)
+
+ecmo_master4_table3 <-  table1(~ campus + shockable+ unshockable+ rosc_num +  rea +
+                                length_of_stay + ICU_length_of_stay + ecmo_time + impella_time + ef1 + ef2 +
+                                 stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt*mort,
+                               data= summary)
 
 xtabs(~campus+trt,data=ecmo_master4)
 
