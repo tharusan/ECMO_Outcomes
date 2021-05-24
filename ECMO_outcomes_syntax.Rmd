@@ -782,6 +782,7 @@ ecmo_master3$impella_implantation <- as.Date(ecmo_master3$`Impella wann eingebau
 
 #1. was impella implantation during ecmo ?
 
+library(lubridate)
 ecmo_master3$ecmo_interval <- interval(ecmo_master3$ecmo_implantation, ecmo_master3$`ECMO wann ausgebaut?`) #create time interval
 ecmo_master3$impella_during_ecmo <- ecmo_master3$impella_implantation %within% ecmo_master3$ecmo_interval #test if impella implantation was during ecmo 
 
@@ -833,17 +834,14 @@ n <- ecmo_master3 %>% filter(ecmella_true==T & ecmella_final==F)
 ```{r}
 #check for mortality results
 
-xtabs(~mort+ec,data=ecmo_master3)
+ecmo_master3_test <- ecmo_master3 %>% filter(rosc_num == 0 & (rea == "In-hospital" | rea == "Out-of-hospital")) #check all patients with unclear or missing rea
 
-mort <- ggplot(ecmo_master3, aes(ec, mort)) +
-        geom_boxplot()
+xtabs(~mort+ecmella_final,data=ecmo_master3_test)
 
-t.test(mort + ec, data = ecmo_master3)
+t.test(mort + ecmella_final, data = ecmo_master3_test)
 
-ecmo_master3_rea <- ecmo_master3 %>% filter(rea == "In-hospital" | rea == "Out-of-hospital")
-
-log_mort <- glm(mort ~ ec,
-          data = ecmo_master3_rea, family = "binomial")
+log_mort <- glm(mort ~ ecmella_final,
+          data = ecmo_master3_test, family = "binomial")
 summary(log_mort)
 
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
