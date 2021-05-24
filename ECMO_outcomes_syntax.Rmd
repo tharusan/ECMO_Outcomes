@@ -65,29 +65,30 @@ panderOptions('table.split.table', Inf)
 ## convert to numeric: both EF variables
 
 #all
-
 library(readxl)
 ecmo_all_campi <- read_excel("ecmo_data1_all_campi.xlsx", 
-    col_types = c("numeric", "date", "text", 
-        "text", "numeric", "text", "text", 
+    col_types = c("numeric", "numeric", "date", 
+        "text", "text", "numeric", "text", 
+        "text", "date", "date", "text", "text", 
         "date", "date", "text", "text", "date", 
-        "date", "text", "text", "date", "date", 
-        "date", "date", "date", "text", "text", 
+        "date", "date", "date", "date", "numeric", 
         "text", "text", "text", "text", "text", 
-        "numeric", "numeric", "text", "text"))
+        "text", "numeric", "numeric", "text", 
+        "text"))
 View(ecmo_all_campi)
+
 
 #CBF 2016-2019
 
 library(readxl)
 ecmo_cbf_2016_2019 <- read_excel("ecmo_data1_cbf_2016_2019.xlsx", 
-    col_types = c("numeric", "date", "text", 
-        "numeric", "numeric", "text", "text", 
+    col_types = c("numeric", "numeric", "date", 
+        "text", "numeric", "numeric", "text", 
+        "text", "date", "date", "text", "text", 
         "date", "date", "text", "text", "date", 
-        "date", "text", "text", "date", "date", 
-        "date", "date", "date", "text", "text", 
+        "date", "date", "date", "date", "text", 
         "text", "text", "text", "text", "text", 
-        "numeric", "numeric", "text"))
+        "text", "numeric", "numeric", "text"))
 View(ecmo_cbf_2016_2019)
 
 
@@ -95,33 +96,34 @@ View(ecmo_cbf_2016_2019)
 
 library(readxl)
 ecmo_cbf_2013_2015 <- read_excel("ecmo_data1_cbf_2013_2015.xlsx", 
-    col_types = c("numeric", "date", "numeric", 
+    col_types = c("numeric", "numeric", "date", 
+        "numeric", "numeric", "text", "text", 
+        "text", "date", "date", "numeric", 
+        "text", "date", "date", "text", "text", 
+        "date", "date", "date", "date", "date", 
         "numeric", "text", "text", "text", 
-        "date", "date", "numeric", "text", 
-        "date", "date", "text", "text", "date", 
-        "date", "date", "date", "date", "numeric", 
-        "text", "text", "text", "text", "text", 
-        "text", "numeric", "numeric", "text"))
+        "text", "text", "text", "numeric", 
+        "numeric", "text"))
 View(ecmo_cbf_2013_2015)
 
 #CCM 2016-2019
 
 library(readxl)
 ecmo_ccm_2016_2019 <- read_excel("ecmo_data1_ccm_2016_2019.xlsx", 
-    col_types = c("text", "date", "text", 
-        "text", "numeric", "text", "text", 
+    col_types = c("numeric", "text", "date", 
+        "text", "text", "numeric", "text", 
+        "text", "date", "date", "text", "text", 
         "date", "date", "text", "text", "date", 
-        "date", "text", "text", "date", "date", 
-        "date", "date", "date", "text", "text", 
+        "date", "date", "date", "date", "numeric", 
         "text", "text", "text", "text", "text", 
-        "numeric", "numeric", "text"))
+        "text", "numeric", "numeric", "text"))
 View(ecmo_ccm_2016_2019)
 ```
 
 #merge to one master dataset
 
 ```{r}
-ecmo_all_campi2 <- ecmo_all_campi %>% select(!"...31") #remove column on the right
+ecmo_all_campi2 <- ecmo_all_campi %>% select(!"...32") #remove column on the right
 
 #append all datasets
 ecmo_master1 <- rbind(ecmo_all_campi2, ecmo_cbf_2013_2015, ecmo_cbf_2016_2019, ecmo_ccm_2016_2019)
@@ -132,7 +134,6 @@ ecmo_master2 <- ecmo_master1[c(-ecmo_mis), ]
 
 #why so many missings? check which patients were dropped
 
-#check patient 313443437 and 	 312944303- multiple lines with information - some lines have no diagnoses???
 
 #drop patients with protected PCI
 ecmo_master2 <- ecmo_master2 %>% mutate(ppci = case_when((`Kommentar ECMO` == "PCI unter ECMO-Schutz" |
@@ -145,7 +146,9 @@ ecmo_master2 <- ecmo_master2 %>% mutate(ppci = case_when((`Kommentar ECMO` == "P
                                                             `Kommentar Impella` == "PCI mit Impellaschutz" |
                                                             `Kommentar Impella` == "PCI unter  Impellschutz" |
                                                             `Kommentar Impella` == "PCI unter Impellaschutz, unklar im AB" |
-                                                             `Kommentar Impella` == "keine Erwähnung Impella, ist nur die Rede von PCI unter PHP-Schutz" 
+                                                             `Kommentar Impella` == "keine Erwähnung Impella, ist nur die Rede von PCI unter PHP-Schutz" |
+                                                            
+                                                            `Kommentar Impella` == "PCI unter Impellaschutz - aber 1 Tag länger belassen"
                                                           ) ~ 1))
 ecmo_master2$ppci[is.na(ecmo_master2$ppci)] <- 0
 
@@ -235,35 +238,34 @@ impella <- ggplot(ecmo_master3, aes(x="", y= "", fill=impella)) +
 
 #ECMELLA yes/no
 
-#only date
+##only date
 ecmo_master3$ecmo_implantation <- as.Date(ecmo_master3$`ECMO wann eingebaut?`)
 ecmo_master3$impella_implantation <- as.Date(ecmo_master3$`Impella wann eingebaut?`)
 
-#1. was impella implantation during ecmo ?
+##1. was impella implantation during ecmo ?
 
 ecmo_master3$ecmo_interval <- interval(ecmo_master3$ecmo_implantation, ecmo_master3$`ECMO wann ausgebaut?`) #create time interval
 ecmo_master3$impella_during_ecmo <- ecmo_master3$impella_implantation %within% ecmo_master3$ecmo_interval #test if impella implantation was during ecmo 
 n <- ecmo_master3 %>% select(`ECMO wann eingebaut?`, `ECMO wann ausgebaut?`, `Impella wann eingebaut?`, impella_during_ecmo) #check manually
 
-#see how many test negative and why 
+##see how many test negative and why 
 n <- ecmo_master3 %>% filter(impella_during_ecmo==F)
 
-#2. was ecmo implantation during impella? same procedure
+##2. was ecmo implantation during impella? same procedure
 
 ecmo_master3$impella_interval <- interval(ecmo_master3$impella_implantation, ecmo_master3$`Impella wann ausgebaut?`) #create time interval
 ecmo_master3$ecmo_during_impella <- ecmo_master3$ecmo_implantation %within% ecmo_master3$impella_interval
 
 n <- ecmo_master3 %>% select(`Impella wann eingebaut?`, `Impella wann ausgebaut?`, `ECMO wann eingebaut?`, ecmo_during_impella) #check manually
 
-#3. create variable that covers both 
+##3. create variable that covers both 
 ecmo_master3$ecmella_true <- ifelse(ecmo_master3$ecmo_during_impella==T | ecmo_master3$impella_during_ecmo==T, 
                                     TRUE, FALSE)
 
-#check patients that are exlucded
+##check patients that are exlucded
 n <- ecmo_master3 %>% filter(ecmella_true==F)
 
-
-#final ecmella definition --> make sure only VA-ECMO and LV-Impella are included in variable
+##final ecmella definition --> make sure only VA-ECMO and LV-Impella are included in variable
 ecmo_master3$ecmella_final <- ifelse(ecmo_master3$ecmella_true==T & ecmo_master3$ecmo=="VA-ECMO" & ecmo_master3$impella=="LV impella", 
                                      TRUE, FALSE)
 count(ecmo_master3, ecmella_final)
@@ -273,20 +275,28 @@ ecmo_master3$ecmella_num <- ifelse(ecmo_master3$ecmella_final==T, 1, 0)
 n <- ecmo_master3 %>% filter(ecmella_true==T & ecmella_final==F)
 
 
-#intervention variable
+##intervention variable
 ecmo_master3$intervention <- ifelse(ecmo_master3$ecmella_final==TRUE, "ECMELLA",
                                     ifelse(ecmo_master3$ecmo=="VA-ECMO", "VA-ECMO",
                                        ifelse(ecmo_master3$impella=="LV impella", "LV-Impella", 
                                                   "others")))
-#test if code worked appropriately 
+##test if code worked appropriately 
 n <- ecmo_master3 %>% filter(intervention=="others")
-#patients with intervention = unclear have a vv ecmo or rv impella or nothing at all 
+##patients with intervention = unclear have a vv ecmo or rv impella or nothing at all 
 
 n <- ecmo_master3 %>% filter(intervention=="LV-Impella")
-# patients with intervention =LV-Impella have a LV-Impella and no ECmo or a vv-ecmo
+## patients with intervention =LV-Impella have a LV-Impella and no ECmo or a vv-ecmo
 
 n <- ecmo_master3 %>% filter(intervention=="VA-ECMO")
-#patients with intervention=va-ecmo have a va ecmo and no impella OR both but not simultaneously 
+##patients with intervention=va-ecmo have a va ecmo and no impella OR both but not simultaneously 
+
+
+
+#ECMELLA vs. ECMO variable
+
+ecmo_master3 <- ecmo_master3 %>% mutate(trt = case_when(ecmella_final == TRUE   ~ 1,
+                                  (ecmo == "VA-ECMO" & impella == "No impella") ~ 0))
+ecmo_master3$trt <- as.numeric(ecmo_master3$trt)
 
 
 
@@ -297,6 +307,8 @@ ecmo_master3$mort[ecmo_master3$mort == "1899-12-31 00:00:00"] <- 0
 ecmo_master3$mort[!(ecmo_master3$mort == 0)] <- 1
 ecmo_master3$mort <- as.numeric(ecmo_master3$mort)
 ecmo_master3$mort <- as.logical(ecmo_master3$mort)
+
+n <- ecmo_master3 %>% select(`Sterbezeit (0 = nicht tot)`, mort)
 
 #rea
 
@@ -312,7 +324,8 @@ ecmo_master3 <- ecmo_master3  %>% mutate(rea = case_when(
   `Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)` == "2" ~ "In-hospital",
   `Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)` == "2.0" ~ "In-hospital",
   `Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)` == "2 beim Ausladen aus dem Krankenwagen " ~ "In-hospital",))
-##check missings
+#check cases with missings and "unclear"
+n <- ecmo_master3 %>% select(`Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)`, rea)
 
 
 rea <- ggplot(ecmo_master3, aes(x="", y= "", fill=rea)) +
@@ -789,10 +802,10 @@ ecmo_master3 <- rename(ecmo_master3, rosc = `ROSC bei ANSCHLUSS: Ja (1) /nein (0
 
 n <- count(ecmo_master3, rosc)
 
-ecmo_master3 <- ecmo_master3 %>% mutate(rosc_num = case_when(rosc == "NA"  | rosc == "1" | rosc == "1?" |
+ecmo_master3 <- ecmo_master3 %>% mutate(rosc_num = case_when(rosc == "NA"  | rosc == "1" | rosc == "1?" | rosc == "1.0" |
                                                      rosc == "(AB klingt wie ROSC, Katheterprotokoll: periterventionelle Reanimation)" ~ "1",
                                                      
-                                  rosc == "0" |
+                                  rosc == "0" | rosc == "0.0" |
                                   rosc == "0 - primär Anschluss an HLM währen Kreislaufstillstand" | 
                                     rosc == "0 \"Anlage der CARDIOHELP durch Wechsel der arteriellen  Schleuse in der linken Leiste und der venösen Schleuse der rechten Leiste. Dabei Kammerflimmern, welches sich  nicht durch Defibrillation terminieren lässt.. \""  ~ "0",
                                   
@@ -928,13 +941,13 @@ g
 ```{r}
 #check for mortality results
 
-ecmo_master3_test <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & ecmo == "VA-ECMO") #check all patients with unclear or missing rea
+ecmo_master3_test <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1 | trt == 0)) #check all patients with unclear or missing rea
 
-xtabs(~campus+ecmo,data=ecmo_master3_test)
+xtabs(~campus+trt,data=ecmo_master3_test)
 
 t.test(mort + ecmella_final, data = ecmo_master3_test)
 
-log_mort <- glm(mort ~ ecmella_final,
+log_mort <- glm(mort ~ trt,
           data = ecmo_master3_test, family = "binomial")
 summary(log_mort)
 
@@ -942,7 +955,9 @@ exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
 
 
-ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 0)
+ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 1 &  mort == FALSE & (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1))
+
+ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, rea, rosc, rosc_num, mort, trt, ecmo, impella)
 ```
 
 
