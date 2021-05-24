@@ -25,6 +25,7 @@ Less important:
   
 4. selet one major diagnosis based on all diagnoses
 5. re-think ECMELLA definition: What if there is a small time overlap (e.g. 5 days ECMO, then 20mins Impella - is this ECMELLA?)
+6. How to treat patients with OP?
 
 Questions
 
