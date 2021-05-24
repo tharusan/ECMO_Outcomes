@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 2. Chart review
 2.1 Check all patients with "NA" in "ROSC erreicht" variable if reanimaton is 1 or 2
-2.2 check cases with "unclear" ECMO
+2.2 check cases with "unclear" or missing ECMO
 2.3 check "unclear" or missing Impella
 2.4 check patients with missing mortality
 2.5 check patients who have ROSC if they really had ROSC
@@ -243,6 +243,7 @@ ecmo_master3$impella_implantation <- as.Date(ecmo_master3$`Impella wann eingebau
 
 ecmo_master3$ecmo_interval <- interval(ecmo_master3$ecmo_implantation, ecmo_master3$`ECMO wann ausgebaut?`) #create time interval
 ecmo_master3$impella_during_ecmo <- ecmo_master3$impella_implantation %within% ecmo_master3$ecmo_interval #test if impella implantation was during ecmo 
+n <- ecmo_master3 %>% select(`ECMO wann eingebaut?`, `ECMO wann ausgebaut?`, `Impella wann eingebaut?`, impella_during_ecmo) #check manually
 
 #see how many test negative and why 
 n <- ecmo_master3 %>% filter(impella_during_ecmo==F)
@@ -252,6 +253,7 @@ n <- ecmo_master3 %>% filter(impella_during_ecmo==F)
 ecmo_master3$impella_interval <- interval(ecmo_master3$impella_implantation, ecmo_master3$`Impella wann ausgebaut?`) #create time interval
 ecmo_master3$ecmo_during_impella <- ecmo_master3$ecmo_implantation %within% ecmo_master3$impella_interval
 
+n <- ecmo_master3 %>% select(`Impella wann eingebaut?`, `Impella wann ausgebaut?`, `ECMO wann eingebaut?`, ecmo_during_impella) #check manually
 
 #3. create variable that covers both 
 ecmo_master3$ecmella_true <- ifelse(ecmo_master3$ecmo_during_impella==T | ecmo_master3$impella_during_ecmo==T, 
@@ -940,5 +942,8 @@ exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
 
 
+ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 0)
 ```
+
+
 
