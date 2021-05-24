@@ -806,6 +806,7 @@ ecmo_master3$rosc_num[(ecmo_master3$rea == "Out-of-hospital" | ecmo_master3$rea 
 rea <- ecmo_master3 %>% select(`Reanimation: out-of-hospital (1) oder in-hospital (2) oder keine Reanimation (0)`, rea, rosc, rosc_num)
 
 ecmo_master3$rosc_num <- as.numeric(ecmo_master3$rosc_num)
+
 ```
 
 #length of stay (hospital and ICU)
