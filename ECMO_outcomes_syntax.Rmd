@@ -827,20 +827,6 @@ n <- ecmo_master3 %>% filter(ecmella_true==T & ecmella_final==F)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 #check for mortality results
 
@@ -856,6 +842,4 @@ summary(log_mort)
 
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 ```
-
-#test
 
