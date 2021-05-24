@@ -7,7 +7,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-test
+#To Dos and questions
+```{r}
+1. Check all yellow and orange fields
+
+2. Chart review
+2.1 Check all patients with "NA" in "ROSC erreicht" variable
+2.2 N-KHK diagnosis for all patients --> create a separate "KHK" variable for chart review
+```
+
 
 ```{r}
 library(dplyr)
