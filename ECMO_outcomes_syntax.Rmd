@@ -294,8 +294,8 @@ n <- ecmo_master3 %>% filter(intervention=="VA-ECMO")
 
 #ECMELLA vs. ECMO variable
 
-ecmo_master3 <- ecmo_master3 %>% mutate(trt = case_when(ecmella_final == TRUE   ~ 1,
-                                  (ecmo == "VA-ECMO" & impella == "No impella") ~ 0))
+ecmo_master3 <- ecmo_master3 %>% mutate(trt = case_when(intervention == "ECMELLA" ~ 1,
+                                  intervention == "VA-ECMO" ~ 0))
 ecmo_master3$trt <- as.numeric(ecmo_master3$trt)
 
 
@@ -939,13 +939,22 @@ g
 
 
 ```{r}
-#check for mortality results
+#create final cohort
 
-ecmo_master3_test <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1 | trt == 0)) #check all patients with unclear or missing rea
+ecmo_master4 <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1 | trt == 0))
 
-xtabs(~campus+trt,data=ecmo_master3_test)
+#check diagnoses in final cohort
+n <- ecmo_master4 %>% select(Fallnumer, diag1, diag2, diag3, diag4, shockable, unshockable, stmei, nstemi, mi, cs, lae, pul, khk, khk_num, sepsis, hi, myocarditis, intox)
 
-t.test(mort + ecmella_final, data = ecmo_master3_test)
+
+
+
+xtabs(~campus+trt,data=ecmo_master4)
+
+
+
+
+
 
 log_mort <- glm(mort ~ trt,
           data = ecmo_master3_test, family = "binomial")
@@ -954,11 +963,16 @@ summary(log_mort)
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
 
+```
+
+
+
+
+```{r}
+#check data
 
 ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 1 &  mort == FALSE & (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1))
 
 ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, rea, rosc, rosc_num, mort, trt, ecmo, impella)
 ```
-
-
 
