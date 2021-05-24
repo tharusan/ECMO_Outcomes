@@ -234,6 +234,57 @@ impella <- ggplot(ecmo_master3, aes(x="", y= "", fill=impella)) +
 
 #ECMELLA yes/no
 
+#only date
+ecmo_master3$ecmo_implantation <- as.Date(ecmo_master3$`ECMO wann eingebaut?`)
+ecmo_master3$impella_implantation <- as.Date(ecmo_master3$`Impella wann eingebaut?`)
+
+#1. was impella implantation during ecmo ?
+
+ecmo_master3$ecmo_interval <- interval(ecmo_master3$ecmo_implantation, ecmo_master3$`ECMO wann ausgebaut?`) #create time interval
+ecmo_master3$impella_during_ecmo <- ecmo_master3$impella_implantation %within% ecmo_master3$ecmo_interval #test if impella implantation was during ecmo 
+
+#see how many test negative and why 
+n <- ecmo_master3 %>% filter(impella_during_ecmo==F)
+
+#2. was ecmo implantation during impella? same procedure
+
+ecmo_master3$impella_interval <- interval(ecmo_master3$impella_implantation, ecmo_master3$`Impella wann ausgebaut?`) #create time interval
+ecmo_master3$ecmo_during_impella <- ecmo_master3$ecmo_implantation %within% ecmo_master3$impella_interval
+
+
+#3. create variable that covers both 
+ecmo_master3$ecmella_true <- ifelse(ecmo_master3$ecmo_during_impella==T | ecmo_master3$impella_during_ecmo==T, 
+                                    TRUE, FALSE)
+
+#check patients that are exlucded
+n <- ecmo_master3 %>% filter(ecmella_true==F)
+
+
+#final ecmella definition --> make sure only VA-ECMO and LV-Impella are included in variable
+ecmo_master3$ecmella_final <- ifelse(ecmo_master3$ecmella_true==T & ecmo_master3$ecmo=="VA-ECMO" & ecmo_master3$impella=="LV impella", 
+                                     TRUE, FALSE)
+count(ecmo_master3, ecmella_final)
+
+ecmo_master3$ecmella_num <- ifelse(ecmo_master3$ecmella_final==T, 1, 0)
+
+n <- ecmo_master3 %>% filter(ecmella_true==T & ecmella_final==F)
+
+
+#intervention variable
+ecmo_master3$intervention <- ifelse(ecmo_master3$ecmella_final==TRUE, "ECMELLA",
+                                    ifelse(ecmo_master3$ecmo=="VA-ECMO", "VA-ECMO",
+                                       ifelse(ecmo_master3$impella=="LV impella", "LV-Impella", 
+                                                  "others")))
+#test if code worked appropriately 
+n <- ecmo_master3 %>% filter(intervention=="others")
+#patients with intervention = unclear have a vv ecmo or rv impella or nothing at all 
+
+n <- ecmo_master3 %>% filter(intervention=="LV-Impella")
+# patients with intervention =LV-Impella have a LV-Impella and no ECmo or a vv-ecmo
+
+n <- ecmo_master3 %>% filter(intervention=="VA-ECMO")
+#patients with intervention=va-ecmo have a va ecmo and no impella OR both but not simultaneously 
+
 
 
 #mortality
@@ -243,7 +294,6 @@ ecmo_master3$mort[ecmo_master3$mort == "1899-12-31 00:00:00"] <- 0
 ecmo_master3$mort[!(ecmo_master3$mort == 0)] <- 1
 ecmo_master3$mort <- as.numeric(ecmo_master3$mort)
 ecmo_master3$mort <- as.logical(ecmo_master3$mort)
-
 
 #rea
 
@@ -266,6 +316,7 @@ rea <- ggplot(ecmo_master3, aes(x="", y= "", fill=rea)) +
    geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
   theme_void()
+
 
 
 #years
@@ -757,7 +808,7 @@ rea <- ecmo_master3 %>% select(`Reanimation: out-of-hospital (1) oder in-hospita
 ecmo_master3$rosc_num <- as.numeric(ecmo_master3$rosc_num)
 ```
 
-#lenght of stay
+#length of stay (hospital and ICU)
 
 ```{r}
 ##length of stay 
@@ -765,61 +816,109 @@ ecmo_master3$admission<- as.Date(ecmo_master3$`Krankenhaus - Aufnahmezeit`)
 ecmo_master3$discharge<- as.Date(ecmo_master3$`Krankenhaus - Entlassungszeit`)
 
 ecmo_master3$length_of_stay <-difftime( ecmo_master3$discharge, ecmo_master3$admission, unit="days") 
+ecmo_master3$length_of_stay <-as.numeric(ecmo_master3$length_of_stay)
 
 n <-count(ecmo_master3, length_of_stay)
-#3 errors in data in negative direction , 1 in positive direction
+#3 errors in data in negative direction , 1 in positive direction --> have been manually corrected in updated data sheet
+
+#ecmo_master3 <- ecmo_master3 %>% mutate(length_of_stay= replace(length_of_stay,
+                                                             # which((length_of_stay<0| length_of_stay>365)), NA))
 
 ##ICU length of stay
 ecmo_master3$ICU_admission<- as.Date(ecmo_master3$`ITS - Aufnahmezeit`)
 ecmo_master3$ICU_discharge<- as.Date(ecmo_master3$`ITS - Entlassungszeit`)
 
 ecmo_master3$ICU_length_of_stay <-difftime( ecmo_master3$ICU_discharge, ecmo_master3$ICU_admission, unit="days") 
+ecmo_master3$ICU_length_of_stay <- as.numeric(ecmo_master3$ICU_length_of_stay)
 
 n <-count(ecmo_master3, ICU_length_of_stay)
 
-#7 errors in data in negative correction, 3 in positive direction 
+#ecmo_master3 <- ecmo_master3 %>% mutate(ICU_length_of_stay= replace(ICU_length_of_stay,
+                                                               # which((length_of_stay<0| length_of_stay>365)), NA))
 
-##ECMELLA time overlap
+#7 errors in data in negative correction, 4 in positive direction --> have been updated manually in corrected data sheet
 
-#only date
-ecmo_master3$ecmo_implantation <- as.Date(ecmo_master3$`ECMO wann eingebaut?`)
-ecmo_master3$impella_implantation <- as.Date(ecmo_master3$`Impella wann eingebaut?`)
-
-#1. was impella implantation during ecmo ?
-
-library(lubridate)
-ecmo_master3$ecmo_interval <- interval(ecmo_master3$ecmo_implantation, ecmo_master3$`ECMO wann ausgebaut?`) #create time interval
-ecmo_master3$impella_during_ecmo <- ecmo_master3$impella_implantation %within% ecmo_master3$ecmo_interval #test if impella implantation was during ecmo 
-
-#see how many test negative and why 
-n <- ecmo_master3 %>% filter(impella_during_ecmo==F)
-
-
-#2. was ecmo implantation during impella? same procedure
-
-ecmo_master3$impella_interval <- interval(ecmo_master3$impella_implantation, ecmo_master3$`Impella wann ausgebaut?`) #create time interval
-ecmo_master3$ecmo_during_impella <- ecmo_master3$ecmo_implantation %within% ecmo_master3$impella_interval
-
-#3. create variable that covers both 
-ecmo_master3$ecmella_true <- ifelse(ecmo_master3$ecmo_during_impella==T | ecmo_master3$impella_during_ecmo==T, 
-                                    TRUE, FALSE)
-
-#check patients that are exlucded
-n <- ecmo_master3 %>% filter(ecmella_true==F)
-
-#1 patient is wrongfully excluded, possibly because impella explantation date is still missing in data -> manually corrected
-ecmo_master3 <- ecmo_master3 %>% mutate(ecmella_true= replace(ecmella_true,
-                                                    which((Fallnumer=="313994605" & ecmella_true==F)), T))
-
-#final ecmella definition --> make sure only VA-ECMO and LV-Impella are included in variable
-ecmo_master3$ecmella_final <- ifelse(ecmo_master3$ecmella_true==T & ecmo_master3$ecmo=="VA-ECMO" & ecmo_master3$impella=="LV impella", 
-                                     TRUE, FALSE)
-count(ecmo_master3, ecmella_final)
-
-n <- ecmo_master3 %>% filter(ecmella_true==T & ecmella_final==F)
 
 ```
 
+#duration of support systems 
+```{r}
+#duration of ecmo implantation
+ecmo_master3$ecmo_explantation <- as.Date(ecmo_master3$`ECMO wann ausgebaut?`)
+ecmo_master3$ecmo_time <- difftime(ecmo_master3$ecmo_explantation, ecmo_master3$ecmo_implantation, unit="days")
+n <- count(ecmo_master3, ecmo_time)
+#errors have been identified and corrected manually on updated spreadsheet 
+
+#duration of impella implantation
+ecmo_master3$impella_explantation <- as.Date(ecmo_master3$`Impella wann ausgebaut?`)
+ecmo_master3$impella_time <- difftime(ecmo_master3$impella_explantation, ecmo_master3$impella_implantation, unit="days")
+n <- count(ecmo_master3, impella_time)
+#errors have been identified and corrected manually on updated spreadsheet 
+
+
+mean(ecmo_master3$impella_time, na.rm=T)
+mean(ecmo_master3$ecmo_time, na.rm=T)
+
+
+```
+
+#Megans graphs
+```{r}
+
+intervention <- ggplot(ecmo_master3, aes(x="", y= "", fill=intervention)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  theme_void()
+intervention
+
+
+reaa <- ggplot(ecmo_master3, aes(x="", y= "", fill=rea)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  theme_void()
+reaa
+
+
+ggplot(ecmo_master3, 
+       aes(x = length_of_stay, 
+           y = intervention, 
+           fill = intervention)) +
+  geom_density_ridges() + 
+  theme_ridges() +
+  theme(legend.position = "none")
+
+ecmo_master3$mort_num <- ifelse(ecmo_master3$mort==T, 1, 0)
+
+table <- ecmo_master3 %>%
+  group_by(intervention) %>%
+  summarise(
+    len = mean(length_of_stay, na.rm=T)
+  )
+# Initialize ggplot with data
+f <- ggplot(
+  table, aes(x = intervention, y = len)) +
+  geom_bar(stat = "identity",  fill = c("cornflowerblue", "chartreuse3", "chocolate1", "coral1", "cyan3")) +
+  labs(title = "Mean Length of Stay", 
+       x = "intervention",
+       y = "Length of Stay in Days")
+f
+
+
+table2 <- ecmo_master3 %>%
+  group_by(intervention) %>%
+  summarise(
+    len = mean(ICU_length_of_stay, na.rm=T)
+  )
+# Initialize ggplot with data
+g <- ggplot(
+  table2, aes(x = intervention, y = len)) +
+  geom_bar(stat = "identity",  fill = c("cornflowerblue", "chartreuse3", "chocolate1", "coral1", "cyan3")) +
+  labs(title = "Mean Length of Stay in ICU", 
+       x = "intervention",
+       y = "Length of Stay in ICU in Days")
+g
+
+```
 
 
 ```{r}
