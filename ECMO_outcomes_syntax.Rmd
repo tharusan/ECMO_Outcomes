@@ -947,11 +947,16 @@ g
 ```{r}
 #create final cohort
 
+##ecmo_master3_1 <- ecmo_master3 %>% filter(rea == "In-hospital" | rea == "Out-of-hospital") #cardiac arrest
+##ecmo_master3_2 <- ecmo_master3_1 %>% filter(rosc_num == 0) #ROSC at implantation
+##ecmo_master3_3 <- ecmo_master3_2 %>% filter(trt == 1 | trt == 0) #ECMO or ECMELLA
+
 ecmo_master4 <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1 | trt == 0))
 
 
 
-#create infarct (yes/no) variable manually and diag5 (chart reviewed if diag1 - diag4 were not enough to define infarct variable)
+#create infarct (yes/no) variable manually by looking at diag1 - diag4
+#create diag5 (based on chart review if diag1 - diag4 were not enough to define infarct variable)
 
 primdiag <- ecmo_master4 %>% select(id, Fallnumer, trt, mort, diag1, diag2, diag3, diag4) %>% filter(trt == 0 & mort == "FALSE")
 
@@ -991,7 +996,7 @@ trt0mort0_c <- read_excel("primdiag/trt0mort0_c.xlsx",
 
 ##append all sheets
 manual_infarct <- rbind(trt1mort1_c, trt1mort0_c, trt0mort1_c, trt0mort0_c)
-manual_infarct <- manual_infarct %>% select(id, infarct) #clean
+manual_infarct <- manual_infarct %>% select(id, infarct, diag5) #clean
 
 
 ##merge with main dataset
@@ -1000,11 +1005,8 @@ ecmo_master5 <- merge(ecmo_master4, manual_infarct, by= "id")
 ecmo_master6 <- ecmo_master5 %>% filter(infarct == 1)
 
 
+#create clean dataset for tables
 summary <- ecmo_master6 %>% select(id, Fallnumer, trt, campus, year, diag1, diag2, diag3, diag4, infarct, shockable, unshockable, stemi, nstemi, mi, cs, khk, khk_num, aortdiss, hi, myocarditis, lae, pul, sepsis, intox, mort, rosc_num, rea, length_of_stay, ICU_length_of_stay,  ecmo_time, impella_time, ef1, ef2)
-
-#create parimary diagnosis variable
-
-
 
 
 #table1
@@ -1025,6 +1027,10 @@ label(summary$shockable) <- "Shockable ECG rhythm"
 
 summary$unshockable <- factor(summary$unshockable , levels=c("0", "1"), labels=c("No", "Yes"))
 label(summary$unshockable) <- "Unshockable ECG rhythm"
+
+summary$infarct <- factor(summary$infarct , levels=c("0", "1"), labels=c("No", "Yes"))
+label(summary$infarct) <- "Myocardial infarction as reason for MCS"
+
 
 summary$stemi <- factor(summary$stemi , levels=c("0", "1"), labels=c("No", "Yes"))
 label(summary$stemi) <- "STE-ACS"
@@ -1078,17 +1084,17 @@ label(summary$ef1) <- "Left ventricular EF at ICU admission"
 label(summary$ef2) <- "Left ventricular EF at ICU discharge"
 
 ##create table
-ecmo_master4_table1 <-  table1(~ campus +  shockable+ unshockable+ rosc_num +  rea +
+ecmo_master4_table1 <-  table1(~ campus + rosc_num + infarct + rea +
                                  mort +  length_of_stay + ICU_length_of_stay + ecmo_time + impella_time + ef1 + ef2 +
-                                 stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt,
+                                 stemi+ nstemi+ mi+ cs+ khk_num + shockable+ unshockable | trt,
                                data= summary)
 
-ecmo_master4_table2 <-  table1(~ unshockable+ rosc_num +  rea +
+ecmo_master4_table2 <-  table1(~ unshockable+ infarct + rosc_num +  rea +
                                  mort +  length_of_stay + ICU_length_of_stay + ecmo_time + impella_time + ef1 + ef2 +
                                  stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt*campus,
                                data= summary)
 
-ecmo_master4_table3 <-  table1(~ campus + shockable+ unshockable+ rosc_num +  rea +
+ecmo_master4_table3 <-  table1(~ campus + shockable+ infarct + unshockable+ rosc_num +  rea +
                                 length_of_stay + ICU_length_of_stay + ecmo_time + impella_time + ef1 + ef2 +
                                  stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt*mort,
                                data= summary)
@@ -1103,12 +1109,31 @@ xtabs(~campus+trt,data=ecmo_master4)
 log_mort <- glm(mort ~ trt,
           data = ecmo_master6, family = "binomial")
 summary(log_mort)
-
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
+library(MASS)
 
+los <- glm(length_of_stay ~ trt,  family = poisson, data = ecmo_master6)
+summary(los)
+exp(cbind(IRR = coef(los), confint(los)))
+
+
+iculos <- glm(ICU_length_of_stay ~ trt,  family = poisson, data = ecmo_master6)
+summary(iculos)
+exp(cbind(IRR = coef(iculos), confint(iculos)))
+
+#resuts table
+library(jtools)
+library(huxtable)
+library(officer)
+library(flextable)
+
+res_mort <- summ(log_mort, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_los <- summ(los, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+
+export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
 ```
-
 
 
 
