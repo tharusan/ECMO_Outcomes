@@ -27,9 +27,12 @@ Less important:
 4. selet one major diagnosis based on all diagnoses
 5. re-think ECMELLA definition: What if there is a small time overlap (e.g. 5 days ECMO, then 20mins Impella - is this ECMELLA?)
 6. How to treat patients with OP?
+  
+7. Get ECMO and ECMELLA data for most recent patients - send request to Kalinowksy
 
 Questions
 
+1. By Carsten: Why are there so few cases in CCM und CVK in the final cohort? Why does CCM have more cases than CVK? Did we have access to all patients?
 ```
 
 #Load libraries
@@ -946,9 +949,61 @@ g
 
 ecmo_master4 <- ecmo_master3 %>% filter(rosc_num == 0 &  (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1 | trt == 0))
 
-#check diagnoses in final cohort
 
-summary <- ecmo_master4 %>% select(id, Fallnumer, trt, campus, year, diag1, diag2, diag3, diag4, shockable, unshockable, stemi, nstemi, mi, cs, khk, khk_num, aortdiss, hi, myocarditis, lae, pul, sepsis, intox, mort, rosc_num, rea, length_of_stay, ICU_length_of_stay,  ecmo_time, impella_time, ef1, ef2)
+
+#create infarct (yes/no) variable manually and diag5 (chart reviewed if diag1 - diag4 were not enough to define infarct variable)
+
+primdiag <- ecmo_master4 %>% select(id, Fallnumer, trt, mort, diag1, diag2, diag3, diag4) %>% filter(trt == 0 & mort == "FALSE")
+
+##create excel sheets for manual edit
+
+library("writexl")
+write_xlsx(primdiag,"E:/backup9/projects/ecmella_outcomes/kenny/data/data3/ECMO_outcomes/primdiag/trt1mort1.xlsx")
+write_xlsx(primdiag,"E:/backup9/projects/ecmella_outcomes/kenny/data/data3/ECMO_outcomes/primdiag/trt1mort0.xlsx")
+write_xlsx(primdiag,"E:/backup9/projects/ecmella_outcomes/kenny/data/data3/ECMO_outcomes/primdiag/trt0mort1.xlsx")
+write_xlsx(primdiag,"E:/backup9/projects/ecmella_outcomes/kenny/data/data3/ECMO_outcomes/primdiag/trt0mort0.xlsx")
+
+##import all sheets - make infarct variable numeric
+
+library(readxl)
+trt1mort1_c <- read_excel("primdiag/trt1mort1_c.xlsx", 
+    col_types = c("numeric", "text", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "text"))
+
+library(readxl)
+trt1mort0_c <- read_excel("primdiag/trt1mort0_c.xlsx", 
+    col_types = c("numeric", "text", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "text"))
+
+library(readxl)
+trt0mort1_c <- read_excel("primdiag/trt0mort1_c.xlsx", 
+    col_types = c("numeric", "text", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "text"))
+
+library(readxl)
+trt0mort0_c <- read_excel("primdiag/trt0mort0_c.xlsx", 
+    col_types = c("numeric", "text", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "text"))
+
+##append all sheets
+manual_infarct <- rbind(trt1mort1_c, trt1mort0_c, trt0mort1_c, trt0mort0_c)
+manual_infarct <- manual_infarct %>% select(id, infarct) #clean
+
+
+##merge with main dataset
+ecmo_master5 <- merge(ecmo_master4, manual_infarct, by= "id")
+
+ecmo_master6 <- ecmo_master5 %>% filter(infarct == 1)
+
+
+summary <- ecmo_master6 %>% select(id, Fallnumer, trt, campus, year, diag1, diag2, diag3, diag4, infarct, shockable, unshockable, stemi, nstemi, mi, cs, khk, khk_num, aortdiss, hi, myocarditis, lae, pul, sepsis, intox, mort, rosc_num, rea, length_of_stay, ICU_length_of_stay,  ecmo_time, impella_time, ef1, ef2)
+
+#create parimary diagnosis variable
+
 
 
 
@@ -1046,7 +1101,7 @@ xtabs(~campus+trt,data=ecmo_master4)
 
 
 log_mort <- glm(mort ~ trt,
-          data = ecmo_master3_test, family = "binomial")
+          data = ecmo_master6, family = "binomial")
 summary(log_mort)
 
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
