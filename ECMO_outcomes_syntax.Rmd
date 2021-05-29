@@ -19,11 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Chart review of final cohort (N = 93): ALWAYS create NEW Variable which can be merged into main dataset by id
   1. All missing values of already existing variables (see Table)
   2. Create provider variable: prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t2
-  2. Schrage paper: age, sex, lactate, SAVE score, SAPS II, previous cardiac arrest, blood pressure, heart rate, crea
-  3. Additional - clarfiy with Carsten: CK, CKMB, Troponin, pH, APACHE, GCS, TISS, medication, BMI (height, weight), CCI
 
-
-4. re-think ECMELLA definition: What if there is a small time overlap (e.g. 5 days ECMO, then 20mins Impella - is this ECMELLA?)
 5. Get ECMO and ECMELLA data for most recent patients - send request to Kalinowksy --> create a new google sheet (new tab) with exactly the same column names
 ```
 
@@ -1099,7 +1095,7 @@ ecmo_master4_table3 <-  table1(~ campus + shockable+ infarct + unshockable+ rosc
                                  stemi+ nstemi+ mi+ cs+ khk_num+ aortdiss+ hi+ myocarditis+ lae+ pul+ sepsis+ intox | trt*mort,
                                data= summary)
 
-xtabs(~campus+trt,data=ecmo_master4)
+xtabs(~campus+trt,data= summary)
 
 
 
@@ -1136,6 +1132,55 @@ res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
 ```
 
+#Provider variable
+```{r}
+#import data
+library(readxl)
+id_provider <- read_excel("E:/backup9/projects/ecmella_outcomes/kenny/data/data3/additional_data/provider/id_provider.xlsx")
+View(id_provider)
+
+##clean dataset
+id_provider2 <- id_provider %>% select(id, prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t3)
+
+#merge with master datatset
+ecmo_master7 <- merge(ecmo_master6, id_provider2, by= "id")
+ecmo_master7$prov1_t1 <- as.ordered(ecmo_master7$prov1_t1)
+ecmo_master7$prov1_t1_num <- as.numeric(ecmo_master7$prov1_t1)
+
+n <- count(ecmo_master7,prov1_t1)
+
+graph_prov <- ggplot(ecmo_master7, aes(y=trt, color = prov1_t1_num)) + 
+  geom_boxplot()
+
+hist_prov <-ggplot(ecmo_master7, aes(x= prov1_t1_num, fill = campus, color = campus)) + 
+    geom_histogram( alpha=0.5, position="identity") +
+   labs(title="Frequency of MCS implantation as part of eCPR by primary provider ID (\"Untersucher 1\") and hospital site",x="Provider ID", y = "Count") +
+  theme_classic()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 additional chart review
 ```{r}
 #import data
@@ -1168,7 +1213,7 @@ ecmo_master7$length_of_stay2 <-difftime( ecmo_master7$discharge, ecmo_master7$ad
 ecmo_master7$length_of_stay2 <-as.numeric(ecmo_master7$length_of_stay2)
 
 n <-count(ecmo_master7, length_of_stay2)
-
+ 
 #new ICU length of stay
 ecmo_master7$ICU_length_of_stay2 <-difftime( ecmo_master7$ICU_discharge2, ecmo_master7$ICU_admission2, unit="days")
 ecmo_master7$ICU_length_of_stay2 <- as.numeric(ecmo_master7$ICU_length_of_stay2)
