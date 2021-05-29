@@ -880,22 +880,30 @@ mean(ecmo_master3$ecmo_time, na.rm=T)
 #Megans graphs
 ```{r}
 
-intervention <- ggplot(ecmo_master3, aes(x="", y= "", fill=intervention)) +
+intervention <- ggplot(ecmo_master7, aes(x="", y= "", fill=intervention)) +
   geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
   theme_void()
 intervention
 
 
-reaa <- ggplot(ecmo_master3, aes(x="", y= "", fill=rea)) +
+ecmella <- ecmo_master7 %>% filter(intervention=="ECMELLA")
+rea_ec <- ggplot(ecmella, aes(x="", y= "", fill=rea)) +
   geom_bar(stat="identity", width=1) +
   coord_polar("y", start=0) +
   theme_void()
-reaa
+rea_ec
+
+ecmo <- ecmo_master7 %>% filter(intervention=="VA-ECMO")
+rea_ecmo <- ggplot(ecmo, aes(x="", y= "", fill=rea)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  theme_void()
+rea_ecmo
 
 
-ggplot(ecmo_master3, 
-       aes(x = length_of_stay, 
+los <-ggplot(ecmo_master7, 
+       aes(x = length_of_stay2, 
            y = intervention, 
            fill = intervention)) +
   geom_density_ridges() + 
@@ -904,30 +912,30 @@ ggplot(ecmo_master3,
 
 ecmo_master3$mort_num <- ifelse(ecmo_master3$mort==T, 1, 0)
 
-table <- ecmo_master3 %>%
+table <- ecmo_master7 %>%
   group_by(intervention) %>%
   summarise(
-    len = mean(length_of_stay, na.rm=T)
+    len = mean(length_of_stay2, na.rm=T)
   )
 # Initialize ggplot with data
-f <- ggplot(
+los2 <- ggplot(
   table, aes(x = intervention, y = len)) +
-  geom_bar(stat = "identity",  fill = c("cornflowerblue", "chartreuse3", "chocolate1", "coral1", "cyan3")) +
-  labs(title = "Mean Length of Stay", 
+  geom_bar(stat = "identity",  fill = c("cornflowerblue", "chartreuse3")) +
+  labs(title = "Mean Hospital Length of Stay", 
        x = "intervention",
        y = "Length of Stay in Days")
-f
+los2
 
 
-table2 <- ecmo_master3 %>%
+table2 <- ecmo_master7 %>%
   group_by(intervention) %>%
   summarise(
-    len = mean(ICU_length_of_stay, na.rm=T)
+    len = mean(ICU_length_of_stay2, na.rm=T)
   )
 # Initialize ggplot with data
 g <- ggplot(
   table2, aes(x = intervention, y = len)) +
-  geom_bar(stat = "identity",  fill = c("cornflowerblue", "chartreuse3", "chocolate1", "coral1", "cyan3")) +
+  geom_bar(stat = "identity",  fill = c("cornflowerblue", "chartreuse3")) +
   labs(title = "Mean Length of Stay in ICU", 
        x = "intervention",
        y = "Length of Stay in ICU in Days")
@@ -1103,6 +1111,7 @@ log_mort <- glm(mort ~ trt,
 summary(log_mort)
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
+
 library(MASS)
 
 los <- glm(length_of_stay ~ trt,  family = poisson, data = ecmo_master6)
@@ -1132,7 +1141,7 @@ additional chart review
 #import data
 library(readxl)
 new_chart <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new_chart.xlsx", 
-    col_types = c("numeric", "numeric", "numeric", 
+    col_types = c("numeric", "numeric", "text", 
         "text", "date", "date", "date", "date", 
         "date"))
 View(new_chart)
@@ -1142,14 +1151,7 @@ View(new_chart)
 ecmo_master7 <- merge(ecmo_master6, new_chart[, c(1,3,4,5,6,7,8,9)], by="id", all=T)
 #campus2 is new variable containing campus for ALL patients
 #cad is new variable containing information on coronary artery disease on ALL patients
-#data variables only contain dates of missings
 
-#admission2 = new variable
-ecmo_master7 <- ecmo_master7 %>% mutate(admission2= replace(admission2,
-                                                               which((!is.na(admission) & is.na(admission2))), admission))
-
-#transform to date
-ecmo_master7$admission2 <- as.Date(ecmo_master7$admission2)
 #control 
 n <- ecmo_master7 %>% select(id, admission, admission2)
 
@@ -1161,6 +1163,114 @@ n <- ecmo_master7 %>% select(id, ecmo_ex, ecmo_explantation)
 
 n <- ecmo_master7 %>% select(id, impella_ex, impella_explantation)
 
+#new length of stay
+ecmo_master7$length_of_stay2 <-difftime( ecmo_master7$discharge, ecmo_master7$admission2, unit="days") 
+ecmo_master7$length_of_stay2 <-as.numeric(ecmo_master7$length_of_stay2)
+
+n <-count(ecmo_master7, length_of_stay2)
+
+#new ICU length of stay
+ecmo_master7$ICU_length_of_stay2 <-difftime( ecmo_master7$ICU_discharge2, ecmo_master7$ICU_admission2, unit="days")
+ecmo_master7$ICU_length_of_stay2 <- as.numeric(ecmo_master7$ICU_length_of_stay2)
+
+n <-count(ecmo_master7, ICU_length_of_stay2)
+
+
+#new ecmo time
+ecmo_master7$ecmo_time2 <- difftime(ecmo_master7$ecmo_ex, ecmo_master7$ecmo_implantation, unit="days")
+ecmo_master7$ecmo_time2 <- as.numeric(ecmo_master7$ecmo_time2)
+n <- count(ecmo_master7, ecmo_time2)
+
+#new impella time
+ecmo_master7$impella_time2 <- difftime(ecmo_master7$impella_ex, ecmo_master7$impella_implantation, unit="days")
+ecmo_master7$impella_time2 <- as.numeric(ecmo_master7$impella_time2)
+n <- count(ecmo_master7, impella_time2)
+
+#new tables
+ecmo_master7_table1 <-  table1(~ campus2 + rea + mort + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2|intervention, data= ecmo_master7)
+
+ecmo_master7_table2 <-  table1(~ cad + shockable +unshockable + ef1 + ef2|intervention, data= ecmo_master7)
+
+#cause of death 
+#import additional Chart Review
+library(readxl)
+cod <- read_excel("~/Uni/Promotion/ECMELLA/chart review/cod2.xlsx", 
+    col_types = c("numeric", "text", "text", 
+        "text", "text", "text", "numeric", 
+        "numeric", "text"))
+View(cod)
+
+cod <- rename(cod, cod4 ='...6')
+cod[,9]<- list(NULL)
+
+n <- count(cod, cod1)
+n2 <- count(cod, cod2)
+n3 <- count(cod, cod3)
+n4 <- count(cod, cod4)
+
+cod <- cod %>% mutate(hypox_brain = case_when((cod1 == "schwerer hypoxischer Hirnschaden" |
+                                               cod1 == "Hirntod" |
+                                               cod1 == "posthypoxische Enzephalopathie" |
+                                               cod1 == "mind. mittelgradig hypoxischer Hirnschaden" |
+                                               cod2 == "hypoxischer Hirnschaden" |
+                                               cod2 == "posthypoxische Enzephalopathie" |
+                                               cod2 == "schwerer hypoxischer Hirnschaden" |
+                                              cod2 == "V.a. schweren hypoxischen Hirnschaden") ~ 1))
+cod$hypox_brain[is.na(cod$hypox_brain)] <- 0
+cod$hypox_brain <- as.factor(cod$hypox_brain)
+
+
+cod <- cod %>% mutate(mof = case_when((cod1 == "Multiorganversagen" |
+                                               cod1 == "therapierefraktäres Multiorganversagen" |
+                                               cod2 == "Multiorganversagen" |
+                                               cod3 == "Multiorganversagen" |
+                                               cod4 == "Multiorganversagen") ~ 1))
+cod$mof[is.na(cod$mof)] <- 0
+cod$mof <- as.factor(cod$mof)
+
+
+cod <- cod %>% mutate(infect.inflam = case_when((cod2 == "septischer  und kardiogener Schock" |
+                                                  cod2 == "SIRS"|
+                                               cod2 == "septischer Schock" |
+                                               cod2 == "septischer und kardiogener Schock" |
+                                               cod3 == "Sepsis" |
+                                               cod3 == "pneumogene Sepsis" |
+                                               cod3 == "Pneumonie" |
+                                               cod3 == "Peritonitis mit akutem Abdomen" |
+                                              cod3 == "Covid-Pneumonie") ~ 1))
+cod$infect.inflam[is.na(cod$infect.inflam)] <- 0
+cod$infect.inflam <- as.factor(cod$infect.inflam)
+
+
+cod <- cod %>% mutate(bleed = case_when((cod1 == "hämorrhagischer Schock" |
+                                                  cod1 == "Hämorrhagischer Schock"|
+                                               cod2 == "Blutung" |
+                                               cod2 == "Koagulopathie" |
+                                               cod2 == "perioperative Blutung" |
+                                               cod2 == "pulmonale Hämorrhagie" |
+                                               cod3 == "Gerinnungsstörrung" |
+                                               cod3 == "Hämolyse" |
+                                               cod3 == "Koagulopathie" |
+                                              cod3 == "Hämolyse bei ECMO"|
+                                              cod4=="septische Koagulopathie und HIT II") ~ 1))
+cod$bleed[is.na(cod$bleed)] <- 0
+cod$bleed <- as.factor(cod$bleed)
+
+
+cod <- cod %>% mutate(cardiogenic_shock = case_when((cod1 == "kardiogener Schock" |
+                                                  cod1 == "therapierefraktärer kardiogener Schock"|
+                                               cod2 == "kardiogener Schock" |
+                                               cod2 == "septischer  und kardiogener Schock" |
+                                               cod2 == "septischer und kardiogener Schock" |
+                                               cod2 == "protrahierter kardiogener Schock") ~ 1))
+cod$cardiogenic_shock[is.na(cod$cardiogenic_shock)] <- 0
+cod$cardiogenic_shock <- as.factor(cod$cardiogenic_shock)
+
+
+ecmomaster8 <- merge(ecmo_master7, cod[, c(1,3,4,5,6,7,8,9,10,11,12,13)], by="id", all=T)
+table_death <- ecmomaster8 %>% filter(!cod1=="0.0")
+
+table1_death <- table1(~hypox_brain + mof + infect.inflam +bleed + cardiogenic_shock|intervention, data=table_death)
 
 ```
 
