@@ -1322,7 +1322,6 @@ table1_death <- table1(~hypox_brain + mof + infect.inflam +bleed + cardiogenic_s
 
 ```{r}
 #check data
-
 ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 1 &  mort == FALSE & (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1))
 
 ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, rea, rosc, rosc_num, mort, trt, ecmo, impella)
