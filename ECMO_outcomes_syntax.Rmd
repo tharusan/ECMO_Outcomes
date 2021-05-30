@@ -1232,9 +1232,9 @@ ecmo_master7$impella_time2 <- as.numeric(ecmo_master7$impella_time2)
 n <- count(ecmo_master7, impella_time2)
 
 #new tables
-ecmo_master7_table1 <-  table1(~ campus2 + rea + mort + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2|intervention, data= ecmo_master7)
+ecmo_master7_table1 <-  table1(~ campus2 + rea + mort + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 +
+                                cad + shockable +unshockable + ef1 + ef2| trt, data= ecmo_master7)
 
-ecmo_master7_table2 <-  table1(~ cad + shockable +unshockable + ef1 + ef2|intervention, data= ecmo_master7)
 
 #cause of death 
 #import additional Chart Review
