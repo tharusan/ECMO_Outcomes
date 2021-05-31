@@ -1103,7 +1103,7 @@ xtabs(~campus+trt,data= summary)
 
 
 log_mort <- glm(mort ~ trt,
-          data = ecmo_master6, family = "binomial")
+          data = ecmo_master7, family = "binomial")
 summary(log_mort)
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
@@ -1464,6 +1464,75 @@ write_xlsx(new_data2,"C:/Users/HP-EliteBook-840-G3/Desktop/new_data2.xlsx")
 #manually added to drive spreadseet
 
 ```
+
+#EF values
+
+```{r}
+library(readxl)
+id_ef_cod <- read_excel("E:/backup9/projects/ecmella_outcomes/kenny/data/data3/additional_data/ef_cod/id_ef_cod.xlsx")
+View(id_ef_cod)
+
+#create dataframe only with EF variables and cod
+id_ef_cod2 <- id_ef_cod %>% select(id, cod_main, ef_admission, ef_discharge)
+
+#make EF variables numeric
+id_ef_cod2$ef_admission2 <- as.numeric(id_ef_cod2$ef_admission)
+id_ef_cod2$ef_discharge2 <- as.numeric(id_ef_cod2$ef_discharge)
+
+#merge variables with main dataset
+ecmo_master7 <- merge(ecmo_master7, id_ef_cod2, by= "id")
+
+#create final EF variables
+ecmo_master7$trt2 <- as.factor(ecmo_master7$trt) #make trt factorial
+
+ef_bp0 <- ggplot(ecmo_master7, aes(x=trt2, y=ef_admission2, fill=trt2)) + 
+    geom_boxplot() + ylim(0, 60) +
+  labs(title = "LVEF at ICU admission", 
+       x = "va-ECMO vs. ECMELLA",
+       y = "LVEF (percent)")
+
+ef_bp1 <- ggplot(ecmo_master7, aes(x=trt2, y=ef_discharge2, fill=trt2)) + 
+    geom_boxplot()+  ylim(0, 60) +
+  labs(title = "LVEF at ICU discharge", 
+       x = "va-ECMO vs. ECMELLA",
+       y = "LVEF (percent)")
+
+eff_bp_all <- ggarrange(ef_bp0, ef_bp1,
+          ncol = 1, nrow = 2)
+
+#t test
+t.test(ef_admission2 ~ trt, data = ecmo_master7)
+t.test(ef_discharge2 ~ trt, data = ecmo_master7)
+
+#create difference between admission and discharge
+ecmo_master7 <- ecmo_master7 %>% mutate(ef_diff = ef_discharge2 - ef_admission2 )
+t.test(ef_diff ~ trt, data = ecmo_master7)
+```
+
+
+#mortality - Kaplan Meier curve
+
+```{r}
+ecmo_master7$survdays <-difftime(ecmo_master7$`Sterbezeit (0 = nicht tot)`, ecmo_master7$ecmo_implantation, unit="days")
+ecmo_master7$survdays <- as.numeric(ecmo_master7$survdays)
+
+ecmo_master7 <- ecmo_master7 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+survdays_check <- ecmo_master7 %>% select(ecmo_implantation, `Sterbezeit (0 = nicht tot)`, survdays) #check
+
+library(survival)
+library(ggfortify)
+km <- with(ecmo_master7, Surv(survdays))
+km_trt_fit <- survfit(Surv(survdays) ~ trt, data=ecmo_master7)
+autoplot(km_trt_fit)
+
+library("survminer")
+fit <- survfit(Surv(survdays) ~ trt, data = ecmo_master7)
+surv <- ggsurvplot(fit, data = ecmo_master7, pval = TRUE, risk.table = TRUE, risk.table.col = "strata",
+                   legend.labs = c("VA-ECMO", "ECMELLA"), ggtheme = theme_bw(),
+                   xlim = c(0,45), xlab = "Time in days", ylab = "Survical probability")
+```
+
 
 ```{r}
 #check data
