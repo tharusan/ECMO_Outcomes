@@ -1432,6 +1432,39 @@ confusionMatrix(tree.survived.predicted, test$mort)
 prp(tree)
 ```
 
+Find new case numbers in Kalinowsky new data
+```{r}
+#just checking we do not accidentally miss patients
+
+#import new table 
+library(readxl)
+new_data_K <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new_data_K.xlsx", 
+    col_types = c("text", "text", "text", 
+        "date", "text", "text"))
+View(new_data_K)
+
+#ecmo_master1 is data set in which all case numbers of reviewed patients are in 
+#create sub data set with only case numbers of this one and create new variable "done" to identify all reviewed patients in later merge
+
+em1 <- ecmo_master1 %>% select("Fallnumer")
+em1$done <-1
+
+#merge together
+new_data <- merge(em1, new_data_K, by.x="Fallnumer", by.y="Fallnummer", all=T)
+
+count(new_data, done)
+#apparently 18 new case_numbers that haven't been reviewed yet, all of them  after 27.04.21
+#1 case has already been reviewed but had additional procedure -> review as well
+
+new_data2 <- new_data %>% filter(is.na(done)| (Untersuchungsnummer =="21-HYHK-00362" ))
+
+#save data and import on excel sheet
+write_xlsx(new_data2,"C:/Users/HP-EliteBook-840-G3/Desktop/new_data2.xlsx")
+
+#manually added to drive spreadseet
+
+```
+
 ```{r}
 #check data
 ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 1 &  mort == FALSE & (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1))
