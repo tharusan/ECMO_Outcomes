@@ -17,8 +17,8 @@ knitr::opts_chunk$set(echo = TRUE)
 #2.5 check patients who have ROSC if they really had ROSC
 
 Chart review of final cohort (N = 93): ALWAYS create NEW Variable which can be merged into main dataset by id
-  1. All missing values of already existing variables (see Table)
-  2. Create provider variable: prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t2
+  #Done:1. All missing values of already existing variables (see Table)
+  #Done: 2. Create provider variable: prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t2
 
 5. Get ECMO and ECMELLA data for most recent patients - send request to Kalinowksy --> create a new google sheet (new tab) with exactly the same column names
 ```
