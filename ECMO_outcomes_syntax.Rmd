@@ -1355,7 +1355,6 @@ tree <- rpart(mort ~., data=train)
 tree.survived.predicted <- predict(tree, test, type="class")
 confusionMatrix(tree.survived.predicted, test$mort)
 
-
 prp(tree)
 
 ```
