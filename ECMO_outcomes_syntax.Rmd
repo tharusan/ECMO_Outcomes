@@ -1002,7 +1002,7 @@ ecmo_master6 <- ecmo_master5 %>% filter(infarct == 1)
 
 
 #create clean dataset for tables
-summary <- ecmo_master6 %>% select(id, Fallnumer, trt, campus, year, diag1, diag2, diag3, diag4, infarct, shockable, unshockable, stemi, nstemi, mi, cs, khk, khk_num, aortdiss, hi, myocarditis, lae, pul, sepsis, intox, mort, rosc_num, rea, length_of_stay, ICU_length_of_stay,  ecmo_time, impella_time, ef1, ef2)
+summary <- ecmo_master7 %>% select(id, Fallnumer, trt, campus, year, diag1, diag2, diag3, diag4, infarct, shockable, unshockable, stemi, nstemi, mi, cs, khk, khk_num, aortdiss, hi, myocarditis, lae, pul, sepsis, intox, mort, rosc_num, rea, length_of_stay, ICU_length_of_stay,  ecmo_time, impella_time, ef1, ef2)
 
 
 #table1
@@ -1110,12 +1110,12 @@ exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
 library(MASS)
 
-los <- glm(length_of_stay ~ trt,  family = poisson, data = ecmo_master6)
+los <- glm(length_of_stay ~ trt,  family = poisson, data = ecmo_master7)
 summary(los)
 exp(cbind(IRR = coef(los), confint(los)))
 
 
-iculos <- glm(ICU_length_of_stay ~ trt,  family = poisson, data = ecmo_master6)
+iculos <- glm(ICU_length_of_stay ~ trt,  family = poisson, data = ecmo_master7)
 summary(iculos)
 exp(cbind(IRR = coef(iculos), confint(iculos)))
 
@@ -1140,21 +1140,26 @@ id_provider <- read_excel("E:/backup9/projects/ecmella_outcomes/kenny/data/data3
 View(id_provider)
 
 ##clean dataset
-id_provider2 <- id_provider %>% select(id, prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t3)
+id_provider2 <- id_provider %>% select(id, prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t3, prov1)
+
+##generate provider which is combind by t1 and t2 if t1 is missing
+#id_provider2 <- id_provider2 %>% mutate(prov1 = prov1_t1)
+#id_provider2 <- id_provider2 %>% mutate(prov1 = replace(prov1_t2, which(prov1_t1 == "NA"), prov1_t2))
+#id_provider2$prov1 = ifelse(!(id_provider2$prov1_t1 == "NA"), id_provider2$prov1_t2)
 
 #merge with master datatset
 ecmo_master7 <- merge(ecmo_master6, id_provider2, by= "id")
-ecmo_master7$prov1_t1 <- as.ordered(ecmo_master7$prov1_t1)
-ecmo_master7$prov1_t1_num <- as.numeric(ecmo_master7$prov1_t1)
+ecmo_master7$prov1 <- as.ordered(ecmo_master7$prov1)
+ecmo_master7$prov1_num <- as.numeric(ecmo_master7$prov1)
 
 n <- count(ecmo_master7,prov1_t1)
 
-graph_prov <- ggplot(ecmo_master7, aes(y=trt, color = prov1_t1_num)) + 
+graph_prov <- ggplot(ecmo_master7, aes(y=trt, color = prov1_num)) + 
   geom_boxplot()
 
-hist_prov <-ggplot(ecmo_master7, aes(x= prov1_t1_num, fill = campus, color = campus)) + 
+hist_prov <-ggplot(ecmo_master7, aes(x= prov1_num, fill = campus, color = campus)) + 
     geom_histogram( alpha=0.5, position="identity") +
-   labs(title="Frequency of MCS implantation as part of eCPR by primary provider ID (\"Untersucher 1\") and hospital site",x="Provider ID", y = "Count") +
+   labs(title="Frequency of eCPR therapy by primary provider ID (\"Untersucher 1\") and hospital site",x="Provider ID (anonymized)", y = "Count") +
   theme_classic()
 ```
 
@@ -1507,6 +1512,25 @@ t.test(ef_discharge2 ~ trt, data = ecmo_master7)
 #create difference between admission and discharge
 ecmo_master7 <- ecmo_master7 %>% mutate(ef_diff = ef_discharge2 - ef_admission2 )
 t.test(ef_diff ~ trt, data = ecmo_master7)
+```
+
+#length of stay
+
+```{r}
+los_bp0 <- ggplot(ecmo_master7, aes(x=trt2, y=length_of_stay, fill=trt2)) + 
+    geom_boxplot() +
+  labs(title = "Hospital length of stay", 
+       x = "va-ECMO vs. ECMELLA",
+       y = "Hospital length of stay (days)")
+
+iculos_bp0 <- ggplot(ecmo_master7, aes(x=trt2, y=ICU_length_of_stay, fill=trt2)) + 
+    geom_boxplot() +
+  labs(title = "ICU length of stay", 
+       x = "va-ECMO vs. ECMELLA",
+       y = "ICU length of stay (days)")
+
+los_bp_all <- ggarrange(los_bp0, iculos_bp0,
+          ncol = 1, nrow = 2)
 ```
 
 
