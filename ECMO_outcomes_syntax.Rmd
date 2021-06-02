@@ -328,33 +328,63 @@ rea <- ggplot(ecmo_master3, aes(x="", y= "", fill=rea)) +
 
 #years
 
-ecmo_master3$year <- as.character(ecmo_master3$`Krankenhaus - Aufnahmezeit`)
-ecmo_master3$year <- substr(ecmo_master3$year, 1, 4)
+ecmo_master3_fig <- ecmo_master3
 
-year_ecmo <- ggplot(data = ecmo_master3, aes(x = year, y = ecmo_num, fill= campus)) +
+##drop missings
+campus_mis <- which(!complete.cases(ecmo_master3_fig2$campus))
+year_mis <- which(!complete.cases(ecmo_master3_fig$year))
+rea_mis <- which(!complete.cases(ecmo_master3_fig$rea))
+ecmo_mis <- which(!complete.cases(ecmo_master3_fig$ecmo))
+impella_mis <- which(!complete.cases(ecmo_master3_fig$impella))
+
+ecmo_master3_fig <- ecmo_master3_fig[c(-year_mis, -rea_mis), ]
+
+#-campus_mis, -ecmo_mis, -impella_mis
+
+ecmo_master3_fig$year <- as.character(ecmo_master3_fig$`Krankenhaus - Aufnahmezeit`)
+ecmo_master3_fig$year <- substr(ecmo_master3_fig$year, 1, 4)
+
+ecmo_master3_fig2$year <- as.character(ecmo_master3_fig2$`Krankenhaus - Aufnahmezeit`)
+ecmo_master3_fig2$year <- substr(ecmo_master3_fig2$year, 1, 4)
+
+year_ecmo_type <- ggplot(data = ecmo_master3_fig, aes(x = year, y = ecmo_num)) +
     geom_bar(stat="identity")
 
-year_impella <- ggplot(data = ecmo_master3, aes(x = year, y = impella_num, fill= campus)) +
+
+
+ecmo_master3_fig$rea <- factor(ecmo_master3_fig$rea, levels=c("In-hospital", "No rea", "Out-of-hospital", "unclear"), labels=c("In-hospital CA", "No CA",
+                                                                                                                               "Out-of-hospital CA",
+                                                                                                                               "Not reported"))
+label(summary$trt) <- "Type of MCS"
+
+year_ecmo_rea <- ggplot(data = ecmo_master3_fig, aes(x = year, y = ecmo_num, fill= rea)) +
+    geom_bar(stat="identity") + ylab("Frequency of ECMOs") + xlab("Year")
+
+year_impella_type <- ggplot(data = ecmo_master3_fig, aes(x = year, y = impella_num)) +
     geom_bar(stat="identity")
 
-year_ecmo_type <- ggplot(data = ecmo_master3, aes(x = year, y = ecmo_num, fill= ecmo)) +
-    geom_bar(stat="identity")
+year_impella_rea <- ggplot(data = ecmo_master3_fig, aes(x = year, y = impella_num, fill= rea)) +
+    geom_bar(stat="identity")  + ylab("Frequency of Impella devices") + xlab("Year")
 
-year_ecmo_rea <- ggplot(data = ecmo_master3, aes(x = year, y = ecmo_num, fill= rea)) +
-    geom_bar(stat="identity")
+graph <- ggarrange(year_ecmo_rea, year_impella_rea,ncol = 1, nrow = 2)
 
-year_impella_type <- ggplot(data = ecmo_master3, aes(x = year, y = impella_num, fill= impella)) +
-    geom_bar(stat="identity")
 
-year_impella_rea <- ggplot(data = ecmo_master3, aes(x = year, y = impella_num, fill= rea)) +
-    geom_bar(stat="identity")
 
-graph <- ggarrange(year_ecmo, year_ecmo_type, year_ecmo_rea, year_impella, year_impella_type, year_impella_rea,
-                    labels = c("1a. Frequency of ECMOs per hospital site", "1b. Frequency of ECMOs per ECMO type", "1c. Frequency of ECMOs per location of resuscitation",
-                               "2a. Frequency of impellas per hospital site", "2b. Frequency of impellas per impella type",
-                               "2c. Frequency of impellas per location of resuscitation"),
-          ncol = 3, nrow = 2)
+ecmo_master3_fig2 <- ecmo_master3
 
+campus_mis2 <- which(!complete.cases(ecmo_master3_fig2$campus))
+year_mis2 <- which(!complete.cases(ecmo_master3_fig2$year))
+ecmo_master3_fig2 <- ecmo_master3_fig2[c(-year_mis2, -campus_mis2), ]
+
+ecmo_master3_fig2$campus <- factor(ecmo_master3_fig2$campus, levels=c("cbf", "ccm", "cvk"), labels=c("CBF", "CCM", "CVK"))
+
+year_ecmo <- ggplot(data = ecmo_master3_fig2, aes(x = year, y = ecmo_num, fill= campus)) +
+    geom_bar(stat="identity") + ylab("Frequency of ECMOs") + xlab("Year")
+
+year_impella <- ggplot(data = ecmo_master3_fig2, aes(x = year, y = impella_num, fill= campus)) +
+    geom_bar(stat="identity") + ylab("Frequency of ECMOs") + xlab("Year")
+
+graph2 <- ggarrange(year_ecmo, year_impella, ncol = 1, nrow = 2)
 
 
 #diagnoses
@@ -1154,12 +1184,18 @@ ecmo_master7$prov1_num <- as.numeric(ecmo_master7$prov1)
 
 n <- count(ecmo_master7,prov1_t1)
 
+#just for graph
+#campprov_mis <- which(!complete.cases(ecmo_master7$campus))
+#prov_mis <- which(!complete.cases(ecmo_master7$prov1))
+#ecmo_master7_prov <- ecmo_master7[c(-prov_mis, -campprov_mis), ]
+
+
 graph_prov <- ggplot(ecmo_master7, aes(y=trt, color = prov1_num)) + 
   geom_boxplot()
 
 hist_prov <-ggplot(ecmo_master7, aes(x= prov1_num, fill = campus, color = campus)) + 
     geom_histogram( alpha=0.5, position="identity") +
-   labs(title="Frequency of eCPR therapy by primary provider ID (\"Untersucher 1\") and hospital site",x="Provider ID (anonymized)", y = "Count") +
+   labs(title="Frequency of eCPR therapy by primary provider ID and hospital site",x="Provider ID (anonymized)", y = "Count") +
   theme_classic()
 ```
 
