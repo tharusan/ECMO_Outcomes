@@ -1907,3 +1907,42 @@ ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 1 &  mort == FALSE & (
 
 ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, rea, rosc, rosc_num, mort, trt, ecmo, impella)
 ```
+
+
+
+#mort analysis
+```{r}
+library(gtools)
+ecmo_master8$age_q4 <- quantcut(ecmo_master8$age, q = 4, na.rm = TRUE) #quartile of age
+ecmo_master8$prov1_fact <- as.factor(ecmo_master8$prov1)
+
+log_mort <- glm(mort ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time,
+                data = ecmo_master8, family = "binomial")
+summary(log_mort)
+exp(cbind(OR = coef(log_mort), confint(log_mort)))
+
+
+library(MASS)
+
+los <- glm(length_of_stay ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time,  family = poisson, data = ecmo_master8)
+summary(los)
+exp(cbind(IRR = coef(los), confint(los)))
+
+
+iculos <- glm(ICU_length_of_stay ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time,  family = poisson, data = ecmo_master8)
+summary(iculos)
+exp(cbind(IRR = coef(iculos), confint(iculos)))
+
+#resuts table
+library(jtools)
+library(huxtable)
+library(officer)
+library(flextable)
+
+res_mort <- summ(log_mort, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_los <- summ(los, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+
+export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
+```
+
