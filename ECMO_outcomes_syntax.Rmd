@@ -1585,29 +1585,29 @@ lab3 <- lab2 %>% filter(!is.na(N2VALUE))
 #look how lab values are wirtten in data 
 n <- count(lab3, N2KATTEXT)
 
-#Lactate
-lac <- lab3 %>% filter(N2KATTEXT=="Lac")
-#first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
-lacb4 <- lac %>% filter(time_to_lab<0)
-
-#selecting lactate values before implantation, closest (_c) to implantation 
-lacb4 <-lacb4[order(lacb4$id, lacb4$time_to_lab2),]
-lacb4_c <- lacb4 %>% distinct(id, .keep_all = T)
-
-#selecting lactate values before implantation, highest (_h)
-lacb4_h <- lacb4[order(lacb4$id, -lacb4$N2VALUE, lacb4$time_to_lab2),]
-lacb4_h <- lacb4_h %>% distinct(id, .keep_all = T)
-
-#Lactate, after (later=l8) implantation 
-lacl8 <- lac %>% filter(time_to_lab>0)
-
-#selecting lactate values after implantation, closest (_c) to implantation 
-lacl8_c <-lacl8[order(lacl8$id, lacl8$time_to_lab2),]
-lacl8_c <- lacl8_c %>% distinct(id, .keep_all = T)
-
-#selecting lactate after before implantation, highest (_h)
-lacl8_h <- lacl8[order(lacl8$id, -lacl8$N2VALUE, lacl8$time_to_lab2),]
-lacl8_h <- lacl8_h %>% distinct(id, .keep_all = T)
+##Lactate
+  lac <- lab3 %>% filter(N2KATTEXT=="Lac")
+  #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
+  lacb4 <- lac %>% filter(time_to_lab<0)
+  
+  #selecting lactate values before implantation, closest (_c) to implantation 
+  lacb4 <-lacb4[order(lacb4$id, lacb4$time_to_lab2),]
+  lacb4_c <- lacb4 %>% distinct(id, .keep_all = T)
+  
+  #selecting lactate values before implantation, highest (_h)
+  lacb4_h <- lacb4[order(lacb4$id, -lacb4$N2VALUE, lacb4$time_to_lab2),]
+  lacb4_h <- lacb4_h %>% distinct(id, .keep_all = T)
+  
+  #Lactate, after (later=l8) implantation 
+  lacl8 <- lac %>% filter(time_to_lab>0)
+  
+  #selecting lactate values after implantation, closest (_c) to implantation 
+  lacl8_c <-lacl8[order(lacl8$id, lacl8$time_to_lab2),]
+  lacl8_c <- lacl8_c %>% distinct(id, .keep_all = T)
+  
+  #selecting lactate after implantation, highest (_h)
+  lacl8_h <- lacl8[order(lacl8$id, -lacl8$N2VALUE, lacl8$time_to_lab2),]
+  lacl8_h <- lacl8_h %>% distinct(id, .keep_all = T)
 
 
 
@@ -1621,14 +1621,82 @@ trop <- lab3 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Tro
 #CK
 ck <- lab3 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinase (CK) HP"))
 
+ #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
+  ckb4 <- ck %>% filter(time_to_lab<0)
+  
+  #selecting ck values before implantation, closest (_c) to implantation 
+  ckb4_c <-ckb4[order(ckb4$id, ckb4$time_to_lab2),]
+  ckb4_c <- ckb4_c %>% distinct(id, .keep_all = T)
+  
+  #selecting ck values before implantation, highest (_h)
+  ckb4_h <- ckb4[order(ckb4$id, -ckb4$N2VALUE),]
+  ckb4_h <- ckb4_h %>% distinct(id, .keep_all = T)
+  
+  #ck, after (later=l8) implantation 
+  ckl8 <- ck %>% filter(time_to_lab>0)
+  
+  #selecting ck values after implantation, closest (_c) to implantation 
+  ckl8_c <-ckl8[order(ckl8$id, ckl8$time_to_lab2),]
+  ckl8_c <- ckl8_c %>% distinct(id, .keep_all = T)
+  
+  #selecting ck after implantation, highest (_h)
+  ckl8_h <- ckl8[order(ckl8$id, -ckl8$N2VALUE, ckl8$time_to_lab2),]
+  ckl8_h <- ckl8_h %>% distinct(id, .keep_all = T)
+
+
+
 
 #CK-MB
 ckmb <- lab3 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
 
+  #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
+  ckmbb4 <- ckmb %>% filter(time_to_lab<0)
+  
+  #selecting ck-mb values before implantation, closest (_c) to implantation 
+  ckmbb4_c <-ckmbb4[order(ckmbb4$id, ckmbb4$time_to_lab2),]
+  ckmbb4_c <- ckmbb4_c %>% distinct(id, .keep_all = T)
+  
+  #selecting ck-mb values before implantation, highest (_h)
+  ckmbb4_h <- ckmbb4[order(ckmbb4$id, -ckmbb4$N2VALUE, ckmbb4$time_to_lab2),]
+  ckmbb4_h <- ckmbb4_h %>% distinct(id, .keep_all = T)
+  
+  #ck-mb, after (later=l8) implantation 
+  ckmbl8 <- ckmb %>% filter(time_to_lab>0)
+  
+  #selecting ck-mb values after implantation, closest (_c) to implantation 
+  ckmbl8_c <-ckmbl8[order(ckmbl8$id, ckmbl8$time_to_lab2),]
+  ckmbl8_c <- ckmbl8_c %>% distinct(id, .keep_all = T)
+  
+  #selecting lactate after implantation, highest (_h)
+  ckmbl8_h <- ckmbl8[order(ckmbl8$id, -ckmbl8$N2VALUE, ckmbl8$time_to_lab2),]
+  ckmbl8_h <- ckmbl8_h %>% distinct(id, .keep_all = T)
+  
+
 #pH
-ph <- lab3 %>% filter(N2KATTEXT=="pH")
-
-
+  ph <- lab3 %>% filter(N2KATTEXT=="pH")
+  
+  #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
+  phb4 <- ph %>% filter(time_to_lab<0)
+  
+  #selecting ph values before implantation, closest (_c) to implantation 
+  phb4_c <-phb4[order(phb4$id, phb4$time_to_lab2),]
+  phb4_c <- phb4_c %>% distinct(id, .keep_all = T)
+  
+  #selecting ph values before implantation, lowest (_l)
+  phb4_l <- phb4[order(phb4$id, phb4$N2VALUE, phb4$time_to_lab2),]
+  phb4_l <- phb4_l %>% distinct(id, .keep_all = T)
+  
+  #ph, after (later=l8) implantation 
+  phl8 <- ph %>% filter(time_to_lab>0)
+  
+  #selecting ph values after implantation, closest (_c) to implantation 
+  phl8_c <-phl8[order(phl8$id, phl8$time_to_lab2),]
+  phl8_c <- phl8_c %>% distinct(id, .keep_all = T)
+  
+  #selecting ph after implantation, lowest (_l)
+  phl8_l <- phl8[order(phl8$id, phl8$N2VALUE, phl8$time_to_lab2),]
+  phl8_l <- phl8_l %>% distinct(id, .keep_all = T)
+  
 
 
 ```
@@ -1673,8 +1741,64 @@ weightc6$casenumber <-as.numeric(weightc6$casenumber)
 weightc6$val <- as.numeric(weightc6$val)
 weightc6$DateTimeTo <- as.POSIXct(weightc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
 
+#weight c5
+  #merge so that there is ecmo implantation date 
+  weightc5.2 <- merge(weightc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+  #create difftime 
+  weightc5.2$time_to_weight <- difftime(weightc5.2$Datum_wann, weightc5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  weightc5.2$time_to_weight2 <- abs(weightc5.2$time_to_weight)
+  #order so that the value the clostest to implantation date gets chosen 
+  weightc5.2 <- weightc5.2[order(weightc5.2$id, weightc5.2$time_to_weight2),]
+  weightc5.3 <- weightc5.2 %>% distinct(id, .keep_all = T)
+
+#height c5
+  
+   #merge so that there is ecmo implantation date 
+  heightc5.2 <- merge(heightc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+  #create difftime 
+  heightc5.2$time_to_height <- difftime(heightc5.2$Datum_wann, heightc5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  heightc5.2$time_to_height2 <- abs(heightc5.2$time_to_height)
+  #order so that the value the clostest to implantation date gets chosen 
+  heightc5.2 <- heightc5.2[order(heightc5.2$id, heightc5.2$time_to_height2),]
+  heightc5.3 <- heightc5.2 %>% distinct(id, .keep_all = T)
+  
+  
+#weight c6
+  #merge so that there is ecmo implantation date 
+  weightc6.2 <- merge(weightc6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnumer", all=F)
+  #create difftime 
+  weightc6.2$time_to_weight <- difftime(weightc6.2$DateTimeTo, weightc6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  weightc6.2$time_to_weight2 <- abs(weightc6.2$time_to_weight)
+  #order so that the value the clostest to implantation date gets chosen 
+  weightc6.2 <- weightc6.2[order(weightc6.2$id, weightc6.2$time_to_weight2),]
+  weightc6.3 <- weightc6.2 %>% distinct(id, .keep_all = T)
 
 
+#height c6 
+  #merge so that there is ecmo implantation date 
+  heightc6.2 <- merge(heightc6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnumer", all=F)
+  #create difftime 
+  heightc6.2$time_to_height <- difftime(heightc6.2$DateTimeTo, heightc6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  heightc6.2$time_to_height2 <- abs(heightc6.2$time_to_height)
+  #order so that the value the clostest to implantation date gets chosen 
+  heightc6.2 <- heightc6.2[order(heightc6.2$id, heightc6.2$time_to_height2),]
+  heightc6.3 <- heightc6.2 %>% distinct(id, .keep_all = T)
+
+#merge eight from 5 &6
+height <-merge(heightc5.3[,c(1,4,7,10)], heightc6.3[,c(1,4,6,9)], by="id", all=T)
+
+#keep value that is closer to implantation time
+height$height <- ifelse(is.na(height$time_to_height2.x), height$val, ifelse(is.na(height$time_to_height2.y), height$vFloat, ifelse(height$time_to_height2.x < height$time_to_height2.y, height$vFloat, height$val)))
+
+#merge weight from 5&6
+weight <- merge(weightc5.3[,c(1,4,7,10)], weightc6.3[,c(1,4,6,9)], by="id", all=T)
+
+#keep value that is closer to implantation time
+weight$weight <- ifelse(is.na(weight$time_to_weight2.x), weight$val, ifelse(is.na(weight$time_to_weight2.y), weight$vFloat, ifelse(weight$time_to_weight2.x < weight$time_to_weight2.y, weight$vFloat, weight$val)))
 
 
 ```
