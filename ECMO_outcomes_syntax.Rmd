@@ -1213,7 +1213,7 @@ View(new_chart)
 
 
 #merge new data frame with existing
-ecmo_master7 <- merge(ecmo_master6, new_chart[, c(1,3,4,5,6,7,8,9)], by="id", all=T)
+ecmo_master7 <- merge(ecmo_master7, new_chart[, c(1,3,4,5,6,7,8,9)], by="id", all=T)
 #campus2 is new variable containing campus for ALL patients
 #cad is new variable containing information on coronary artery disease on ALL patients
 
@@ -1260,88 +1260,6 @@ ecmo_master7_table1 <-  table1(~ campus2 + rea + mort + length_of_stay2 + ICU_le
 
 
 
-
-
-
-#cause of death 
-#import additional Chart Review
-library(readxl)
-cod <- read_excel("~/Uni/Promotion/ECMELLA/chart review/cod2.xlsx", 
-    col_types = c("numeric", "text", "text", 
-        "text", "text", "text", "numeric", 
-        "numeric", "text"))
-View(cod)
-
-cod <- rename(cod, cod4 ='...6')
-cod[,9]<- list(NULL)
-
-n <- count(cod, cod1)
-n2 <- count(cod, cod2)
-n3 <- count(cod, cod3)
-n4 <- count(cod, cod4)
-
-cod <- cod %>% mutate(hypox_brain = case_when((cod1 == "schwerer hypoxischer Hirnschaden" |
-                                               cod1 == "Hirntod" |
-                                               cod1 == "posthypoxische Enzephalopathie" |
-                                               cod1 == "mind. mittelgradig hypoxischer Hirnschaden" |
-                                               cod2 == "hypoxischer Hirnschaden" |
-                                               cod2 == "posthypoxische Enzephalopathie" |
-                                               cod2 == "schwerer hypoxischer Hirnschaden" |
-                                              cod2 == "V.a. schweren hypoxischen Hirnschaden") ~ 1))
-cod$hypox_brain[is.na(cod$hypox_brain)] <- 0
-cod$hypox_brain <- as.factor(cod$hypox_brain)
-
-
-cod <- cod %>% mutate(mof = case_when((cod1 == "Multiorganversagen" |
-                                               cod1 == "therapierefraktäres Multiorganversagen" |
-                                               cod2 == "Multiorganversagen" |
-                                               cod3 == "Multiorganversagen" |
-                                               cod4 == "Multiorganversagen") ~ 1))
-cod$mof[is.na(cod$mof)] <- 0
-cod$mof <- as.factor(cod$mof)
-
-
-cod <- cod %>% mutate(infect.inflam = case_when((cod2 == "septischer  und kardiogener Schock" |
-                                                  cod2 == "SIRS"|
-                                               cod2 == "septischer Schock" |
-                                               cod2 == "septischer und kardiogener Schock" |
-                                               cod3 == "Sepsis" |
-                                               cod3 == "pneumogene Sepsis" |
-                                               cod3 == "Pneumonie" |
-                                               cod3 == "Peritonitis mit akutem Abdomen" |
-                                              cod3 == "Covid-Pneumonie") ~ 1))
-cod$infect.inflam[is.na(cod$infect.inflam)] <- 0
-cod$infect.inflam <- as.factor(cod$infect.inflam)
-
-
-cod <- cod %>% mutate(bleed = case_when((cod1 == "hämorrhagischer Schock" |
-                                                  cod1 == "Hämorrhagischer Schock"|
-                                               cod2 == "Blutung" |
-                                               cod2 == "Koagulopathie" |
-                                               cod2 == "perioperative Blutung" |
-                                               cod2 == "pulmonale Hämorrhagie" |
-                                               cod3 == "Gerinnungsstörrung" |
-                                               cod3 == "Hämolyse" |
-                                               cod3 == "Koagulopathie" |
-                                              cod3 == "Hämolyse bei ECMO"|
-                                              cod4=="septische Koagulopathie und HIT II") ~ 1))
-cod$bleed[is.na(cod$bleed)] <- 0
-cod$bleed <- as.factor(cod$bleed)
-
-
-cod <- cod %>% mutate(cardiogenic_shock = case_when((cod1 == "kardiogener Schock" |
-                                                  cod1 == "therapierefraktärer kardiogener Schock"|
-                                               cod2 == "kardiogener Schock" |
-                                               cod2 == "septischer  und kardiogener Schock" |
-                                               cod2 == "septischer und kardiogener Schock" |
-                                               cod2 == "protrahierter kardiogener Schock") ~ 1))
-cod$cardiogenic_shock[is.na(cod$cardiogenic_shock)] <- 0
-
-ecmomaster8 <- merge(ecmo_master7, cod[, c(1,3,4,5,6,7,8,9,10,11,12,13)], by="id", all=T)
-table_death <- ecmomaster8 %>% filter(!cod1=="0.0")
-
-table1_death <- table1(~hypox_brain + mof + infect.inflam +bleed + cardiogenic_shock|intervention, data=table_death)
-
 ```
 
 
@@ -1351,10 +1269,10 @@ table1_death <- table1(~hypox_brain + mof + infect.inflam +bleed + cardiogenic_s
 #cause of death 
 #import additional Chart Review
 library(readxl)
-cod <- read_excel("~/Uni/Promotion/ECMELLA/chart review/cod2.xlsx", 
-    col_types = c("numeric", "text", "text", 
-        "text", "text", "text", "numeric", 
-        "numeric", "text"))
+cod <- read_excel("~/Uni/Promotion/ECMELLA/chart review/cod.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "text", "text", "text", "text", "numeric", 
+        "numeric", "skip"))
 View(cod)
 
 cod <- rename(cod, cod4 ='...6')
@@ -1429,6 +1347,7 @@ table_death <- ecmomaster8 %>% filter(!cod1=="0.0")
 
 table1_death <- table1(~hypox_brain + mof + infect.inflam +bleed + cardiogenic_shock|intervention, data=table_death)
 
+
 ```
 
 
@@ -1472,6 +1391,11 @@ confusionMatrix(tree.survived.predicted, test$mort)
 
 prp(tree)
 ```
+
+
+
+
+
 
 Find new case numbers in Kalinowsky new data
 ```{r}
@@ -1593,6 +1517,29 @@ surv <- ggsurvplot(fit, data = ecmo_master7, pval = TRUE, risk.table = TRUE, ris
                    xlim = c(0,45), xlab = "Time in days", ylab = "Survical probability")
 ```
 
+Sebastians Data
+
+```{r}
+#Gender and Age
+
+library(readxl)
+demographics <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_sap.xlsx", 
+    sheet = "demographics", col_types = c("numeric", 
+        "text", "text"))
+View(demographics)
+
+
+demographics$GBDAT <- as.Date(demographics$GBDAT, format="%Y%m%d")
+
+ecmo_master8 <- merge(ecmo_master7, demographics, by.x="Fallnumer", by.y="FALNR")
+
+ecmo_master8$age <- difftime(ecmo_master8$admission2, ecmo_master8$GBDAT, unit="days")
+ecmo_master8$age <- ecmo_master8$age/365
+ecmo_master8$age <- substr(ecmo_master8$age, 1,2)
+
+n <- count(ecmo_master8, age)
+
+```
 
 ```{r}
 #check data
