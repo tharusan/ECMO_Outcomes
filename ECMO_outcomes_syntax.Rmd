@@ -1517,7 +1517,7 @@ surv <- ggsurvplot(fit, data = ecmo_master7, pval = TRUE, risk.table = TRUE, ris
                    xlim = c(0,45), xlab = "Time in days", ylab = "Survical probability")
 ```
 
-Sebastians Data
+#Sebastians Data
 
 ```{r}
 #Gender and Age
@@ -1537,11 +1537,13 @@ ecmo_master8 <- merge(ecmo_master7, demographics, by.x="Fallnumer", by.y="FALNR"
 ecmo_master8$age <- difftime(ecmo_master8$admission2, ecmo_master8$GBDAT, unit="days")
 ecmo_master8$age <- ecmo_master8$age/365
 ecmo_master8$age <- substr(ecmo_master8$age, 1,2)
+ecmo_master8$age <-as.numeric(ecmo_master8$age)
 
 n <- count(ecmo_master8, age)
 
 ```
-lab values
+
+#lab values
 ```{r}
 library(readxl)
 lab <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_sap.xlsx", 
@@ -1552,32 +1554,62 @@ View(lab)
 
 lab$N2LADATUM <- as.Date(lab$N2LADATUM, format="%Y%m%d")
 
-lab$time<- as.POSIXlt.character(lab$N2LATIME, format="%H%M%S")
+#transform time from character into fitting format
+lab$time<- as.POSIXlt.character(lab$N2LATIME, format="%H%M%S") #this for some reason automatically adds the date of today -> I get rid of that in the next step
 lab$time <- substr(lab$time, 11, 19)
+n <- lab %>% select(N2LATIME, time)#I made sure this wouldnt change the time 
 
 
-#put date and time together
-lab$datetime <- as.POSIXct(paste(lab$N2LADATUM, lab$time), format="%Y-%m-%d %H:%M:%S")
+#put date and time together into one variable 
+lab$datetime <- as.POSIXct(paste(lab$N2LADATUM, lab$time),  tz = "UTC", format="%Y-%m-%d %H:%M:%S")
 
-#merge with ecmo implanation date
+
+#merge with ecmo implantation date
 lab2 <- merge(lab, ecmo_master8[,c(1,2,9)], by.x="N2LAFALNR", by.y="Fallnumer", all=T)
 
-#time difference from ecmo implamtation to lab value
-lab2$time_to_lab <- difftime(lab2$datetime, lab2$`ECMO wann eingebaut?`)
+#mutate both variables, so that timezone and format are identical -> this way there should be no more mistakes in difftime
+lab2 <- lab2 %>% 
+  mutate_at(c("ECMO wann eingebaut?", "datetime"), as.POSIXct, format = "%Y-%m-%d %H:%M:%S")
 
-#absolute values
+#time difference from ecmo implamtation to lab value
+lab2$time_to_lab <- difftime(lab2$datetime, lab2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+lab2$time_to_lab <- as.numeric(lab2$time_to_lab)
+#all negative values are before, all positive after ecmo implantation
+
+#absolute values just in case its needed
 lab2$time_to_lab2 <-abs(lab2$time_to_lab)
 
-#exclude missings
+#exclude missings 
 lab3 <- lab2 %>% filter(!is.na(N2VALUE))
 
-
+#look how lab values are wirtten in data 
 n <- count(lab3, N2KATTEXT)
 
 #Lactate
 lac <- lab3 %>% filter(N2KATTEXT=="Lac")
-lac <- lac[order(lac$id, lac$time_to_lab),]
-lac_c<- lac %>% distinct(id, .keep_all = T)
+#first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
+lacb4 <- lac %>% filter(time_to_lab<0)
+
+#selecting lactate values before implantation, closest (_c) to implantation 
+lacb4 <-lacb4[order(lacb4$id, lacb4$time_to_lab2),]
+lacb4_c <- lacb4 %>% distinct(id, .keep_all = T)
+
+#selecting lactate values before implantation, highest (_h)
+lacb4_h <- lacb4[order(lacb4$id, -lacb4$N2VALUE, lacb4$time_to_lab2),]
+lacb4_h <- lacb4_h %>% distinct(id, .keep_all = T)
+
+#Lactate, after (later=l8) implantation 
+lacl8 <- lac %>% filter(time_to_lab>0)
+
+#selecting lactate values after implantation, closest (_c) to implantation 
+lacl8_c <-lacl8[order(lacl8$id, lacl8$time_to_lab2),]
+lacl8_c <- lacl8_c %>% distinct(id, .keep_all = T)
+
+#selecting lactate after before implantation, highest (_h)
+lacl8_h <- lacl8[order(lacl8$id, -lacl8$N2VALUE, lacl8$time_to_lab2),]
+lacl8_h <- lacl8_h %>% distinct(id, .keep_all = T)
+
+
 
 #Creatinine
 crea <- lab3 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaffé)", "Kreatinin (Jaffé) HP"))
@@ -1601,7 +1633,7 @@ ph <- lab3 %>% filter(N2KATTEXT=="pH")
 
 ```
 
-height&weight 
+#height&weight 
 ```{r}
 
 library(readxl)
@@ -1647,6 +1679,98 @@ weightc6$DateTimeTo <- as.POSIXct(weightc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S
 
 ```
 
+#Scores
+```{r}
+library(readxl)
+apachec5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "apache2")
+View(apachec5)
+
+apachec5$FALLNR <-as.numeric(apachec5$FALLNR)
+apachec5$Gesamtscore <- as.numeric(apachec5$Gesamtscore)
+apachec5$Datum_wann <- as.POSIXct(apachec5$Datum_wann, format="%Y-%m-%d %H:%M:%S")
+
+library(readxl)
+sapsc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "saps2")
+View(sapsc5)
+
+sapsc5$FALLNR <-as.numeric(sapsc5$FALLNR)
+sapsc5$Gesamtscore <- as.numeric(sapsc5$Gesamtscore)
+sapsc5$Datum_wann <- as.POSIXct(sapsc5$Datum_wann, format="%Y-%m-%d %H:%M:%S")
+
+
+library(readxl)
+tiss28c5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "tiss28")
+View(tiss28c5)
+
+tiss28c5$FALLNR <-as.numeric(tiss28c5$FALLNR)
+tiss28c5$Gesamtscore <- as.numeric(tiss28c5$Gesamtscore)
+tiss28c5$Datum_wann <- as.POSIXct(tiss28c5$Datum_wann, format="%Y-%m-%d %H:%M:%S")
+
+
+library(readxl)
+gcsc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "gcs")
+View(gcsc5)
+
+gcsc5$FALLNR <-as.numeric(gcsc5$FALLNR)
+gcsc5$Gesamtscore <- as.numeric(gcsc5$Gesamtscore)
+gcsc5$Datum_wann <- as.POSIXct(gcsc5$Datum_wann, format="%Y-%m-%d %H:%M:%S")
+
+
+
+library(readxl)
+tiss10c6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
+    sheet = "TISS10")
+View(tiss10c6)
+
+tiss10c6$casenumber <-as.numeric(tiss10c6$casenumber)
+tiss10c6$val <- as.numeric(tiss10c6$val)
+tiss10c6$DateTimeTo <- as.POSIXct(tiss10c6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+
+library(readxl)
+gcsc6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
+    sheet = "GCS")
+View(gcsc6)
+
+gcsc6$casenumber <-as.numeric(gcsc6$casenumber)
+gcsc6$val <- as.numeric(gcsc6$val)
+gcsc6$DateTimeTo <- as.POSIXct(gcsc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+
+library(readxl)
+apachec6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
+    sheet = "APACHEII")
+View(apachec6)
+
+apachec6$casenumber <-as.numeric(apachec6$casenumber)
+apachec6$val <- as.numeric(apachec6$val)
+apachec6$DateTimeTo <- as.POSIXct(apachec6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+
+
+
+
+
+```
+
+#Vitals
+
+```{r}
+
+library(readxl)
+hfc6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
+    sheet = "VitalHF")
+View(hfc6)
+
+hfc6$casenumber <-as.numeric(hfc6$casenumber)
+hfc6$val <- as.numeric(hfc6$val)
+hfc6$DateTimeTo <- as.POSIXct(hfc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+```
 
 
 ```{r}
