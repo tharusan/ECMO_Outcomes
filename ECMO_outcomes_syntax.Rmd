@@ -1533,6 +1533,7 @@ demographics$GBDAT <- as.Date(demographics$GBDAT, format="%Y%m%d")
 
 ecmo_master8 <- merge(ecmo_master7, demographics, by.x="Fallnumer", by.y="FALNR")
 
+
 ecmo_master8$age <- difftime(ecmo_master8$admission2, ecmo_master8$GBDAT, unit="days")
 ecmo_master8$age <- ecmo_master8$age/365
 ecmo_master8$age <- substr(ecmo_master8$age, 1,2)
@@ -1540,6 +1541,113 @@ ecmo_master8$age <- substr(ecmo_master8$age, 1,2)
 n <- count(ecmo_master8, age)
 
 ```
+lab values
+```{r}
+library(readxl)
+lab <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_sap.xlsx", 
+    sheet = "labvalues", col_types = c("numeric", 
+        "text", "text", "text", "text", "numeric", 
+        "text", "text"))
+View(lab)
+
+lab$N2LADATUM <- as.Date(lab$N2LADATUM, format="%Y%m%d")
+
+lab$time<- as.POSIXlt.character(lab$N2LATIME, format="%H%M%S")
+lab$time <- substr(lab$time, 11, 19)
+
+
+#put date and time together
+lab$datetime <- as.POSIXct(paste(lab$N2LADATUM, lab$time), format="%Y-%m-%d %H:%M:%S")
+
+#merge with ecmo implanation date
+lab2 <- merge(lab, ecmo_master8[,c(1,2,9)], by.x="N2LAFALNR", by.y="Fallnumer", all=T)
+
+#time difference from ecmo implamtation to lab value
+lab2$time_to_lab <- difftime(lab2$datetime, lab2$`ECMO wann eingebaut?`)
+
+#absolute values
+lab2$time_to_lab2 <-abs(lab2$time_to_lab)
+
+#exclude missings
+lab3 <- lab2 %>% filter(!is.na(N2VALUE))
+
+
+n <- count(lab3, N2KATTEXT)
+
+#Lactate
+lac <- lab3 %>% filter(N2KATTEXT=="Lac")
+lac <- lac[order(lac$id, lac$time_to_lab),]
+lac_c<- lac %>% distinct(id, .keep_all = T)
+
+#Creatinine
+crea <- lab3 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaffé)", "Kreatinin (Jaffé) HP"))
+
+
+#Troponin 
+trop <- lab3 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Troponin T hs"))
+
+#CK
+ck <- lab3 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinase (CK) HP"))
+
+
+#CK-MB
+ckmb <- lab3 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
+
+#pH
+ph <- lab3 %>% filter(N2KATTEXT=="pH")
+
+
+
+
+```
+
+height&weight 
+```{r}
+
+library(readxl)
+weightc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "weight")
+View(weightc5)
+
+weightc5$vFloat <-as.numeric(weightc5$vFloat)
+weightc5$FALLNR <- as.numeric(weightc5$FALLNR)
+weightc5$Datum_wann <- as.POSIXct(weightc5$Datum_wann, format="%Y-%m-%d %H:%M:%S")
+
+
+library(readxl)
+heightc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "height")
+View(heightc5)
+
+heightc5$vFloat <-as.numeric(heightc5$vFloat)
+heightc5$FALLNR <- as.numeric(heightc5$FALLNR)
+heightc5$Datum_wann <- as.POSIXct(heightc5$Datum_wann, format="%Y-%m-%d %H:%M:%S")
+
+library(readxl)
+heightc6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
+    sheet = "Height")
+View(heightc6)
+
+heightc6$casenumber <-as.numeric(heightc6$casenumber)
+heightc6$val <- as.numeric(heightc6$val)
+heightc6$DateTimeTo <- as.POSIXct(heightc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+library(readxl)
+weightc6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
+    sheet = "Weight")
+View(weightc6)
+
+weightc6$casenumber <-as.numeric(weightc6$casenumber)
+weightc6$val <- as.numeric(weightc6$val)
+weightc6$DateTimeTo <- as.POSIXct(weightc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+
+
+
+
+```
+
+
 
 ```{r}
 #check data
