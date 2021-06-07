@@ -1788,17 +1788,21 @@ weightc6$DateTimeTo <- as.POSIXct(weightc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S
   heightc6.2 <- heightc6.2[order(heightc6.2$id, heightc6.2$time_to_height2),]
   heightc6.3 <- heightc6.2 %>% distinct(id, .keep_all = T)
 
-#merge eight from 5 &6
+#merge height from 5 &6
 height <-merge(heightc5.3[,c(1,4,7,10)], heightc6.3[,c(1,4,6,9)], by="id", all=T)
 
 #keep value that is closer to implantation time
-height$height <- ifelse(is.na(height$time_to_height2.x), height$val, ifelse(is.na(height$time_to_height2.y), height$vFloat, ifelse(height$time_to_height2.x < height$time_to_height2.y, height$vFloat, height$val)))
+height$height <- ifelse(is.na(height$time_to_height2.x), height$val, 
+                        ifelse(is.na(height$time_to_height2.y), height$vFloat, 
+                               ifelse(height$time_to_height2.x < height$time_to_height2.y, height$vFloat, height$val)))
 
 #merge weight from 5&6
 weight <- merge(weightc5.3[,c(1,4,7,10)], weightc6.3[,c(1,4,6,9)], by="id", all=T)
 
 #keep value that is closer to implantation time
-weight$weight <- ifelse(is.na(weight$time_to_weight2.x), weight$val, ifelse(is.na(weight$time_to_weight2.y), weight$vFloat, ifelse(weight$time_to_weight2.x < weight$time_to_weight2.y, weight$vFloat, weight$val)))
+weight$weight <- ifelse(is.na(weight$time_to_weight2.x), weight$val, 
+                        ifelse(is.na(weight$time_to_weight2.y), weight$vFloat, 
+                               ifelse(weight$time_to_weight2.x < weight$time_to_weight2.y, weight$vFloat, weight$val)))
 
 
 ```
