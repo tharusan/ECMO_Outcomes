@@ -1605,10 +1605,14 @@ n <- count(lab3, N2KATTEXT)
   lacl8_c <-lacl8[order(lacl8$id, lacl8$time_to_lab2),]
   lacl8_c <- lacl8_c %>% distinct(id, .keep_all = T)
   
+    lacl8_c <- lacl8_c %>% dplyr::rename(lacl8_c ="N2VALUE")
+
+  
   #selecting lactate after implantation, highest (_h)
   lacl8_h <- lacl8[order(lacl8$id, -lacl8$N2VALUE, lacl8$time_to_lab2),]
   lacl8_h <- lacl8_h %>% distinct(id, .keep_all = T)
 
+  lacl8_h <- lacl8_h %>% dplyr::rename(lacl8_h ="N2VALUE")
 
 
 #Creatinine
@@ -1639,11 +1643,15 @@ ck <- lab3 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinas
   ckl8_c <-ckl8[order(ckl8$id, ckl8$time_to_lab2),]
   ckl8_c <- ckl8_c %>% distinct(id, .keep_all = T)
   
+    ckl8_c <- ckl8_c %>% dplyr::rename(ckl8_c ="N2VALUE")
+
+  
+  
   #selecting ck after implantation, highest (_h)
   ckl8_h <- ckl8[order(ckl8$id, -ckl8$N2VALUE, ckl8$time_to_lab2),]
   ckl8_h <- ckl8_h %>% distinct(id, .keep_all = T)
 
-
+  ckl8_h <- ckl8_h %>% dplyr::rename(ckl8_h ="N2VALUE")
 
 
 #CK-MB
@@ -1667,10 +1675,13 @@ ckmb <- lab3 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   ckmbl8_c <-ckmbl8[order(ckmbl8$id, ckmbl8$time_to_lab2),]
   ckmbl8_c <- ckmbl8_c %>% distinct(id, .keep_all = T)
   
+  ckmbl8_c <- ckmbl8_c %>% dplyr::rename(ckmbl8_c ="N2VALUE")
+  
   #selecting lactate after implantation, highest (_h)
   ckmbl8_h <- ckmbl8[order(ckmbl8$id, -ckmbl8$N2VALUE, ckmbl8$time_to_lab2),]
   ckmbl8_h <- ckmbl8_h %>% distinct(id, .keep_all = T)
   
+  ckmbl8_h <- ckmbl8_h %>% dplyr::rename(ckmbl8_h ="N2VALUE")
 
 #pH
   ph <- lab3 %>% filter(N2KATTEXT=="pH")
@@ -1692,11 +1703,14 @@ ckmb <- lab3 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   #selecting ph values after implantation, closest (_c) to implantation 
   phl8_c <-phl8[order(phl8$id, phl8$time_to_lab2),]
   phl8_c <- phl8_c %>% distinct(id, .keep_all = T)
+
+  phl8_c <- phl8_c %>% dplyr::rename(phl8_c ="N2VALUE")
   
   #selecting ph after implantation, lowest (_l)
   phl8_l <- phl8[order(phl8$id, phl8$N2VALUE, phl8$time_to_lab2),]
   phl8_l <- phl8_l %>% distinct(id, .keep_all = T)
   
+phl8_l <- phl8_l %>% dplyr::rename(phl8_l ="N2VALUE") #umbennen
 
 
 ```
@@ -1806,6 +1820,22 @@ weight$weight <- ifelse(is.na(weight$time_to_weight2.x), weight$val,
 
 
 ```
+
+#merge to see where missings are
+```{r}
+ecmo_missings <- Reduce(
+  function(ecmo_master8, height) merge(ecmo_master8, height, by="id", all=T),
+  list(ecmo_master8, height[,c(1,8)], weight[,c(1,8)], phl8_c[,c(6,11)], phl8_l[,c(6,11)], lacl8_c[,c(6,11)], lacl8_h[,c(6,11)], ckl8_c[,c(6,11)], ckl8_h[,c(6,11)], ckmbl8_c[,c(6,11)], ckmbl8_h[,c(6,11)])
+)
+)
+
+ecmo_missings2 <- ecmo_missings %>% select(Fallnumer, id, `ECMO wann eingebaut?`, age, GSCHL, height, weight, phl8_c, phl8_l, lacl8_c, lacl8_h, ckl8_c, ckl8_h, ckmbl8_c, ckmbl8_h)
+
+write_xlsx(ecmo_missings2,"C:/Users/HP-EliteBook-840-G3/Desktop/ecmo_missings2.xlsx")
+
+```
+
+
 
 #Scores
 ```{r}
