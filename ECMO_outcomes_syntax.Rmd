@@ -1940,26 +1940,72 @@ ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, r
 
 
 
+#import chart review age, sex, weight, height, lab values
+
+```{r}
+#downloaded clean sheet from Gooogle sheets - imported age and lab values as numeric
+library(readxl)
+id_bmi_sex_lab1 <- read_excel("E:/backup9/projects/ecmella_outcomes/kenny/data/data3/additional_data/bmi_sex_lab/id_bmi_sex_lab1.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "numeric", "text", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric"))
+View(id_bmi_sex_lab1)
+
+#clean dataset
+id_bmi_sex_lab2 <- id_bmi_sex_lab1 %>% select(id, age, GSCHL, height, weight, phl8_c,  phl8_l, lacl8_c,  lacl8_h, ckl8_c,  ckl8_h, ckmbl8_c,ckmbl8_h)
+id_bmi_sex_lab2 <- rename(id_bmi_sex_lab2, age_chart = age)
+id_bmi_sex_lab2 <- rename(id_bmi_sex_lab2, sex_chart = GSCHL)
+id_bmi_sex_lab2 <- rename(id_bmi_sex_lab2, height_chart = height)
+id_bmi_sex_lab2 <- rename(id_bmi_sex_lab2, weight_chart = weight)
+
+#create bmi variable
+
+id_bmi_sex_lab2 <- id_bmi_sex_lab2 %>% mutate(bmi = weight_chart / ((height_chart/100) * (height_chart/100)))
+
+#merge with master dataset
+
+ecmo_master9 <- merge(ecmo_master8, id_bmi_sex_lab2, by= "id")
+
+```
+
+
 #mort analysis
 ```{r}
 library(gtools)
-ecmo_master8$age_q4 <- quantcut(ecmo_master8$age, q = 4, na.rm = TRUE) #quartile of age
-ecmo_master8$prov1_fact <- as.factor(ecmo_master8$prov1)
+ecmo_master9$age_q4 <- quantcut(ecmo_master9$age, q = 4, na.rm = TRUE) #quartile of age
+ecmo_master9$prov1_fact <- as.factor(ecmo_master9$prov1)
+ecmo_master9$bmi_q4 <- quantcut(ecmo_master9$bmi, q = 4, na.rm = TRUE) #quartile of bmi
+ecmo_master9$lac_q4 <- quantcut(ecmo_master9$lacl8_c, q = 4, na.rm = TRUE) #quartile of lactate closest after
+ecmo_master9$ph_q4 <- quantcut(ecmo_master9$phl8_c, q = 4, na.rm = TRUE) #quartile of pH closest after
 
-log_mort <- glm(mort ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time,
-                data = ecmo_master8, family = "binomial")
+#create survival duration variable
+
+ecmo_master9$survdays <-difftime(ecmo_master9$`Sterbezeit (0 = nicht tot)`, ecmo_master9$ecmo_implantation, unit="days")
+ecmo_master9$survdays <- as.numeric(ecmo_master9$survdays)
+ecmo_master9 <- ecmo_master9 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+
+log_mort <- glm(mort ~ trt + age_q4 + sex_chart + unshockable + rea + ecmo_time + bmi_q4 +lac_q4,
+                data = ecmo_master9, family = "binomial")
 summary(log_mort)
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
+#Cox proportional hazard
+cox.mod <- coxph(Surv(survdays, mort) ~ trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4
+                 , data= ecmo_master9)
+
+summary(cox.mod)
 
 library(MASS)
 
-los <- glm(length_of_stay ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time,  family = poisson, data = ecmo_master8)
+los <- glm(length_of_stay ~ trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson, data = ecmo_master9)
 summary(los)
 exp(cbind(IRR = coef(los), confint(los)))
 
 
-iculos <- glm(ICU_length_of_stay ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time,  family = poisson, data = ecmo_master8)
+iculos <- glm(ICU_length_of_stay ~ trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson, data = ecmo_master9)
 summary(iculos)
 exp(cbind(IRR = coef(iculos), confint(iculos)))
 
