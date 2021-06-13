@@ -1582,11 +1582,14 @@ lab2$time_to_lab2 <-abs(lab2$time_to_lab)
 #exclude missings 
 lab3 <- lab2 %>% filter(!is.na(N2VALUE))
 
+#only keep values within 48 hours of implantation 
+lab4 <- lab3 %>% filter(time_to_lab2 <= 48)
+
 #look how lab values are wirtten in data 
-n <- count(lab3, N2KATTEXT)
+n <- count(lab4, N2KATTEXT)
 
 ##Lactate
-  lac <- lab3 %>% filter(N2KATTEXT=="Lac")
+  lac <- lab4 %>% filter(N2KATTEXT=="Lac")
   #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
   lacb4 <- lac %>% filter(time_to_lab<0)
   
@@ -1616,14 +1619,46 @@ n <- count(lab3, N2KATTEXT)
 
 
 #Creatinine
-crea <- lab3 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaffé)", "Kreatinin (Jaffé) HP"))
+crea <- lab4 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaffé)", "Kreatinin (Jaffé) HP"))
+
+  #before implantation 
+  creab4 <- crea %>% filter(time_to_lab < 0)
+  creab4_c <-creab4[order(creab4$id, creab4$time_to_lab2),]
+  creab4_c <- creab4_c %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+  creal8 <- crea %>% filter(time_to_lab>0)
+  creal8_c <-creal8[order(creal8$id, creal8$time_to_lab2),]
+  creal8_c <- creal8 %>% distinct(id, .keep_all = T)
 
 
 #Troponin 
-trop <- lab3 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Troponin T hs"))
+trop <- lab4 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Troponin T hs"))
+
+  #before implantation 
+  tropb4 <- trop %>% filter(time_to_lab < 0)
+  
+  #closest
+  tropb4_c <-tropb4[order(tropb4$id, tropb4$time_to_lab2),]
+  tropb4_c <- tropb4_c %>% distinct(id, .keep_all = T)
+  
+  #highest 
+  tropb4_h <-tropb4[order(tropb4$id, -tropb4$N2VALUE),]
+  tropb4_h <- tropb4_h %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+  
+  #closest 
+  tropl8 <- trop %>% filter(time_to_lab > 0)
+  tropl8_c <-tropl8[order(tropl8$id, tropl8$time_to_lab2),]
+  tropl8_c <- tropl8_c %>% distinct(id, .keep_all = T)
+  
+  #highest
+  tropl8_h <-tropl8[order(tropl8$id, -tropl8$N2VALUE),]
+  tropl8_h <- tropl8_h %>% distinct(id, .keep_all = T)
 
 #CK
-ck <- lab3 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinase (CK) HP"))
+ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinase (CK) HP"))
 
  #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
   ckb4 <- ck %>% filter(time_to_lab<0)
@@ -1655,7 +1690,7 @@ ck <- lab3 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinas
 
 
 #CK-MB
-ckmb <- lab3 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
+ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
 
   #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
   ckmbb4 <- ckmb %>% filter(time_to_lab<0)
@@ -1684,7 +1719,7 @@ ckmb <- lab3 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   ckmbl8_h <- ckmbl8_h %>% dplyr::rename(ckmbl8_h ="N2VALUE")
 
 #pH
-  ph <- lab3 %>% filter(N2KATTEXT=="pH")
+  ph <- lab4 %>% filter(N2KATTEXT=="pH")
   
   #first selecting only values before (b4) implantation of Ecmo, meaning time_to_lab needs to be negative 
   phb4 <- ph %>% filter(time_to_lab<0)
@@ -1910,9 +1945,149 @@ apachec6$DateTimeTo <- as.POSIXct(apachec6$DateTimeTo, format="%Y-%m-%d %H:%M:%S
 
 
 
+#saps
+
+#copra 5 
+sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+  #create difftime 
+  sapsc5.2$time_to_score <- difftime(sapsc5.2$Datum_wann, sapsc5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  sapsc5.2$time_to_score2 <- abs(sapsc5.2$time_to_score)
+  
+  #before implantation 
+  sapsc5_b4 <- sapsc5.2 %>% filter(time_to_score <0)
+  
+  sapsc5_b4_c <-sapsc5_b4[order(sapsc5_b4$id, sapsc5_b4$time_to_score2),]
+  sapsc5_b4_c <- sapsc5_b4_c %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+  sapsc5_l8 <- sapsc5.2 %>% filter(time_to_score >0)
+  
+  sapsc5_l8_c <-sapsc5_l8[order(sapsc5_l8$id, sapsc5_l8$time_to_score2),]
+  sapsc5_l8_c <- sapsc5_l8_c %>% distinct(id, .keep_all =T)
+  
+  
+  
+#apache 
+  
+  #copra 5 
+  
+  apachec5.2 <- merge(apachec5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+  #create difftime 
+  apachec5.2$time_to_score <- difftime(apachec5.2$Datum_wann, apachec5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  apachec5.2$time_to_score2 <- abs(apachec5.2$time_to_score)
+  
+  #before implantation 
+  apachec5.2_b4 <- apachec5.2 %>% filter(time_to_score <0)
+  
+  apachec5.2_b4_c <-apachec5.2_b4[order(apachec5.2_b4$id, apachec5.2_b4$time_to_score2),]
+  apachec5.2_b4_c <- apachec5.2_b4_c %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+  apachec5.2_l8 <- apachec5.2 %>% filter(time_to_score >0)
+  
+  apachec5.2_l8_c <-apachec5.2_l8[order(apachec5.2_l8$id, apachec5.2_l8$time_to_score2),]
+  apachec5.2_l8_c <- apachec5.2_l8_c %>% distinct(id, .keep_all =T)
+  
+  #copra 6 
+  
+  apachec6.2 <- merge(apachec6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnumer", all=F)
+    
+  #create difftime 
+  apachec6.2$time_to_score <- difftime(apachec6.2$DateTimeTo, apachec6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  apachec6.2$time_to_score2 <- abs(apachec6.2$time_to_score)
+
+  #before implantation 
+  apachec6.2_b4 <- apachec6.2 %>% filter(time_to_score <0)
+  
+  apachec6.2_b4_c <-apachec6.2_b4[order(apachec6.2_b4$id, apachec6.2_b4$time_to_score2),]
+  apachec6.2_b4_c <- apachec6.2_b4_c %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+ 
+  apachec6.2_l8 <- apachec6.2 %>% filter(time_to_score >0)
+  
+  apachec6.2_l8_c <-apachec6.2_l8[order(apachec6.2_l8$id, apachec6.2_l8$time_to_score2),]
+  apachec6.2_l8_c <- apachec6.2_l8_c %>% distinct(id, .keep_all =T)
+
+  #merge apache scores from copra 5 and 6 together
+  
+  #before implantation 
+apachec5.2_b4_c <- rename(apachec5.2_b4_c, apacheb4 = Gesamtscore)
+apachec6.2_b4_c <- rename(apachec6.2_b4_c, apacheb4 = val)
+
+apacheb4 <- rbind(apachec5.2_b4_c[,c(3,6)], apachec6.2_b4_c[,c(4,6)])  
+  
+#after implantation
+apachec5.2_l8_c <- rename(apachec5.2_l8_c, apachel8 = Gesamtscore)
+apachec6.2_l8_c <- rename(apachec6.2_l8_c, apachel8 = val)
+
+apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
+
+#tiss
 
 
 
+
+#gcs
+
+ #copra 5 
+  
+  gcs5.2 <- merge(gcsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+  #create difftime 
+  gcs5.2$time_to_score <- difftime(gcs5.2$Datum_wann, gcs5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  gcs5.2$time_to_score2 <- abs(gcs5.2$time_to_score)
+  
+  #before implantation 
+  gcs5.2_b4 <- gcs5.2 %>% filter(time_to_score <0)
+  
+  gcs5.2_b4_c <-gcs5.2_b4[order(gcs5.2_b4$id, gcs5.2_b4$time_to_score2),]
+  gcs5.2_b4_c <- gcs5.2_b4_c %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+  gcs5.2_l8 <- gcs5.2 %>% filter(time_to_score >0)
+  
+  gcs5.2_l8_c <-gcs5.2_l8[order(gcs5.2_l8$id, gcs5.2_l8$time_to_score2),]
+  gcs5.2_l8_c <- gcs5.2_l8_c %>% distinct(id, .keep_all =T)
+  
+  #copra 6 
+  
+  gcs6.2 <- merge(gcsc6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnumer", all=F)
+    
+  #create difftime 
+  gcs6.2$time_to_score <- difftime(gcs6.2$DateTimeTo, gcs6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  gcs6.2$time_to_score2 <- abs(gcs6.2$time_to_score)
+
+  #before implantation 
+  gcs6.2_b4 <- gcs6.2 %>% filter(time_to_score <0)
+  
+  gcs6.2_b4_c <-gcs6.2_b4[order(gcs6.2_b4$id, gcs6.2_b4$time_to_score2),]
+  gcs6.2_b4_c <- gcs6.2_b4_c %>% distinct(id, .keep_all = T)
+  
+  #after implantation 
+  gcs6.2_l8 <- gcs6.2 %>% filter(time_to_score >0)
+  gcs6.2_l8_c <-gcs6.2_l8[order(gcs6.2_l8$id, gcs6.2_l8$time_to_score2),]
+  gcs6.2_l8_c <- gcs6.2_l8_c %>% distinct(id, .keep_all =T)
+
+  #merge gcs scores from copra 5 and 6 together
+  
+  #before implantation 
+gcs5.2_b4_c <- rename(gcs5.2_b4_c, gcsb4 = Gesamtscore)
+gcs6.2_b4_c <- rename(gcs6.2_b4_c, gcsb4 = val)
+
+gcsb4 <- rbind(gcs5.2_b4_c[,c(3,6)], gcs6.2_b4_c[,c(4,6)])  
+  
+#after implantation
+gcs5.2_l8_c <- rename(gcs5.2_l8_c, gcsl8 = Gesamtscore)
+gcs6.2_l8_c <- rename(gcs6.2_l8_c, gcsl8 = val)
+
+gcsl8 <- rbind(gcs5.2_l8_c[,c(3,6)], gcs6.2_l8_c[,c(4,6)])
+
+  
 ```
 
 #Vitals
