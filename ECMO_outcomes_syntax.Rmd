@@ -2503,8 +2503,9 @@ ecmo_master10 <- Reduce(
 )
 
 
+#clean up 
 
-
+ecmo_master11 <- ecmo_master10 %>% select(id, Fallnumer, Patientenummer, GBDAT, age, age_q4, GSCHL, height_chart, weight_chart, bmi, admission2, discharge, length_of_stay2, ICU_admission2, ICU_discharge2, ICU_length_of_stay2, `Sterbezeit (0 = nicht tot)`, mort, campus2, year, ecmo, ecmo_num, ecmo_implantation, `ECMO wann eingebaut?`, ecmo_ex, ecmo_interval, ecmo_time2, impella, impella_num, impella_implantation, `Impella wann eingebaut?`,  impella_ex, impella_interval, impella_time2, ppci,  impella_during_ecmo, ecmo_during_impella,  ecmella_true, ecmella_final, ecmella_num, intervention, trt, rosc_num, rea, shockable, unshockable, stemi, nstemi, mi, cs, lae, pul, intox, sepsis, aortdiss, hi, myocarditis, cad, diag1, diag2, diag3, diag4, diag5, infarct, prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t3, prov1, prov1_num, prov1_fact, ef1, ef2, phb4_c, phb4_l, phl8_c, phl8_l, lacb4_c, lacb4_h, lacl8_c, lacl8_h, ckb4_c, ckb4_h, ckl8_c, ckl8_h, ckmbb4_c, ckmbb4_h, ckmbl8_c, ckmbl8_h, tropb4_c, tropb4_h, tropl8_c, tropl8_h, creab4_c, creal8_c, hfb4_c, hfl8_c, afb4_c, afl8_c, psab4_c, psal8_c, pdab4_c, pdal8_c, pmab4_c, pmal8_c, apacheb4, apachel8, gcsb4, gcsl8, sapsc5_b4_c, tiss10b4_c, tiss10l8_c) 
 
 ```
 
