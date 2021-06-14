@@ -2091,7 +2091,6 @@ gcsl8 <- rbind(gcs5.2_l8_c[,c(3,6)], gcs6.2_l8_c[,c(4,6)])
 ```
 
 #Vitals
-
 ```{r}
 
 library(readxl)
@@ -2102,6 +2101,52 @@ View(hfc6)
 hfc6$casenumber <-as.numeric(hfc6$casenumber)
 hfc6$val <- as.numeric(hfc6$val)
 hfc6$DateTimeTo <- as.POSIXct(hfc6$DateTimeTo, format="%Y-%m-%d %H:%M:%S")
+
+
+library(readxl)
+hfc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "HF")
+
+hfc5$FALLNR <-as.numeric(hfc5$FALLNR)
+hfc5$vFloat <- as.numeric(hfc5$vFloat)
+hfc5$Datum_fuer_wann <- as.POSIXct(hfc5$Datum_fuer_wann, format="%Y-%m-%d %H:%M:%S")
+
+#heart rate
+#copra 5 
+hfc5.2 <- merge(hfc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+hfc5.2$time_to_val <- difftime(hfc5.2$Datum_fuer_wann, hfc5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+hfc5.2$time_to_val2 <- abs(hfc5.2$time_to_val)
+
+#before implantation 
+hfc5b4 <- hfc5.2 %>% filter(time_to_val < 0)
+
+hfc5b4 <-hfc5b4[order(hfc5b4$id, hfc5b4$time_to_val2),]
+hfc5b4_c <- hfc5b4 %>% distinct(id, .keep_all = T)
+
+#after implantation 
+hfc5l8 <- hfc5.2 %>% filter(time_to_val >0)
+hfc5l8 <-hfc5l8[order(hfc5l8$id, hfc5l8$time_to_val2),]
+hfc5l8_c <- hfc5l8 %>% distinct(id, .keep_all=T)
+
+#copra 6 
+
+hfc6.2 <- merge(hfc6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnumer", all=F)
+hfc6.2$time_to_val <- difftime(hfc6.2$DateTimeTo, hfc6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+hfc6.2$time_to_val2 <- abs(hfc6.2$time_to_val)
+
+#before implantation 
+hfc6b4 <- hfc6.2 %>% filter(time_to_val < 0)
+
+hfc6b4 <-hfc6b4[order(hfc6b4$id, hfc6b4$time_to_val2),]
+hfc6b4_c <- hfc6b4 %>% distinct(id, .keep_all = T)
+
+#after implantation
+hfc6l8 <- hfc6.2 %>% filter(time_to_val >0)
+hfc6l8 <-hfc6l8[order(hfc6l8$id, hfc6l8$time_to_val2),]
+hfc6l8_c <- hfc6l8 %>% distinct(id, .keep_all=T)
+
+#what about HF 0?
+
 
 ```
 
