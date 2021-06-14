@@ -1988,19 +1988,25 @@ sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnume
   #create absolute value 
   sapsc5.2$time_to_score2 <- abs(sapsc5.2$time_to_score)
   
+  sapsc5.3 <- sapsc5.2 %>% filter(time_to_score2 <= 72)
+  
   #before implantation 
-  sapsc5_b4 <- sapsc5.2 %>% filter(time_to_score <0)
+  sapsc5_b4 <- sapsc5.3 %>% filter(time_to_score <0)
   
   sapsc5_b4_c <-sapsc5_b4[order(sapsc5_b4$id, sapsc5_b4$time_to_score2),]
   sapsc5_b4_c <- sapsc5_b4_c %>% distinct(id, .keep_all = T)
   
+    sapsc5_b4_c <- rename(sapsc5_b4_c, sapsc5_b4_c = Gesamtscore)
+
+  
   #after implantation 
-  sapsc5_l8 <- sapsc5.2 %>% filter(time_to_score >0)
+  sapsc5_l8 <- sapsc5.3 %>% filter(time_to_score >0)
   
   sapsc5_l8_c <-sapsc5_l8[order(sapsc5_l8$id, sapsc5_l8$time_to_score2),]
   sapsc5_l8_c <- sapsc5_l8_c %>% distinct(id, .keep_all =T)
   
-  
+  sapsc5_l8_c <- rename(sapsc5_l8_c, sapsc5_l8_c = Gesamtscore)
+
   
 #apache 
   
@@ -2012,14 +2018,16 @@ sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnume
   #create absolute value 
   apachec5.2$time_to_score2 <- abs(apachec5.2$time_to_score)
   
+  apachec5.3 <- apachec5.2 %>% filter(time_to_score2 <= 72)
+  
   #before implantation 
-  apachec5.2_b4 <- apachec5.2 %>% filter(time_to_score <0)
+  apachec5.2_b4 <- apachec5.3 %>% filter(time_to_score <0)
   
   apachec5.2_b4_c <-apachec5.2_b4[order(apachec5.2_b4$id, apachec5.2_b4$time_to_score2),]
   apachec5.2_b4_c <- apachec5.2_b4_c %>% distinct(id, .keep_all = T)
   
   #after implantation 
-  apachec5.2_l8 <- apachec5.2 %>% filter(time_to_score >0)
+  apachec5.2_l8 <- apachec5.3 %>% filter(time_to_score >0)
   
   apachec5.2_l8_c <-apachec5.2_l8[order(apachec5.2_l8$id, apachec5.2_l8$time_to_score2),]
   apachec5.2_l8_c <- apachec5.2_l8_c %>% distinct(id, .keep_all =T)
@@ -2032,16 +2040,18 @@ sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnume
   apachec6.2$time_to_score <- difftime(apachec6.2$DateTimeTo, apachec6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
   #create absolute value 
   apachec6.2$time_to_score2 <- abs(apachec6.2$time_to_score)
+  
+  apachec6.3 <- apachec6.2 %>% filter(time_to_score2 <=72)
 
   #before implantation 
-  apachec6.2_b4 <- apachec6.2 %>% filter(time_to_score <0)
+  apachec6.2_b4 <- apachec6.3 %>% filter(time_to_score <0)
   
   apachec6.2_b4_c <-apachec6.2_b4[order(apachec6.2_b4$id, apachec6.2_b4$time_to_score2),]
   apachec6.2_b4_c <- apachec6.2_b4_c %>% distinct(id, .keep_all = T)
   
   #after implantation 
  
-  apachec6.2_l8 <- apachec6.2 %>% filter(time_to_score >0)
+  apachec6.2_l8 <- apachec6.3 %>% filter(time_to_score >0)
   
   apachec6.2_l8_c <-apachec6.2_l8[order(apachec6.2_l8$id, apachec6.2_l8$time_to_score2),]
   apachec6.2_l8_c <- apachec6.2_l8_c %>% distinct(id, .keep_all =T)
@@ -2060,9 +2070,63 @@ apachec6.2_l8_c <- rename(apachec6.2_l8_c, apachel8 = val)
 
 apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
 
-#tiss
+#tiss10  -copra 6
+
+  tiss10c6.2 <- merge(tiss10c6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnumer", all=F)
+    
+  #create difftime 
+  tiss10c6.2$time_to_score <- difftime(tiss10c6.2$DateTimeTo, tiss10c6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  tiss10c6.2$time_to_score2 <- abs(tiss10c6.2$time_to_score)
+  
+  tiss10c6.3 <- tiss10c6.2 %>% filter(time_to_score2 <= 72)
+
+  #before implantation 
+  tiss10c6b4 <- tiss10c6.3 %>% filter(time_to_score <0)
+  
+  tiss10c6b4_c <-tiss10c6b4[order(tiss10c6b4$id, tiss10c6b4$time_to_score2),]
+  tiss10c6b4_c <- tiss10c6b4_c %>% distinct(id, .keep_all = T)
+  
+  tiss10c6b4_c <- rename(tiss10c6b4_c, tiss10b4_c = val)
+
+  #after implantation 
+ 
+  tiss10c6l8 <- tiss10c6.3 %>% filter(time_to_score >0)
+  
+  tiss10c6l8_c <-tiss10c6l8[order(tiss10c6l8$id, tiss10c6l8$time_to_score2),]
+  tiss10c6l8_c <- tiss10c6l8_c %>% distinct(id, .keep_all =T)
+
+  tiss10c6l8_c <- rename(tiss10c6l8_c, tiss10l8_c = val)
 
 
+#tiss28 -copra 5 
+
+ #copra 5 
+  
+  tiss28c5.2 <- merge(tiss28c5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+  #create difftime 
+  tiss28c5.2$time_to_score <- difftime(tiss28c5.2$Datum_wann, tiss28c5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+  #create absolute value 
+  tiss28c5.2$time_to_score2 <- abs(tiss28c5.2$time_to_score)
+  
+  tiss28c5.3 <- tiss28c5.2 %>% filter(time_to_score2 <= 72)
+  
+  #before implantation 
+  tiss28b4 <- tiss28c5.3 %>% filter(time_to_score <0)
+  
+  tiss28b4_c <-tiss28b4[order(tiss28b4$id, tiss28b4$time_to_score2),]
+  tiss28b4_c <- tiss28b4_c %>% distinct(id, .keep_all = T)
+  
+  tiss28b4_c <- rename(tiss28b4_c, tiss28b4_c = Gesamtscore)
+
+  
+  #after implantation 
+  tiss28l8 <- tiss28c5.3 %>% filter(time_to_score >0)
+  
+  tiss28l8_c <-tiss28l8[order(tiss28l8$id, tiss28l8$time_to_score2),]
+  tiss28l8_c <- tiss28l8_c %>% distinct(id, .keep_all =T)
+
+  tiss28l8_c <- rename(tiss28l8_c, tiss28l8_c = Gesamtscore)
 
 
 #gcs
@@ -2075,14 +2139,16 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   #create absolute value 
   gcs5.2$time_to_score2 <- abs(gcs5.2$time_to_score)
   
+  gcs5.3 <- gcs5.2 %>% filter(time_to_score2 <=72)
+  
   #before implantation 
-  gcs5.2_b4 <- gcs5.2 %>% filter(time_to_score <0)
+  gcs5.2_b4 <- gcs5.3 %>% filter(time_to_score <0)
   
   gcs5.2_b4_c <-gcs5.2_b4[order(gcs5.2_b4$id, gcs5.2_b4$time_to_score2),]
   gcs5.2_b4_c <- gcs5.2_b4_c %>% distinct(id, .keep_all = T)
   
   #after implantation 
-  gcs5.2_l8 <- gcs5.2 %>% filter(time_to_score >0)
+  gcs5.2_l8 <- gcs5.3 %>% filter(time_to_score >0)
   
   gcs5.2_l8_c <-gcs5.2_l8[order(gcs5.2_l8$id, gcs5.2_l8$time_to_score2),]
   gcs5.2_l8_c <- gcs5.2_l8_c %>% distinct(id, .keep_all =T)
@@ -2095,15 +2161,17 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   gcs6.2$time_to_score <- difftime(gcs6.2$DateTimeTo, gcs6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
   #create absolute value 
   gcs6.2$time_to_score2 <- abs(gcs6.2$time_to_score)
+  
+  gcs6.3 <- gcs6.2 %>% filter(time_to_score2 <=72)
 
   #before implantation 
-  gcs6.2_b4 <- gcs6.2 %>% filter(time_to_score <0)
+  gcs6.2_b4 <- gcs6.3 %>% filter(time_to_score <0)
   
   gcs6.2_b4_c <-gcs6.2_b4[order(gcs6.2_b4$id, gcs6.2_b4$time_to_score2),]
   gcs6.2_b4_c <- gcs6.2_b4_c %>% distinct(id, .keep_all = T)
   
   #after implantation 
-  gcs6.2_l8 <- gcs6.2 %>% filter(time_to_score >0)
+  gcs6.2_l8 <- gcs6.3 %>% filter(time_to_score >0)
   gcs6.2_l8_c <-gcs6.2_l8[order(gcs6.2_l8$id, gcs6.2_l8$time_to_score2),]
   gcs6.2_l8_c <- gcs6.2_l8_c %>% distinct(id, .keep_all =T)
 
@@ -2132,21 +2200,37 @@ afc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xl
     sheet = "AF")
 View(afc5)
 
+afc5$FALLNR <-as.numeric(afc5$FALLNR)
+afc5$vFloat <- as.numeric(afc5$vFloat)
+afc5$Datum_fuer_wann <- as.POSIXct(afc5$Datum_fuer_wann, format="%Y-%m-%d %H:%M:%S")
+
 library(readxl)
 p_sa_i <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
     sheet = "p_sa_i")
 View(p_sa_i)
+
+p_sa_i$FALLNR <-as.numeric(p_sa_i$FALLNR)
+p_sa_i$vFloat <- as.numeric(p_sa_i$vFloat)
+p_sa_i$Datum_fuer_wann <- as.POSIXct(p_sa_i$Datum_fuer_wann, format="%Y-%m-%d %H:%M:%S")
 
 library(readxl)
 p_da_i <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
     sheet = "p_da_i")
 View(p_da_i)
 
+p_da_i$FALLNR <-as.numeric(p_da_i$FALLNR)
+p_da_i$vFloat <- as.numeric(p_da_i$vFloat)
+p_da_i$Datum_fuer_wann <- as.POSIXct(p_da_i$Datum_fuer_wann, format="%Y-%m-%d %H:%M:%S")
+
+
 library(readxl)
 p_ma_i <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
     sheet = "p_ma_i")
 View(p_ma_i)
 
+p_ma_i$FALLNR <-as.numeric(p_ma_i$FALLNR)
+p_ma_i$vFloat <- as.numeric(p_ma_i$vFloat)
+p_ma_i$Datum_fuer_wann <- as.POSIXct(p_ma_i$Datum_fuer_wann, format="%Y-%m-%d %H:%M:%S")
 
 library(readxl)
 hfc6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
@@ -2172,14 +2256,16 @@ hfc5.2 <- merge(hfc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", 
 hfc5.2$time_to_val <- difftime(hfc5.2$Datum_fuer_wann, hfc5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
 hfc5.2$time_to_val2 <- abs(hfc5.2$time_to_val)
 
+hfc5.3 <- hfc5.2 %>% filter(time_to_val2 <= 48 & vFloat >0)
+
 #before implantation 
-hfc5b4 <- hfc5.2 %>% filter(time_to_val < 0)
+hfc5b4 <- hfc5.3 %>% filter(time_to_val < 0)
 
 hfc5b4 <-hfc5b4[order(hfc5b4$id, hfc5b4$time_to_val2),]
 hfc5b4_c <- hfc5b4 %>% distinct(id, .keep_all = T)
 
 #after implantation 
-hfc5l8 <- hfc5.2 %>% filter(time_to_val >0)
+hfc5l8 <- hfc5.3 %>% filter(time_to_val >0)
 hfc5l8 <-hfc5l8[order(hfc5l8$id, hfc5l8$time_to_val2),]
 hfc5l8_c <- hfc5l8 %>% distinct(id, .keep_all=T)
 
@@ -2189,18 +2275,130 @@ hfc6.2 <- merge(hfc6, ecmo_master8[,c(1,2,9)], by.x="casenumber", by.y="Fallnume
 hfc6.2$time_to_val <- difftime(hfc6.2$DateTimeTo, hfc6.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
 hfc6.2$time_to_val2 <- abs(hfc6.2$time_to_val)
 
+hfc6.3 <- hfc6.2 %>% filter(val>0 & time_to_val2 <= 48)
+
 #before implantation 
-hfc6b4 <- hfc6.2 %>% filter(time_to_val < 0)
+hfc6b4 <- hfc6.3 %>% filter(time_to_val < 0)
 
 hfc6b4 <-hfc6b4[order(hfc6b4$id, hfc6b4$time_to_val2),]
 hfc6b4_c <- hfc6b4 %>% distinct(id, .keep_all = T)
 
 #after implantation
-hfc6l8 <- hfc6.2 %>% filter(time_to_val >0)
+hfc6l8 <- hfc6.3 %>% filter(time_to_val >0)
 hfc6l8 <-hfc6l8[order(hfc6l8$id, hfc6l8$time_to_val2),]
 hfc6l8_c <- hfc6l8 %>% distinct(id, .keep_all=T)
 
-#what about HF 0?
+hfl8_c <- merge(hfc5l8_c[,c(3,5,7)], hfc6l8_c[,c(4,6,8)], by="id", all=T)
+
+hfl8_c$hfl8_c <- ifelse(is.na(hfl8_c$vFloat), hfl8_c$val, 
+                        ifelse(is.na(hfl8_c$val), hfl8_c$vFloat,
+                               ifelse(hfl8_c$time_to_val.x< hfl8_c$time_to_val.y, hfl8_c$vFloat, hfl8_c$val)
+)
+)
+
+
+hfb4_c <- merge(hfc5b4_c[,c(3,5,7)], hfc6b4_c[,c(4,6,8)], by="id", all=T)
+
+hfb4_c$hfb4_c <- ifelse(is.na(hfb4_c$vFloat), hfb4_c$val, 
+                        ifelse(is.na(hfb4_c$val), hfb4_c$vFloat,
+                               ifelse(hfb4_c$time_to_val.x > hfb4_c$time_to_val.y, hfb4_c$vFloat, hfb4_c$val)
+)
+)
+
+
+
+#Atemfrequenz 
+afc5.2 <- merge(afc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+afc5.2$time_to_val <- difftime(afc5.2$Datum_fuer_wann, afc5.2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+afc5.2$time_to_val2 <- abs(afc5.2$time_to_val)
+
+afc5.3 <- afc5.2 %>% filter(time_to_val2 <= 48 & vFloat >0)
+
+#before implantation 
+afc5b4 <- afc5.3 %>% filter(time_to_val < 0)
+
+afc5b4_c <-afc5b4[order(afc5b4$id, afc5b4$time_to_val2),]
+afc5b4_c <- afc5b4_c %>% distinct(id, .keep_all = T)
+
+afc5b4_c <- rename(afc5b4_c, afb4_c = vFloat)
+
+#after implantation 
+afc5l8 <- afc5.3 %>% filter(time_to_val >0)
+afc5l8_c <-afc5l8[order(afc5l8$id, afc5l8$time_to_val2),]
+afc5l8_c <- afc5l8_c %>% distinct(id, .keep_all=T)
+
+afc5l8_c <- rename(afc5l8_c, afl8_c = vFloat)
+
+
+#systolic blood pressure copra 5 
+
+psa2 <- merge(p_sa_i, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+psa2$time_to_val <- difftime(psa2$Datum_fuer_wann, psa2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+psa2$time_to_val2 <- abs(psa2$time_to_val)
+
+psa3 <- psa2 %>% filter(time_to_val2 <= 48 & vFloat >0)
+
+#before implantation 
+psab4 <- psa3 %>% filter(time_to_val < 0)
+
+psab4_c <-psab4[order(psab4$id, psab4$time_to_val2),]
+psab4_c <- psab4_c %>% distinct(id, .keep_all = T)
+
+psab4_c <- rename(psab4_c, psab4_c = vFloat)
+
+#after implantation 
+psal8 <- psa3 %>% filter(time_to_val >0)
+psal8_c <-psal8[order(psal8$id, psal8$time_to_val2),]
+psal8_c <- psal8_c %>% distinct(id, .keep_all=T)
+
+psal8_c <- rename(psal8_c, psal8_c = vFloat)
+
+
+#diastolic blood pressure copra5 
+
+pda2 <- merge(p_da_i, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+pda2$time_to_val <- difftime(pda2$Datum_fuer_wann, pda2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+pda2$time_to_val2 <- abs(pda2$time_to_val)
+
+pda3 <- pda2 %>% filter(time_to_val2 <= 48 & vFloat >0)
+
+#before implantation 
+pdab4 <- pda3 %>% filter(time_to_val < 0)
+
+pdab4_c <-pdab4[order(pdab4$id, pdab4$time_to_val2),]
+pdab4_c <- pdab4_c %>% distinct(id, .keep_all = T)
+
+pdab4_c <- rename(pdab4_c, pdab4_c = vFloat)
+
+#after implantation 
+pdal8 <- pda3 %>% filter(time_to_val >0)
+pdal8_c <-pdal8[order(pdal8$id, pdal8$time_to_val2),]
+pdal8_c <- pdal8_c %>% distinct(id, .keep_all=T)
+
+pdal8_c <- rename(pdal8_c, pdal8_c = vFloat)
+
+#mean arterial pressure
+pma2 <- merge(p_ma_i, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
+pma2$time_to_val <- difftime(pma2$Datum_fuer_wann, pma2$`ECMO wann eingebaut?`, units="hours", tz = "UTC")
+pma2$time_to_val2 <- abs(pma2$time_to_val)
+
+pma3 <- pma2 %>% filter(time_to_val2 <= 48 & vFloat >0)
+
+#before implantation 
+pmab4 <- pma3 %>% filter(time_to_val < 0)
+
+pmab4_c <-pmab4[order(pmab4$id, pmab4$time_to_val2),]
+pmab4_c <- pmab4_c %>% distinct(id, .keep_all = T)
+
+pmab4_c <- rename(pmab4_c, pmab4_c = vFloat)
+
+#after implantation 
+pmal8 <- pma3 %>% filter(time_to_val >0)
+pmal8_c <-pmal8[order(pmal8$id, pmal8$time_to_val2),]
+pmal8_c <- pmal8_c %>% distinct(id, .keep_all=T)
+
+pmal8_c <- rename(pmal8_c, pmal8_c = vFloat)
+
 
 
 ```
@@ -2301,7 +2499,12 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 ```{r}
 ecmo_master10 <- Reduce(
   function(ecmo_master8, id_bmi_sex_lab2) merge(ecmo_master8, id_bmi_sex_lab2, by="id", all=T),
-  list(ecmo_master8, id_bmi_sex_lab2[,c(1,4,5,14)], phl8_c[,c(6,11)], phl8_l[,c(6,11)], lacl8_c[,c(6,11)], lacl8_h[,c(6,11)], ckl8_c[,c(6,11)], ckl8_h[,c(6,11)], ckmbl8_c[,c(6,11)], ckmbl8_h[,c(6,11)],  phb4_c[,c(6,11)], phb4_l[,c(6,11)], lacb4_c[,c(6,11)], lacb4_h[,c(6,11)], ckb4_c[,c(6,11)], ckb4_h[,c(6,11)], ckmbb4_c[,c(6,11)], ckmbb4_h[,c(6,11)], tropb4_c[,c(6,11)], tropb4_h[,c(6,11)], tropl8_c[,c(6,11)], tropl8_h[,c(6,11)], creab4_c[,c(6,11)], creal8_c[,c(6,11)] )
+  list(ecmo_master8, id_bmi_sex_lab2[,c(1,4,5,14)], phl8_c[,c(6,11)], phl8_l[,c(6,11)], lacl8_c[,c(6,11)], lacl8_h[,c(6,11)], ckl8_c[,c(6,11)], ckl8_h[,c(6,11)], ckmbl8_c[,c(6,11)], ckmbl8_h[,c(6,11)],  phb4_c[,c(6,11)], phb4_l[,c(6,11)], lacb4_c[,c(6,11)], lacb4_h[,c(6,11)], ckb4_c[,c(6,11)], ckb4_h[,c(6,11)], ckmbb4_c[,c(6,11)], ckmbb4_h[,c(6,11)], tropb4_c[,c(6,11)], tropb4_h[,c(6,11)], tropl8_c[,c(6,11)], tropl8_h[,c(6,11)], creab4_c[,c(6,11)], creal8_c[,c(6,11)], hfb4_c[,c(1,6)], hfl8_c[,c(1,6)], apacheb4, apachel8, gcsb4, gcsl8, sapsc5_b4_c[,c(3,6)], tiss10c6b4_c[,c(4,6)], tiss10c6l8_c[,c(4,6)], afc5b4_c[,c(3,5)], afc5l8_c[,c(3,5)], psab4_c[,c(3,5)], psal8_c[,c(3,5)], pdab4_c[,c(3,5)], pdal8_c[,c(3,5)], pmab4_c[,c(3,5)], pmal8_c[,c(3,5)]  )
 )
+
+
+
+
+
 ```
 
