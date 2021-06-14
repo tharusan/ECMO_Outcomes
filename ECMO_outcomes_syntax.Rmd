@@ -1597,9 +1597,15 @@ n <- count(lab4, N2KATTEXT)
   lacb4 <-lacb4[order(lacb4$id, lacb4$time_to_lab2),]
   lacb4_c <- lacb4 %>% distinct(id, .keep_all = T)
   
+  lacb4_c <- lacb4_c %>% dplyr::rename(lacb4_c ="N2VALUE")
+
+  
   #selecting lactate values before implantation, highest (_h)
   lacb4_h <- lacb4[order(lacb4$id, -lacb4$N2VALUE, lacb4$time_to_lab2),]
   lacb4_h <- lacb4_h %>% distinct(id, .keep_all = T)
+  
+  lacb4_h <- lacb4_h %>% dplyr::rename(lacb4_h ="N2VALUE")
+
   
   #Lactate, after (later=l8) implantation 
   lacl8 <- lac %>% filter(time_to_lab>0)
@@ -1626,12 +1632,16 @@ crea <- lab4 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaff√©)", "Kreatinin (Jaff√
   creab4_c <-creab4[order(creab4$id, creab4$time_to_lab2),]
   creab4_c <- creab4_c %>% distinct(id, .keep_all = T)
   
+  creab4_c <- creab4_c %>% dplyr::rename(creab4_c ="N2VALUE")
+  
   #after implantation 
   creal8 <- crea %>% filter(time_to_lab>0)
   creal8_c <-creal8[order(creal8$id, creal8$time_to_lab2),]
   creal8_c <- creal8 %>% distinct(id, .keep_all = T)
 
+  creal8_c <- creal8_c %>% dplyr::rename(creal8_c ="N2VALUE")
 
+  
 #Troponin 
 trop <- lab4 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Troponin T hs"))
 
@@ -1642,9 +1652,14 @@ trop <- lab4 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Tro
   tropb4_c <-tropb4[order(tropb4$id, tropb4$time_to_lab2),]
   tropb4_c <- tropb4_c %>% distinct(id, .keep_all = T)
   
+  tropb4_c <- tropb4_c %>% dplyr::rename(tropb4_c ="N2VALUE")
+
+  
   #highest 
   tropb4_h <-tropb4[order(tropb4$id, -tropb4$N2VALUE),]
   tropb4_h <- tropb4_h %>% distinct(id, .keep_all = T)
+  
+  tropb4_h <- tropb4_h %>% dplyr::rename(tropb4_h ="N2VALUE")
   
   #after implantation 
   
@@ -1653,9 +1668,13 @@ trop <- lab4 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Tro
   tropl8_c <-tropl8[order(tropl8$id, tropl8$time_to_lab2),]
   tropl8_c <- tropl8_c %>% distinct(id, .keep_all = T)
   
+  tropl8_c <- tropl8_c %>% dplyr::rename(tropl8_c ="N2VALUE")
+  
   #highest
   tropl8_h <-tropl8[order(tropl8$id, -tropl8$N2VALUE),]
   tropl8_h <- tropl8_h %>% distinct(id, .keep_all = T)
+  
+  tropl8_h <- tropl8_h %>% dplyr::rename(tropl8_h ="N2VALUE")
 
 #CK
 ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinase (CK) HP"))
@@ -1667,9 +1686,13 @@ ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinas
   ckb4_c <-ckb4[order(ckb4$id, ckb4$time_to_lab2),]
   ckb4_c <- ckb4_c %>% distinct(id, .keep_all = T)
   
+  ckb4_c <- ckb4_c %>% dplyr::rename(ckb4_c ="N2VALUE")
+
   #selecting ck values before implantation, highest (_h)
   ckb4_h <- ckb4[order(ckb4$id, -ckb4$N2VALUE),]
   ckb4_h <- ckb4_h %>% distinct(id, .keep_all = T)
+  
+  ckb4_h <- ckb4_h %>% dplyr::rename(ckb4_h ="N2VALUE")
   
   #ck, after (later=l8) implantation 
   ckl8 <- ck %>% filter(time_to_lab>0)
@@ -1699,10 +1722,15 @@ ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   ckmbb4_c <-ckmbb4[order(ckmbb4$id, ckmbb4$time_to_lab2),]
   ckmbb4_c <- ckmbb4_c %>% distinct(id, .keep_all = T)
   
+    ckmbb4_c <- ckmbb4_c %>% dplyr::rename(ckmbb4_c ="N2VALUE")
+
+  
   #selecting ck-mb values before implantation, highest (_h)
   ckmbb4_h <- ckmbb4[order(ckmbb4$id, -ckmbb4$N2VALUE, ckmbb4$time_to_lab2),]
   ckmbb4_h <- ckmbb4_h %>% distinct(id, .keep_all = T)
   
+    ckmbb4_h <- ckmbb4_h %>% dplyr::rename(ckmbb4_h ="N2VALUE")
+
   #ck-mb, after (later=l8) implantation 
   ckmbl8 <- ckmb %>% filter(time_to_lab>0)
   
@@ -1728,9 +1756,15 @@ ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   phb4_c <-phb4[order(phb4$id, phb4$time_to_lab2),]
   phb4_c <- phb4_c %>% distinct(id, .keep_all = T)
   
+   phb4_c <- phb4_c %>% dplyr::rename(phb4_c ="N2VALUE")
+
+  
   #selecting ph values before implantation, lowest (_l)
   phb4_l <- phb4[order(phb4$id, phb4$N2VALUE, phb4$time_to_lab2),]
   phb4_l <- phb4_l %>% distinct(id, .keep_all = T)
+  
+    phb4_l <- phb4_l %>% dplyr::rename(phb4_l ="N2VALUE")
+
   
   #ph, after (later=l8) implantation 
   phl8 <- ph %>% filter(time_to_lab>0)
@@ -2094,6 +2128,27 @@ gcsl8 <- rbind(gcs5.2_l8_c[,c(3,6)], gcs6.2_l8_c[,c(4,6)])
 ```{r}
 
 library(readxl)
+afc5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "AF")
+View(afc5)
+
+library(readxl)
+p_sa_i <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "p_sa_i")
+View(p_sa_i)
+
+library(readxl)
+p_da_i <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "p_da_i")
+View(p_da_i)
+
+library(readxl)
+p_ma_i <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
+    sheet = "p_ma_i")
+View(p_ma_i)
+
+
+library(readxl)
 hfc6 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra6.xlsx", 
     sheet = "VitalHF")
 View(hfc6)
@@ -2240,5 +2295,13 @@ res_los <- summ(los, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 
 export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
+```
+
+#final data set
+```{r}
+ecmo_master10 <- Reduce(
+  function(ecmo_master8, id_bmi_sex_lab2) merge(ecmo_master8, id_bmi_sex_lab2, by="id", all=T),
+  list(ecmo_master8, id_bmi_sex_lab2[,c(1,4,5,14)], phl8_c[,c(6,11)], phl8_l[,c(6,11)], lacl8_c[,c(6,11)], lacl8_h[,c(6,11)], ckl8_c[,c(6,11)], ckl8_h[,c(6,11)], ckmbl8_c[,c(6,11)], ckmbl8_h[,c(6,11)],  phb4_c[,c(6,11)], phb4_l[,c(6,11)], lacb4_c[,c(6,11)], lacb4_h[,c(6,11)], ckb4_c[,c(6,11)], ckb4_h[,c(6,11)], ckmbb4_c[,c(6,11)], ckmbb4_h[,c(6,11)], tropb4_c[,c(6,11)], tropb4_h[,c(6,11)], tropl8_c[,c(6,11)], tropl8_h[,c(6,11)], creab4_c[,c(6,11)], creal8_c[,c(6,11)] )
+)
 ```
 
