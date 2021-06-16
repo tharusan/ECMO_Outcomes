@@ -1597,14 +1597,14 @@ n <- count(lab4, N2KATTEXT)
   lacb4 <-lacb4[order(lacb4$id, lacb4$time_to_lab2),]
   lacb4_c <- lacb4 %>% distinct(id, .keep_all = T)
   
-  lacb4_c <- lacb4_c %>% dplyr::rename(lacb4_c ="N2VALUE")
+  lacb4_c <- lacb4_c %>% dplyr::rename(lac_closest_within48h_before_ecmo ="N2VALUE")
 
   
   #selecting lactate values before implantation, highest (_h)
   lacb4_h <- lacb4[order(lacb4$id, -lacb4$N2VALUE, lacb4$time_to_lab2),]
   lacb4_h <- lacb4_h %>% distinct(id, .keep_all = T)
   
-  lacb4_h <- lacb4_h %>% dplyr::rename(lacb4_h ="N2VALUE")
+  lacb4_h <- lacb4_h %>% dplyr::rename(lac_highest_within48h_before_ecmo ="N2VALUE")
 
   
   #Lactate, after (later=l8) implantation 
@@ -1614,14 +1614,14 @@ n <- count(lab4, N2KATTEXT)
   lacl8_c <-lacl8[order(lacl8$id, lacl8$time_to_lab2),]
   lacl8_c <- lacl8_c %>% distinct(id, .keep_all = T)
   
-    lacl8_c <- lacl8_c %>% dplyr::rename(lacl8_c ="N2VALUE")
+    lacl8_c <- lacl8_c %>% dplyr::rename(lac_closest_within48h_after_ecmo ="N2VALUE")
 
   
   #selecting lactate after implantation, highest (_h)
   lacl8_h <- lacl8[order(lacl8$id, -lacl8$N2VALUE, lacl8$time_to_lab2),]
   lacl8_h <- lacl8_h %>% distinct(id, .keep_all = T)
 
-  lacl8_h <- lacl8_h %>% dplyr::rename(lacl8_h ="N2VALUE")
+  lacl8_h <- lacl8_h %>% dplyr::rename(lac_highest_within48h_after_ecmo ="N2VALUE")
 
 
 #Creatinine
@@ -1632,14 +1632,14 @@ crea <- lab4 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaff√©)", "Kreatinin (Jaff√
   creab4_c <-creab4[order(creab4$id, creab4$time_to_lab2),]
   creab4_c <- creab4_c %>% distinct(id, .keep_all = T)
   
-  creab4_c <- creab4_c %>% dplyr::rename(creab4_c ="N2VALUE")
+  creab4_c <- creab4_c %>% dplyr::rename(crea_closest_within48h_before_ecmo ="N2VALUE")
   
   #after implantation 
   creal8 <- crea %>% filter(time_to_lab>0)
   creal8_c <-creal8[order(creal8$id, creal8$time_to_lab2),]
   creal8_c <- creal8 %>% distinct(id, .keep_all = T)
 
-  creal8_c <- creal8_c %>% dplyr::rename(creal8_c ="N2VALUE")
+  creal8_c <- creal8_c %>% dplyr::rename(crea_closest_within48h_after_ecmo ="N2VALUE")
 
   
 #Troponin 
@@ -1652,14 +1652,14 @@ trop <- lab4 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Tro
   tropb4_c <-tropb4[order(tropb4$id, tropb4$time_to_lab2),]
   tropb4_c <- tropb4_c %>% distinct(id, .keep_all = T)
   
-  tropb4_c <- tropb4_c %>% dplyr::rename(tropb4_c ="N2VALUE")
+  tropb4_c <- tropb4_c %>% dplyr::rename(trop_closest_within48h_before_ecmo ="N2VALUE")
 
   
   #highest 
   tropb4_h <-tropb4[order(tropb4$id, -tropb4$N2VALUE),]
   tropb4_h <- tropb4_h %>% distinct(id, .keep_all = T)
   
-  tropb4_h <- tropb4_h %>% dplyr::rename(tropb4_h ="N2VALUE")
+  tropb4_h <- tropb4_h %>% dplyr::rename(trop_highest_within48h_before_ecmo ="N2VALUE")
   
   #after implantation 
   
@@ -1668,13 +1668,13 @@ trop <- lab4 %>% filter(N2KATTEXT %in% c("Troponin-Ths", "Troponin-Ths HP", "Tro
   tropl8_c <-tropl8[order(tropl8$id, tropl8$time_to_lab2),]
   tropl8_c <- tropl8_c %>% distinct(id, .keep_all = T)
   
-  tropl8_c <- tropl8_c %>% dplyr::rename(tropl8_c ="N2VALUE")
+  tropl8_c <- tropl8_c %>% dplyr::rename(trop_closest_within48h_after_ecmo ="N2VALUE")
   
   #highest
   tropl8_h <-tropl8[order(tropl8$id, -tropl8$N2VALUE),]
   tropl8_h <- tropl8_h %>% distinct(id, .keep_all = T)
   
-  tropl8_h <- tropl8_h %>% dplyr::rename(tropl8_h ="N2VALUE")
+  tropl8_h <- tropl8_h %>% dplyr::rename(trop_highest_within48h_after_ecmo ="N2VALUE")
 
 #CK
 ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinase (CK) HP"))
@@ -1686,13 +1686,13 @@ ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinas
   ckb4_c <-ckb4[order(ckb4$id, ckb4$time_to_lab2),]
   ckb4_c <- ckb4_c %>% distinct(id, .keep_all = T)
   
-  ckb4_c <- ckb4_c %>% dplyr::rename(ckb4_c ="N2VALUE")
+  ckb4_c <- ckb4_c %>% dplyr::rename(ck_closest_within48h_before_ecmo ="N2VALUE")
 
   #selecting ck values before implantation, highest (_h)
   ckb4_h <- ckb4[order(ckb4$id, -ckb4$N2VALUE),]
   ckb4_h <- ckb4_h %>% distinct(id, .keep_all = T)
   
-  ckb4_h <- ckb4_h %>% dplyr::rename(ckb4_h ="N2VALUE")
+  ckb4_h <- ckb4_h %>% dplyr::rename(ck_highest_within48h_before_ecmo ="N2VALUE")
   
   #ck, after (later=l8) implantation 
   ckl8 <- ck %>% filter(time_to_lab>0)
@@ -1701,7 +1701,7 @@ ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinas
   ckl8_c <-ckl8[order(ckl8$id, ckl8$time_to_lab2),]
   ckl8_c <- ckl8_c %>% distinct(id, .keep_all = T)
   
-    ckl8_c <- ckl8_c %>% dplyr::rename(ckl8_c ="N2VALUE")
+    ckl8_c <- ckl8_c %>% dplyr::rename(ck_closest_within48h_after_ecmo ="N2VALUE")
 
   
   
@@ -1709,7 +1709,7 @@ ck <- lab4 %>% filter(N2KATTEXT %in% c("CK", "Creatinkinase (CK)", "Creatinkinas
   ckl8_h <- ckl8[order(ckl8$id, -ckl8$N2VALUE, ckl8$time_to_lab2),]
   ckl8_h <- ckl8_h %>% distinct(id, .keep_all = T)
 
-  ckl8_h <- ckl8_h %>% dplyr::rename(ckl8_h ="N2VALUE")
+  ckl8_h <- ckl8_h %>% dplyr::rename(ck_highest_witin48h_after_ecmo ="N2VALUE")
 
 
 #CK-MB
@@ -1722,14 +1722,14 @@ ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   ckmbb4_c <-ckmbb4[order(ckmbb4$id, ckmbb4$time_to_lab2),]
   ckmbb4_c <- ckmbb4_c %>% distinct(id, .keep_all = T)
   
-    ckmbb4_c <- ckmbb4_c %>% dplyr::rename(ckmbb4_c ="N2VALUE")
+    ckmbb4_c <- ckmbb4_c %>% dplyr::rename(ckmb_closest_within48h_before_ecmo ="N2VALUE")
 
   
   #selecting ck-mb values before implantation, highest (_h)
   ckmbb4_h <- ckmbb4[order(ckmbb4$id, -ckmbb4$N2VALUE, ckmbb4$time_to_lab2),]
   ckmbb4_h <- ckmbb4_h %>% distinct(id, .keep_all = T)
   
-    ckmbb4_h <- ckmbb4_h %>% dplyr::rename(ckmbb4_h ="N2VALUE")
+    ckmbb4_h <- ckmbb4_h %>% dplyr::rename(ckmb_highest_within48h_before_ecmo ="N2VALUE")
 
   #ck-mb, after (later=l8) implantation 
   ckmbl8 <- ckmb %>% filter(time_to_lab>0)
@@ -1738,13 +1738,13 @@ ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   ckmbl8_c <-ckmbl8[order(ckmbl8$id, ckmbl8$time_to_lab2),]
   ckmbl8_c <- ckmbl8_c %>% distinct(id, .keep_all = T)
   
-  ckmbl8_c <- ckmbl8_c %>% dplyr::rename(ckmbl8_c ="N2VALUE")
+  ckmbl8_c <- ckmbl8_c %>% dplyr::rename(ckmb_closest_within48h_after_ecmo ="N2VALUE")
   
-  #selecting lactate after implantation, highest (_h)
+  #selecting ckmb after implantation, highest (_h)
   ckmbl8_h <- ckmbl8[order(ckmbl8$id, -ckmbl8$N2VALUE, ckmbl8$time_to_lab2),]
   ckmbl8_h <- ckmbl8_h %>% distinct(id, .keep_all = T)
   
-  ckmbl8_h <- ckmbl8_h %>% dplyr::rename(ckmbl8_h ="N2VALUE")
+  ckmbl8_h <- ckmbl8_h %>% dplyr::rename(ckmb_highest_within48h_after_ecmo ="N2VALUE")
 
 #pH
   ph <- lab4 %>% filter(N2KATTEXT=="pH")
@@ -1756,14 +1756,14 @@ ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   phb4_c <-phb4[order(phb4$id, phb4$time_to_lab2),]
   phb4_c <- phb4_c %>% distinct(id, .keep_all = T)
   
-   phb4_c <- phb4_c %>% dplyr::rename(phb4_c ="N2VALUE")
+   phb4_c <- phb4_c %>% dplyr::rename(ph_closest_within48h_before_ecmo ="N2VALUE")
 
   
   #selecting ph values before implantation, lowest (_l)
   phb4_l <- phb4[order(phb4$id, phb4$N2VALUE, phb4$time_to_lab2),]
   phb4_l <- phb4_l %>% distinct(id, .keep_all = T)
   
-    phb4_l <- phb4_l %>% dplyr::rename(phb4_l ="N2VALUE")
+    phb4_l <- phb4_l %>% dplyr::rename(ph_lowest_within48h_before_ecmo ="N2VALUE")
 
   
   #ph, after (later=l8) implantation 
@@ -1773,13 +1773,13 @@ ckmb <- lab4 %>% filter(N2KATTEXT %in% c("CK-MB", "CK-MB HP"))
   phl8_c <-phl8[order(phl8$id, phl8$time_to_lab2),]
   phl8_c <- phl8_c %>% distinct(id, .keep_all = T)
 
-  phl8_c <- phl8_c %>% dplyr::rename(phl8_c ="N2VALUE")
+  phl8_c <- phl8_c %>% dplyr::rename(ph_closest_within48h_after_ecmo ="N2VALUE")
   
   #selecting ph after implantation, lowest (_l)
   phl8_l <- phl8[order(phl8$id, phl8$N2VALUE, phl8$time_to_lab2),]
   phl8_l <- phl8_l %>% distinct(id, .keep_all = T)
   
-phl8_l <- phl8_l %>% dplyr::rename(phl8_l ="N2VALUE") #umbennen
+phl8_l <- phl8_l %>% dplyr::rename(ph_lowest_within48h_after_ecmo ="N2VALUE") #umbennen
 
 
 ```
@@ -1996,7 +1996,7 @@ sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnume
   sapsc5_b4_c <-sapsc5_b4[order(sapsc5_b4$id, sapsc5_b4$time_to_score2),]
   sapsc5_b4_c <- sapsc5_b4_c %>% distinct(id, .keep_all = T)
   
-    sapsc5_b4_c <- rename(sapsc5_b4_c, sapsc5_b4_c = Gesamtscore)
+    sapsc5_b4_c <- rename(sapsc5_b4_c, saps_closest_within72h_before_ecmo = Gesamtscore)
 
   
   #after implantation 
@@ -2005,7 +2005,7 @@ sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnume
   sapsc5_l8_c <-sapsc5_l8[order(sapsc5_l8$id, sapsc5_l8$time_to_score2),]
   sapsc5_l8_c <- sapsc5_l8_c %>% distinct(id, .keep_all =T)
   
-  sapsc5_l8_c <- rename(sapsc5_l8_c, sapsc5_l8_c = Gesamtscore)
+  sapsc5_l8_c <- rename(sapsc5_l8_c, saps_closest_within72h_after_ecmo = Gesamtscore)
 
   
 #apache 
@@ -2059,14 +2059,14 @@ sapsc5.2 <- merge(sapsc5, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnume
   #merge apache scores from copra 5 and 6 together
   
   #before implantation 
-apachec5.2_b4_c <- rename(apachec5.2_b4_c, apacheb4 = Gesamtscore)
-apachec6.2_b4_c <- rename(apachec6.2_b4_c, apacheb4 = val)
+apachec5.2_b4_c <- rename(apachec5.2_b4_c,  apache_closest_within72h_before_ecmo = Gesamtscore)
+apachec6.2_b4_c <- rename(apachec6.2_b4_c,  apache_closest_within72h_before_ecmo = val)
 
 apacheb4 <- rbind(apachec5.2_b4_c[,c(3,6)], apachec6.2_b4_c[,c(4,6)])  
   
 #after implantation
-apachec5.2_l8_c <- rename(apachec5.2_l8_c, apachel8 = Gesamtscore)
-apachec6.2_l8_c <- rename(apachec6.2_l8_c, apachel8 = val)
+apachec5.2_l8_c <- rename(apachec5.2_l8_c, apache_closest_within72h_after_ecmo = Gesamtscore)
+apachec6.2_l8_c <- rename(apachec6.2_l8_c, apache_closest_within72h_after_ecmo = val)
 
 apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
 
@@ -2087,7 +2087,7 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   tiss10c6b4_c <-tiss10c6b4[order(tiss10c6b4$id, tiss10c6b4$time_to_score2),]
   tiss10c6b4_c <- tiss10c6b4_c %>% distinct(id, .keep_all = T)
   
-  tiss10c6b4_c <- rename(tiss10c6b4_c, tiss10b4_c = val)
+  tiss10c6b4_c <- rename(tiss10c6b4_c, tiss10_closest_within72h_before_ecmo = val)
 
   #after implantation 
  
@@ -2096,7 +2096,7 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   tiss10c6l8_c <-tiss10c6l8[order(tiss10c6l8$id, tiss10c6l8$time_to_score2),]
   tiss10c6l8_c <- tiss10c6l8_c %>% distinct(id, .keep_all =T)
 
-  tiss10c6l8_c <- rename(tiss10c6l8_c, tiss10l8_c = val)
+  tiss10c6l8_c <- rename(tiss10c6l8_c, tiss10_closest_within72h_after_ecmo = val)
 
 
 #tiss28 -copra 5 
@@ -2117,7 +2117,7 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   tiss28b4_c <-tiss28b4[order(tiss28b4$id, tiss28b4$time_to_score2),]
   tiss28b4_c <- tiss28b4_c %>% distinct(id, .keep_all = T)
   
-  tiss28b4_c <- rename(tiss28b4_c, tiss28b4_c = Gesamtscore)
+  tiss28b4_c <- rename(tiss28b4_c, tiss28_closest_within72h_before_ecmo = Gesamtscore)
 
   
   #after implantation 
@@ -2126,7 +2126,7 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   tiss28l8_c <-tiss28l8[order(tiss28l8$id, tiss28l8$time_to_score2),]
   tiss28l8_c <- tiss28l8_c %>% distinct(id, .keep_all =T)
 
-  tiss28l8_c <- rename(tiss28l8_c, tiss28l8_c = Gesamtscore)
+  tiss28l8_c <- rename(tiss28l8_c, tiss28_closest_within72h_after_ecmo = Gesamtscore)
 
 
 #gcs
@@ -2178,14 +2178,14 @@ apachel8 <- rbind(apachec5.2_l8_c[,c(3,6)], apachec6.2_l8_c[,c(4,6)])
   #merge gcs scores from copra 5 and 6 together
   
   #before implantation 
-gcs5.2_b4_c <- rename(gcs5.2_b4_c, gcsb4 = Gesamtscore)
-gcs6.2_b4_c <- rename(gcs6.2_b4_c, gcsb4 = val)
+gcs5.2_b4_c <- rename(gcs5.2_b4_c, gcs_closest_within72h_before_ecmo = Gesamtscore)
+gcs6.2_b4_c <- rename(gcs6.2_b4_c, gcs_closest_within72h_before_ecmo = val)
 
 gcsb4 <- rbind(gcs5.2_b4_c[,c(3,6)], gcs6.2_b4_c[,c(4,6)])  
   
 #after implantation
-gcs5.2_l8_c <- rename(gcs5.2_l8_c, gcsl8 = Gesamtscore)
-gcs6.2_l8_c <- rename(gcs6.2_l8_c, gcsl8 = val)
+gcs5.2_l8_c <- rename(gcs5.2_l8_c, gcs_closest_within72h_after_ecmo = Gesamtscore)
+gcs6.2_l8_c <- rename(gcs6.2_l8_c, gcs_closest_within72h_after_ecmo = val)
 
 gcsl8 <- rbind(gcs5.2_l8_c[,c(3,6)], gcs6.2_l8_c[,c(4,6)])
 
@@ -2290,7 +2290,7 @@ hfc6l8_c <- hfc6l8 %>% distinct(id, .keep_all=T)
 
 hfl8_c <- merge(hfc5l8_c[,c(3,5,7)], hfc6l8_c[,c(4,6,8)], by="id", all=T)
 
-hfl8_c$hfl8_c <- ifelse(is.na(hfl8_c$vFloat), hfl8_c$val, 
+hfl8_c$heartrate_closest_within48h_after_ecmo <- ifelse(is.na(hfl8_c$vFloat), hfl8_c$val, 
                         ifelse(is.na(hfl8_c$val), hfl8_c$vFloat,
                                ifelse(hfl8_c$time_to_val.x< hfl8_c$time_to_val.y, hfl8_c$vFloat, hfl8_c$val)
 )
@@ -2299,7 +2299,7 @@ hfl8_c$hfl8_c <- ifelse(is.na(hfl8_c$vFloat), hfl8_c$val,
 
 hfb4_c <- merge(hfc5b4_c[,c(3,5,7)], hfc6b4_c[,c(4,6,8)], by="id", all=T)
 
-hfb4_c$hfb4_c <- ifelse(is.na(hfb4_c$vFloat), hfb4_c$val, 
+hfb4_c$heartrate_closest_within48h_before_ecmo <- ifelse(is.na(hfb4_c$vFloat), hfb4_c$val, 
                         ifelse(is.na(hfb4_c$val), hfb4_c$vFloat,
                                ifelse(hfb4_c$time_to_val.x > hfb4_c$time_to_val.y, hfb4_c$vFloat, hfb4_c$val)
 )
@@ -2320,14 +2320,14 @@ afc5b4 <- afc5.3 %>% filter(time_to_val < 0)
 afc5b4_c <-afc5b4[order(afc5b4$id, afc5b4$time_to_val2),]
 afc5b4_c <- afc5b4_c %>% distinct(id, .keep_all = T)
 
-afc5b4_c <- rename(afc5b4_c, afb4_c = vFloat)
+afc5b4_c <- rename(afc5b4_c, respiratoryrate_closest_within48h_before_ecmo = vFloat)
 
 #after implantation 
 afc5l8 <- afc5.3 %>% filter(time_to_val >0)
 afc5l8_c <-afc5l8[order(afc5l8$id, afc5l8$time_to_val2),]
 afc5l8_c <- afc5l8_c %>% distinct(id, .keep_all=T)
 
-afc5l8_c <- rename(afc5l8_c, afl8_c = vFloat)
+afc5l8_c <- rename(afc5l8_c, respiratoryrate_closest_within48h_after_ecmo = vFloat)
 
 
 #systolic blood pressure copra 5 
@@ -2344,14 +2344,14 @@ psab4 <- psa3 %>% filter(time_to_val < 0)
 psab4_c <-psab4[order(psab4$id, psab4$time_to_val2),]
 psab4_c <- psab4_c %>% distinct(id, .keep_all = T)
 
-psab4_c <- rename(psab4_c, psab4_c = vFloat)
+psab4_c <- rename(psab4_c, psa_closest_within48h_before_ecmo = vFloat)
 
 #after implantation 
 psal8 <- psa3 %>% filter(time_to_val >0)
 psal8_c <-psal8[order(psal8$id, psal8$time_to_val2),]
 psal8_c <- psal8_c %>% distinct(id, .keep_all=T)
 
-psal8_c <- rename(psal8_c, psal8_c = vFloat)
+psal8_c <- rename(psal8_c, psa_closest_within48h_after_ecmo = vFloat)
 
 
 #diastolic blood pressure copra5 
@@ -2368,14 +2368,14 @@ pdab4 <- pda3 %>% filter(time_to_val < 0)
 pdab4_c <-pdab4[order(pdab4$id, pdab4$time_to_val2),]
 pdab4_c <- pdab4_c %>% distinct(id, .keep_all = T)
 
-pdab4_c <- rename(pdab4_c, pdab4_c = vFloat)
+pdab4_c <- rename(pdab4_c, pda_closest_within48_before_ecmo = vFloat)
 
 #after implantation 
 pdal8 <- pda3 %>% filter(time_to_val >0)
 pdal8_c <-pdal8[order(pdal8$id, pdal8$time_to_val2),]
 pdal8_c <- pdal8_c %>% distinct(id, .keep_all=T)
 
-pdal8_c <- rename(pdal8_c, pdal8_c = vFloat)
+pdal8_c <- rename(pdal8_c, pda_closest_within48h_after_ecmo = vFloat)
 
 #mean arterial pressure
 pma2 <- merge(p_ma_i, ecmo_master8[,c(1,2,9)], by.x="FALLNR", by.y="Fallnumer", all=F)
@@ -2390,14 +2390,14 @@ pmab4 <- pma3 %>% filter(time_to_val < 0)
 pmab4_c <-pmab4[order(pmab4$id, pmab4$time_to_val2),]
 pmab4_c <- pmab4_c %>% distinct(id, .keep_all = T)
 
-pmab4_c <- rename(pmab4_c, pmab4_c = vFloat)
+pmab4_c <- rename(pmab4_c, pma_closest_within48h_before_ecmo = vFloat)
 
 #after implantation 
 pmal8 <- pma3 %>% filter(time_to_val >0)
 pmal8_c <-pmal8[order(pmal8$id, pmal8$time_to_val2),]
 pmal8_c <- pmal8_c %>% distinct(id, .keep_all=T)
 
-pmal8_c <- rename(pmal8_c, pmal8_c = vFloat)
+pmal8_c <- rename(pmal8_c, pma_closest_within48h_after_ecmo = vFloat)
 
 
 
@@ -2499,13 +2499,13 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 ```{r}
 ecmo_master10 <- Reduce(
   function(ecmo_master8, id_bmi_sex_lab2) merge(ecmo_master8, id_bmi_sex_lab2, by="id", all=T),
-  list(ecmo_master8, id_bmi_sex_lab2[,c(1,4,5,14)], phl8_c[,c(6,11)], phl8_l[,c(6,11)], lacl8_c[,c(6,11)], lacl8_h[,c(6,11)], ckl8_c[,c(6,11)], ckl8_h[,c(6,11)], ckmbl8_c[,c(6,11)], ckmbl8_h[,c(6,11)],  phb4_c[,c(6,11)], phb4_l[,c(6,11)], lacb4_c[,c(6,11)], lacb4_h[,c(6,11)], ckb4_c[,c(6,11)], ckb4_h[,c(6,11)], ckmbb4_c[,c(6,11)], ckmbb4_h[,c(6,11)], tropb4_c[,c(6,11)], tropb4_h[,c(6,11)], tropl8_c[,c(6,11)], tropl8_h[,c(6,11)], creab4_c[,c(6,11)], creal8_c[,c(6,11)], hfb4_c[,c(1,6)], hfl8_c[,c(1,6)], apacheb4, apachel8, gcsb4, gcsl8, sapsc5_b4_c[,c(3,6)], tiss10c6b4_c[,c(4,6)], tiss10c6l8_c[,c(4,6)], afc5b4_c[,c(3,5)], afc5l8_c[,c(3,5)], psab4_c[,c(3,5)], psal8_c[,c(3,5)], pdab4_c[,c(3,5)], pdal8_c[,c(3,5)], pmab4_c[,c(3,5)], pmal8_c[,c(3,5)]  )
+  list(ecmo_master8, id_bmi_sex_lab2[,c(1,4,5,14)], phl8_c[,c(6,11)], phl8_l[,c(6,11)], lacl8_c[,c(6,11)], lacl8_h[,c(6,11)], ckl8_c[,c(6,11)], ckl8_h[,c(6,11)], ckmbl8_c[,c(6,11)], ckmbl8_h[,c(6,11)],  phb4_c[,c(6,11)], phb4_l[,c(6,11)], lacb4_c[,c(6,11)], lacb4_h[,c(6,11)], ckb4_c[,c(6,11)], ckb4_h[,c(6,11)], ckmbb4_c[,c(6,11)], ckmbb4_h[,c(6,11)], tropb4_c[,c(6,11)], tropb4_h[,c(6,11)], tropl8_c[,c(6,11)], tropl8_h[,c(6,11)], creab4_c[,c(6,11)], creal8_c[,c(6,11)], hfb4_c[,c(1,6)], hfl8_c[,c(1,6)], apacheb4, apachel8, gcsb4, gcsl8, sapsc5_b4_c[,c(3,6)],sapsc5_l8_c[,c(3,6)],  tiss10c6b4_c[,c(4,6)], tiss10c6l8_c[,c(4,6)], afc5b4_c[,c(3,5)], afc5l8_c[,c(3,5)], psab4_c[,c(3,5)], psal8_c[,c(3,5)], pdab4_c[,c(3,5)], pdal8_c[,c(3,5)], pmab4_c[,c(3,5)], pmal8_c[,c(3,5)], tiss28b4_c[,c(3,6)], tiss28l8_c[,c(3,6)], id_ef_cod2[,c(1,2,5,6)]  )
 )
 
 
 #clean up 
 
-ecmo_master11 <- ecmo_master10 %>% select(id, Fallnumer, Patientenummer, GBDAT, age, age_q4, GSCHL, height_chart, weight_chart, bmi, admission2, discharge, length_of_stay2, ICU_admission2, ICU_discharge2, ICU_length_of_stay2, `Sterbezeit (0 = nicht tot)`, mort, campus2, year, ecmo, ecmo_num, ecmo_implantation, `ECMO wann eingebaut?`, ecmo_ex, ecmo_interval, ecmo_time2, impella, impella_num, impella_implantation, `Impella wann eingebaut?`,  impella_ex, impella_interval, impella_time2, ppci,  impella_during_ecmo, ecmo_during_impella,  ecmella_true, ecmella_final, ecmella_num, intervention, trt, rosc_num, rea, shockable, unshockable, stemi, nstemi, mi, cs, lae, pul, intox, sepsis, aortdiss, hi, myocarditis, cad, diag1, diag2, diag3, diag4, diag5, infarct, prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t3, prov1, prov1_num, prov1_fact, ef1, ef2, phb4_c, phb4_l, phl8_c, phl8_l, lacb4_c, lacb4_h, lacl8_c, lacl8_h, ckb4_c, ckb4_h, ckl8_c, ckl8_h, ckmbb4_c, ckmbb4_h, ckmbl8_c, ckmbl8_h, tropb4_c, tropb4_h, tropl8_c, tropl8_h, creab4_c, creal8_c, hfb4_c, hfl8_c, afb4_c, afl8_c, psab4_c, psal8_c, pdab4_c, pdal8_c, pmab4_c, pmal8_c, apacheb4, apachel8, gcsb4, gcsl8, sapsc5_b4_c, tiss10b4_c, tiss10l8_c) 
+ecmo_final1<- ecmo_master10 %>% select(id, Fallnumer, Patientenummer, GBDAT, age, age_q4, GSCHL, height_chart, weight_chart, bmi, admission2, discharge, length_of_stay2, ICU_admission2, ICU_discharge2, ICU_length_of_stay2, `Sterbezeit (0 = nicht tot)`, mort, cod_main, campus2, year, ecmo, ecmo_num, ecmo_implantation, `ECMO wann eingebaut?`, ecmo_ex, ecmo_interval, ecmo_time2, impella, impella_num, impella_implantation, `Impella wann eingebaut?`,  impella_ex, impella_interval, impella_time2, ppci,  impella_during_ecmo, ecmo_during_impella,  ecmella_true, ecmella_final, ecmella_num, intervention, trt, rosc_num, rea, shockable, unshockable, stemi, nstemi, mi, cs, lae, pul, intox, sepsis, aortdiss, hi, myocarditis, cad, diag1, diag2, diag3, diag4, diag5, infarct, prov1_t1, prov2_t1, prov3_t1, prov1_t2, prov2_t2, prov3_t3, prov1, prov1_num, prov1_fact, ef_admission2, ef_discharge2, ph_closest_within48h_before_ecmo, ph_lowest_within48h_before_ecmo, ph_closest_within48h_after_ecmo, ph_lowest_within48h_after_ecmo, lac_closest_within48h_before_ecmo, lac_highest_within48h_before_ecmo, lac_closest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_before_ecmo, ck_highest_within48h_before_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_before_ecmo, ckmb_highest_within48h_before_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_before_ecmo, trop_highest_within48h_before_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo,  crea_closest_within48h_before_ecmo, crea_closest_within48h_after_ecmo, heartrate_closest_within48h_before_ecmo, heartrate_closest_within48h_after_ecmo, respiratoryrate_closest_within48h_before_ecmo, respiratoryrate_closest_within48h_after_ecmo, psa_closest_within48h_before_ecmo, psa_closest_within48h_after_ecmo, pda_closest_within48_before_ecmo, pda_closest_within48h_after_ecmo, pma_closest_within48h_before_ecmo, pma_closest_within48h_after_ecmo, apache_closest_within72h_before_ecmo, apache_closest_within72h_after_ecmo, gcs_closest_within72h_before_ecmo, gcs_closest_within72h_before_ecmo, gcs_closest_within72h_after_ecmo, saps_closest_within72h_before_ecmo, saps_closest_within72h_after_ecmo, tiss10_closest_within72h_before_ecmo, tiss10_closest_within72h_after_ecmo, tiss28_closest_within72h_before_ecmo, tiss28_closest_within72h_after_ecmo) 
 
 ```
 
