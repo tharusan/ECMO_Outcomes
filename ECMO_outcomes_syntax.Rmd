@@ -2553,4 +2553,31 @@ ecmo_final2 <- rbind(ecmo_final1, new_patients)
 
 
 ```
+#Charlson Comorrbidity Index
+```{r}
+#import diagnosis for charlson comorbidity index
+library(readr)
+diagnosen <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/diagnosen.csv", 
+    col_types = cols(FALNR = col_number(), 
+        DIADT = col_date(format = "%Y%m%d"), 
+        DIAZT = col_time(format = "%H%M%S"), 
+        ERDAT = col_date(format = "%Y%m%d"), 
+        ERTIM = col_time(format = "%H%M%S"), 
+        UPDAT = col_date(format = "%Y%m%d")))
+View(diagnosen)
+
+library(comorbidity)
+charlson <- diagnosen %>% select(FALNR, DKEY1)
+
+charlson_comorbidity <- comorbidity(x=charlson, id="FALNR", code="DKEY1", score="charlson", icd="icd10", assign0=T)
+```
+#Therapies?
+```{r}
+library(readr)
+therapies <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/therapies.csv", 
+    col_types = cols(c_start = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
+        c_end = col_datetime(format = "%Y-%m-%d %H:%M:%S")))
+View(therapies)
+
+```
 
