@@ -1637,7 +1637,7 @@ crea <- lab4 %>% filter(N2KATTEXT %in% c("Kreatinin (Jaff√©)", "Kreatinin (Jaff√
   #after implantation 
   creal8 <- crea %>% filter(time_to_lab>0)
   creal8_c <-creal8[order(creal8$id, creal8$time_to_lab2),]
-  creal8_c <- creal8 %>% distinct(id, .keep_all = T)
+  creal8_c <- creal8_c %>% distinct(id, .keep_all = T)
 
   creal8_c <- creal8_c %>% dplyr::rename(crea_closest_within48h_after_ecmo ="N2VALUE")
 
@@ -2551,6 +2551,14 @@ new_patients<- new_patients %>% mutate(impella_interval = interval(impella_impla
 #merge with existing dataset 
 ecmo_final2 <- rbind(ecmo_final1, new_patients)
 
+#adapt
+ecmo_final2$age_q4 <- quantcut(ecmo_final2$age, q = 4, na.rm = TRUE) #quartile of age
+ecmo_final2$GSCHL <- recode(ecmo_final2$GSCHL, "W" = "F")
+ecmo_final2$rea <- recode(ecmo_final2$rea, "2" ="In-hospital", "1" ="Out-of-hospital")
+ecmo_final2$campus2 <- recode(ecmo_final2$campus2, "CBF" ="cbf", "CVK" ="cvk")
+ecmo_final2$cod_main <- recode(ecmo_final2$cod_main, "SIRS" ="sirs")
+
+
 
 ```
 #Charlson Comorrbidity Index
@@ -2570,6 +2578,34 @@ library(comorbidity)
 charlson <- diagnosen %>% select(FALNR, DKEY1)
 
 charlson_comorbidity <- comorbidity(x=charlson, id="FALNR", code="DKEY1", score="charlson", icd="icd10", assign0=T)
+#in some patients myocardial infarction wasn't coded in diagnoses-> manual correction 
+charlson_comorbidity$wscore2 <- ifelse(charlson_comorbidity$ami == "0", charlson_comorbidity$wscore + 1, charlson_comorbidity$wscore)
+
+#find case numbers of missings
+ecmo_final2_FALNR <- ecmo_final2 %>% select(Fallnumer)
+
+charlson_comorbidity2 <- merge(charlson_comorbidity, ecmo_final2_FALNR, by.x="FALNR", by.y="Fallnumer", all=T)
+write_xlsx(charlson_comorbidity2,"C:/Users/HP-EliteBook-840-G3/Desktop/charlson_comorbidity2.xlsx")
+
+#import chart review of additional patients
+library(readxl)
+comorbidity_chart_review <- read_excel("~/Uni/Promotion/ECMELLA/chart review/charlson_comorbidity_chart_review.xlsx", 
+    col_types = c("numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "text", "numeric", "text", 
+        "numeric"))
+View(comorbidity_chart_review)
+
+#remove duplicates
+comorbidity_chart_review2 <-comorbidity_chart_review %>% distinct()
+
+#merge into final dataframe
+ecmo_final3 <- merge(ecmo_final2, comorbidity_chart_review2, by.x="Fallnumer", by.y="FALNR")
+
 ```
 #Therapies?
 ```{r}
@@ -2578,6 +2614,25 @@ therapies <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/therapies.c
     col_types = cols(c_start = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
         c_end = col_datetime(format = "%Y-%m-%d %H:%M:%S")))
 View(therapies)
+
+```
+
+#Results
+```{r}
+
+library(table1)
+ecmo_final2_table1 <- ecmo_final2
+
+ecmo_final2_table1$trt  <- 
+  factor(ecmo_final2_table1$trt , 
+         levels=c(1,0),
+         labels=c("ECMELLA", 
+                  "VA-ECMO"))
+ecmo_final2_table1$mort  <- as.logical(ecmo_final2_table1$mort)
+
+
+table1(~age + GSCHL + campus2 + rea + shockable + unshockable + length_of_stay2 + ICU_length_of_stay2+ ecmo_time2 + impella_time2 + mort+ cod_main + cad| trt, data=ecmo_final2_table1)
+
 
 ```
 
