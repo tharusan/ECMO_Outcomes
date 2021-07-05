@@ -2621,7 +2621,19 @@ View(therapies)
 ```{r}
 
 library(table1)
-ecmo_final2_table1 <- ecmo_final2
+ecmo_final3$ph_closest_within48h_after_ecmo <-as.numeric(ecmo_final3$ph_closest_within48h_after_ecmo)
+ecmo_final3$ph_lowest_within48h_after_ecmo <- as.numeric(ecmo_final3$ph_lowest_within48h_after_ecmo)
+ecmo_final3$lac_closest_within48h_after_ecmo <- as.numeric(ecmo_final3$lac_closest_within48h_after_ecmo)
+ecmo_final3$lac_highest_within48h_after_ecmo <- as.numeric(ecmo_final3$lac_highest_within48h_after_ecmo)
+ecmo_final3$ck_closest_within48h_after_ecmo <- as.numeric(ecmo_final3$ck_closest_within48h_after_ecmo)
+ecmo_final3$ck_highest_witin48h_after_ecmo <- as.numeric(ecmo_final3$ck_highest_witin48h_after_ecmo )
+ecmo_final3$ckmb_closest_within48h_after_ecmo <- as.numeric(ecmo_final3$ckmb_closest_within48h_after_ecmo)
+ecmo_final3$ckmb_highest_within48h_after_ecmo <- as.numeric(ecmo_final3$ckmb_highest_within48h_after_ecmo)
+ecmo_final3$trop_closest_within48h_after_ecmo <- as.numeric(ecmo_final3$trop_closest_within48h_after_ecmo)
+ecmo_final3$trop_highest_within48h_after_ecmo <- as.numeric(ecmo_final3$trop_highest_within48h_after_ecmo)
+ecmo_final3$crea_closest_within48h_after_ecmo <- as.numeric(ecmo_final3$crea_closest_within48h_after_ecmo)
+
+ecmo_final2_table1 <- ecmo_final3
 
 ecmo_final2_table1$trt  <- 
   factor(ecmo_final2_table1$trt , 
@@ -2632,6 +2644,82 @@ ecmo_final2_table1$mort  <- as.logical(ecmo_final2_table1$mort)
 
 
 table1(~age + GSCHL + campus2 + rea + shockable + unshockable + length_of_stay2 + ICU_length_of_stay2+ ecmo_time2 + impella_time2 + mort+ cod_main + cad| trt, data=ecmo_final2_table1)
+
+
+
+
+
+table1(~ph_closest_within48h_after_ecmo + ph_lowest_within48h_after_ecmo + lac_closest_within48h_after_ecmo+ lac_highest_within48h_after_ecmo+ ck_closest_within48h_after_ecmo +ck_highest_witin48h_after_ecmo +ckmb_closest_within48h_after_ecmo + ckmb_highest_within48h_after_ecmo + trop_closest_within48h_after_ecmo +  trop_highest_within48h_after_ecmo + crea_closest_within48h_after_ecmo|trt, data=ecmo_final2_table1)
+
+
+ecmo_final3$survdays <-difftime(ecmo_final3$`Sterbezeit (0 = nicht tot)`, ecmo_final3$ecmo_implantation, unit="days")
+ecmo_final3$survdays <- as.numeric(ecmo_final3$survdays)
+
+ecmo_final3 <- ecmo_final3 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+survdays_check <- ecmo_final3 %>% select(ecmo_implantation, `Sterbezeit (0 = nicht tot)`, survdays) #check
+
+library(survival)
+library(ggfortify)
+km <- with(ecmo_final3, Surv(survdays, mort))
+km_trt_fit <- survfit(Surv(survdays) ~ trt, data=ecmo_final3)
+autoplot(km_trt_fit)
+
+library("survminer")
+fit <- survfit(Surv(survdays, mort) ~ trt, data = ecmo_final3)
+surv <- ggsurvplot(fit, data = ecmo_final3, pval = TRUE, risk.table = TRUE, risk.table.col = "strata",
+                   legend.labs = c("VA-ECMO", "ECMELLA"),size = 1, ggtheme = theme_bw(),
+                   xlim = c(0,30), xlab = "Time (days)", ylab = "Survival probability")
+
+
+
+library(gtools)
+ecmo_final3$age_q4 <- quantcut(ecmo_final3$age, q = 4, na.rm = TRUE) #quartile of age
+ecmo_final3$prov1_fact <- as.factor(ecmo_final3$prov1)
+ecmo_final3$bmi <- as.numeric(ecmo_final3$bmi)
+ecmo_final3$bmi_q4 <- quantcut(ecmo_final3$bmi, q = 4, na.rm = TRUE) #quartile of bmi
+ecmo_final3$lac_q4 <- quantcut(ecmo_final3$lac_closest_within48h_after_ecmo, q = 4, na.rm = TRUE) #quartile of lactate closest after
+ecmo_final3$ph_q4 <- quantcut(ecmo_final3$ph_closest_within48h_after_ecmo, q = 4, na.rm = TRUE) #quartile of pH closest after
+
+#create survival duration variable
+
+ecmo_final3$survdays <-difftime(ecmo_final3$`Sterbezeit (0 = nicht tot)`, ecmo_final3$ecmo_implantation, unit="days")
+ecmo_final3$survdays <- as.numeric(ecmo_final3$survdays)
+ecmo_final3 <- ecmo_final3 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+log_mort <- glm(mort ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time2 + bmi_q4 +lac_q4,
+                data = ecmo_final3, family = "binomial")
+summary(log_mort)
+exp(cbind(OR = coef(log_mort), confint(log_mort)))
+
+#Cox proportional hazard
+cox.mod <- coxph(Surv(survdays, mort) ~ trt + age_q4 + GSCHL + bmi_q4 + rea + unshockable + lac_q4 + ph_q4
+                 , data= ecmo_final3)
+
+summary(cox.mod)
+
+library(MASS)
+
+los <- glm(length_of_stay2 ~ trt + age_q4 + GSCHL + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson,data = ecmo_final3)
+summary(los)
+exp(cbind(IRR = coef(los), confint(los)))
+
+
+iculos <- glm(ICU_length_of_stay2 ~ trt + age_q4 + GSCHL + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson, data = ecmo_final3)
+summary(iculos)
+exp(cbind(IRR = coef(iculos), confint(iculos)))
+
+#resuts table
+library(jtools)
+library(huxtable)
+library(officer)
+library(flextable)
+
+res_mort <- summ(log_mort, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_los <- summ(los, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+
+export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
 
 
 ```
