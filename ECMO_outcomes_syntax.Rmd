@@ -2723,4 +2723,18 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 
 
 ```
+#Save Score
+```{r}
+
+library(readxl)
+save_score <- read_excel("~/Uni/Promotion/ECMELLA/chart review/save.xlsx", 
+    col_types = c("numeric", "numeric", "numeric", 
+        "numeric", "text", "numeric", "text", 
+        "text", "text", "text", "text", "text", 
+        "numeric", "text", "text", "numeric"))
+View(save_score)
+
+ecmo_final4 <- merge(ecmo_final3, save_score[,c(1,16)], by="id", all=T)
+
+```
 
