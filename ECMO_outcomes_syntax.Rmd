@@ -2189,6 +2189,33 @@ gcs6.2_l8_c <- rename(gcs6.2_l8_c, gcs_closest_within72h_after_ecmo = val)
 
 gcsl8 <- rbind(gcs5.2_l8_c[,c(3,6)], gcs6.2_l8_c[,c(4,6)])
 
+#SAPS aus Copra 6
+library(readr)
+ecmella_CO_Score_SAPS2_Wert_mit_GCS <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/ecmella_CO_Score_SAPS2_Wert_mit_GCS.csv", 
+    col_types = cols(cop6_patient_id = col_number(), 
+        c_parent_id = col_number(), c_date_time_to = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
+        c_val = col_number()))
+View(ecmella_CO_Score_SAPS2_Wert_mit_GCS)
+
+library(readr)
+ecmella_CO_Score_SAPS2_Datum <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/ecmella_CO_Score_SAPS2_Datum.csv", 
+    col_types = cols(cop6_patient_id = col_number(), 
+        c_parent_id = col_number(), c_date_time_to = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
+        c_val = col_datetime(format = "%Y-%m-%d %H:%M:%S")))
+View(ecmella_CO_Score_SAPS2_Datum)
+
+library(readr)
+ecmella_CO_Score_SAPS2_Wert <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/ecmella_CO_Score_SAPS2_Wert.csv", 
+    col_types = cols(cop6_patient_id = col_number(), 
+        c_parent_id = col_number(), c_date_time_to = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
+        c_val = col_number()))
+View(ecmella_CO_Score_SAPS2_Wert)
+
+library(readr)
+mapping <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/mapping.csv", 
+    col_types = cols(Fallnummer = col_number(), 
+        cop6_patient_id = col_number()))
+View(mapping)
   
 ```
 
@@ -2398,6 +2425,22 @@ pmal8_c <-pmal8[order(pmal8$id, pmal8$time_to_val2),]
 pmal8_c <- pmal8_c %>% distinct(id, .keep_all=T)
 
 pmal8_c <- rename(pmal8_c, pma_closest_within48h_after_ecmo = vFloat)
+
+#zusätzliche Vitalwerte
+library(readr)
+ecmella_vital_NBP <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/ecmella_vital_NBP.csv", 
+    col_types = cols(cop6_patient_id = col_number(), 
+        c_parent_id = col_number(), c_date_time_to = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
+        c_diastolic = col_number(), c_mean = col_number(), 
+        c_systolic = col_number()))
+View(ecmella_vital_NBP)
+
+library(readr)
+ecmella_vital_AF <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/ecmella_vital_AF.csv", 
+    col_types = cols(cop6_patient_id = col_number(), 
+        c_parent_id = col_number(), c_date_time_to = col_datetime(format = "%Y-%m-%d %H:%M:%S"), 
+        c_val = col_number()))
+View(ecmella_vital_AF)
 
 
 
@@ -2721,6 +2764,31 @@ res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 
 export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
 
+
+```
+#Save Score
+```{r}
+
+library(readxl)
+save_score <- read_excel("~/Uni/Promotion/ECMELLA/chart review/save.xlsx", 
+    col_types = c("numeric", "numeric", "numeric", 
+        "numeric", "text", "numeric", "text", 
+        "text", "text", "text", "text", "text", 
+        "numeric", "text", "text", "numeric"))
+View(save_score)
+
+ecmo_final4 <- merge(ecmo_final3, save_score[,c(1,16)], by="id", all=T)
+
+```
+#Chart Review missings
+```{r}
+library(readxl)
+chartreview_missings <- read_excel("~/Uni/Promotion/ECMELLA/chart review/chartreview_missings.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric"))
+View(chartreview_missings)
 
 ```
 
