@@ -2216,7 +2216,14 @@ mapping <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/mapping.csv",
     col_types = cols(Fallnummer = col_number(), 
         cop6_patient_id = col_number()))
 View(mapping)
-  
+
+sapsc6 <- merge(ecmella_CO_Score_SAPS2_Wert, mapping_ecmo, by="cop6_patient_id", all=T)
+sapsc6$time_to_score <- as.numeric(difftime(sapsc6$c_date_time_to, sapsc6$`ECMO wann eingebaut?`, unit="hours"))
+sapsc6.2 <- sapsc6 %>% filter(time_to_score <72 & time_to_score >0)
+sapsc6.2 <- sapsc6.2[order(sapsc6.2$id, sapsc6.2$time_to_score),]
+sapsc6.3 <- sapsc6.2 %>% distinct(id, .keep_all = T)
+
+sapsc6.3 <- dplyr::rename(sapsc6.3,  saps_after_ecmo_c6= c_val)
 ```
 
 #Vitals
@@ -2442,6 +2449,27 @@ ecmella_vital_AF <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/ecme
         c_val = col_number()))
 View(ecmella_vital_AF)
 
+mapping2 <- mapping %>% distinct(Fallnummer, cop6_patient_id)
+
+mapping_ecmo <- merge(mapping2, ecmo_final5[,c(1,2,25)], by.x="Fallnummer", by.y="Fallnumer", all=F)
+
+rr_c6 <- merge(ecmella_vital_NBP[,c(2,5,6,7,8)], mapping_ecmo, by="cop6_patient_id", all=T)
+rr_c6$time_to_val <- difftime(rr_c6$c_date_time_to, rr_c6$`ECMO wann eingebaut?`, unit="hours")
+rr_c6$time_to_val <- as.numeric(rr_c6$time_to_val)
+
+rr_c6.2 <- rr_c6 %>% filter(time_to_val < 48 & time_to_val > 0)
+rr_c6.3 <- rr_c6.2[order(rr_c6.2$id, rr_c6.2$time_to_val),]
+rr_c6.3 <- rr_c6.3 %>% distinct(id, .keep_all = T)
+
+af_c6 <- merge(ecmella_vital_AF[,c(2,5,6)], mapping_ecmo,  by="cop6_patient_id", all=T)
+af_c6$time_to_val <- difftime(af_c6$c_date_time_to, af_c6$`ECMO wann eingebaut?`, unit="hours")
+af_c6$time_to_val <- as.numeric(af_c6$time_to_val)
+
+af_c6.2 <- af_c6 %>% filter(time_to_val >0 & time_to_val <48)
+af_c6.3 <- af_c6.2[order(af_c6.2$id, af_c6.2$time_to_val),]
+af_c6.3 <- af_c6.3 %>% distinct(id, .keep_all = T)
+
+af_c6.3 <- dplyr::rename(af_c6.3,  respiratory_rate_after_ecmo_c6 = c_val)
 
 
 ```
@@ -2790,6 +2818,72 @@ chartreview_missings <- read_excel("~/Uni/Promotion/ECMELLA/chart review/chartre
         "numeric", "numeric", "numeric", 
         "numeric"))
 View(chartreview_missings)
+
+ecmo_final5 <- merge(ecmo_final4, chartreview_missings[,c(1,4,5,6,7,8,9,10)], by="id", all=T)
+
+ecmo_final5$bmi <- ifelse(is.na(ecmo_final5$bmi), ecmo_final5$bmi_missings, ecmo_final5$bmi)
+ecmo_final5$height_chart <- ifelse(is.na(ecmo_final5$height_chart), ecmo_final5$height_missings, ecmo_final5$height_chart)
+ecmo_final5$weight_chart <- ifelse(is.na(ecmo_final5$weight_chart), ecmo_final5$weight_missings, ecmo_final5$weight_chart)
+
+ecmo_final5$ph_closest_within48h_after_ecmo <- ifelse(is.na(ecmo_final5$ph_closest_within48h_after_ecmo), ecmo_final5$ph_closest_within48h_after_ecmo_missings, ecmo_final5$ph_closest_within48h_after_ecmo)
+
+ecmo_final5$ph_lowest_within48h_after_ecmo <- ifelse(is.na(ecmo_final5$ph_lowest_within48h_after_ecmo), ecmo_final5$ph_lowest_within48h_after_ecmo_missings, ecmo_final5$ph_lowest_within48h_after_ecmo)
+
+ecmo_final5$lac_closest_within48h_after_ecmo <- ifelse(is.na(ecmo_final5$lac_closest_within48h_after_ecmo), ecmo_final5$lac_closest_within48h_after_ecmo_missings, ecmo_final5$lac_closest_within48h_after_ecmo)
+
+ecmo_final5$lac_highest_within48h_after_ecmo <- ifelse(is.na(ecmo_final5$lac_highest_within48h_after_ecmo), ecmo_final5$lac_highest_within48h_after_missings, ecmo_final5$lac_highest_within48h_after_ecmo)
+
+ecmo_final6 <- Reduce(
+  function(ecmo_final5, rr_c6.3) merge(ecmo_final5, rr_c6.3, by="id", all=T),
+  list(ecmo_final5, rr_c6.3[,c(3,4,5,7)], af_c6.3[,c(3,5)], sapsc6.3[,c(6,8)])
+)
+
+ecmo_final6$respiratoryrate_closest_within48h_after_ecmo <- ifelse(is.na(ecmo_final6$respiratoryrate_closest_within48h_after_ecmo), ecmo_final6$respiratory_rate_after_ecmo_c6, ecmo_final6$respiratoryrate_closest_within48h_after_ecmo)
+
+ecmo_final6$pma_closest_within48h_after_ecmo <- ifelse(is.na(ecmo_final6$pma_closest_within48h_after_ecmo), ecmo_final6$c_mean, ecmo_final6$pma_closest_within48h_after_ecmo )
+
+ecmo_final6$psa_closest_within48h_after_ecmo <- ifelse(is.na(ecmo_final6$psa_closest_within48h_after_ecmo), ecmo_final6$c_systolic, ecmo_final6$psa_closest_within48h_after_ecmo )
+
+ecmo_final6$pda_closest_within48h_after_ecmo <- ifelse(is.na(ecmo_final6$pda_closest_within48h_after_ecmo), ecmo_final6$c_diastolic, ecmo_final6$pda_closest_within48h_after_ecmo)
+
+ecmo_final6$saps_closest_within72h_after_ecmo <- ifelse(is.na(ecmo_final6$saps_closest_within72h_after_ecmo), ecmo_final6$saps_after_ecmo_c6, ecmo_final6$saps_closest_within72h_after_ecmo)
+
+
+library(readxl)
+id_ef_chart_reviewed_send <- read_excel("~/Uni/Promotion/ECMELLA/chart review/id_ef_chart_reviewed_send.xlsx", 
+    col_types = c("numeric", "numeric", "numeric"))
+View(id_ef_chart_reviewed_send)
+
+ecmo_final7 <- merge(ecmo_final6, id_ef_chart_reviewed_send, by="id", all=T)
+
+ecmo_final7$ef_admission_final <- ifelse(is.na(ecmo_final7$ef_admission2) | is.na(ecmo_final7$ef_discharge2), ecmo_final7$ef_admission3, ifelse(is.na(ecmo_final7$ef_admission3), ecmo_final7$ef_admission2, FALSE))
+
+ecmo_final7$ef_discharge_final <- ifelse(is.na(ecmo_final7$ef_admission2) | is.na(ecmo_final7$ef_discharge2), ecmo_final7$ef_discharge3, ifelse(is.na(ecmo_final7$ef_discharge3), ecmo_final7$ef_discharge2, FALSE))
+
+```
+
+
+```{r}
+bb1 <- ggplot(ecmo_final7, aes(y=ef_admission_final, color=intervention)) + 
+    geom_boxplot()
+
+bb2 <- ggplot(ecmo_final7, aes(y=ef_discharge_final, color=intervention)) + 
+    geom_boxplot()
+
+graph_ef <- ggarrange(bb1, bb2, ncol=1, nrow=2,  labels = c("1a. LVEF at first re-occurence of circulation", "1b. LVEF at ICU discharge or prior to death"))
+
+ef_survived <- ecmo_final7 %>% filter(mort==0)
+ef_survived <- ef_survived %>% select(id, ef_admission_final, ef_discharge_final, mort, trt, intervention)
+
+bb1_surv <- ggplot(ef_survived, aes(y=ef_admission_final, color=intervention)) + 
+    geom_boxplot()
+
+bb2_surv <- ggplot(ef_survived, aes(y=ef_discharge_final, color=intervention)) + 
+    geom_boxplot()
+
+graph_ef_surv <- ggarrange(bb1_surv, bb2_surv, ncol=1, nrow=2,  labels = c("1a. LVEF at first re-occurence of circulation", "1b. LVEF at ICU discharge"))
+
+table1(~ SAVE + wscore2 + saps_closest_within72h_after_ecmo +apache_closest_within72h_after_ecmo + cad |trt, data=ecmo_final7)
 
 ```
 
