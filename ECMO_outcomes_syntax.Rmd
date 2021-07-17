@@ -2885,6 +2885,76 @@ graph_ef_surv <- ggarrange(bb1_surv, bb2_surv, ncol=1, nrow=2,  labels = c("1a. 
 
 table1(~ SAVE + wscore2 + saps_closest_within72h_after_ecmo +apache_closest_within72h_after_ecmo + cad |trt, data=ecmo_final7)
 
+
+ecmo_final7$survdays <-difftime(ecmo_final7$`Sterbezeit (0 = nicht tot)`, ecmo_final7$ecmo_implantation, unit="days")
+ecmo_final7$survdays <- as.numeric(ecmo_final7$survdays)
+
+ecmo_final7 <- ecmo_final7 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+survdays_check <- ecmo_final7 %>% select(ecmo_implantation, `Sterbezeit (0 = nicht tot)`, survdays) #check
+
+library(survival)
+library(ggfortify)
+km <- with(ecmo_final7, Surv(survdays, mort))
+km_trt_fit <- survfit(Surv(survdays) ~ trt, data=ecmo_final7)
+autoplot(km_trt_fit)
+
+library("survminer")
+fit <- survfit(Surv(survdays, mort) ~ trt, data = ecmo_final7)
+surv <- ggsurvplot(fit, data = ecmo_final7, pval = TRUE, risk.table = TRUE, risk.table.col = "strata",
+                   legend.labs = c("VA-ECMO", "ECMELLA"),size = 1, ggtheme = theme_bw(),
+                   xlim = c(0,30), xlab = "Time (days)", ylab = "Survival probability")
+
+
+
+library(gtools)
+ecmo_final7$age_q4 <- quantcut(ecmo_final7$age, q = 4, na.rm = TRUE) #quartile of age
+ecmo_final7$prov1_fact <- as.factor(ecmo_final7$prov1)
+ecmo_final7$bmi <- as.numeric(ecmo_final7$bmi)
+ecmo_final7$bmi_q4 <- quantcut(ecmo_final7$bmi, q = 4, na.rm = TRUE) #quartile of bmi
+ecmo_final7$lac_q4 <- quantcut(ecmo_final7$lac_closest_within48h_after_ecmo, q = 4, na.rm = TRUE) #quartile of lactate closest after
+ecmo_final7$ph_q4 <- quantcut(ecmo_final7$ph_closest_within48h_after_ecmo, q = 4, na.rm = TRUE) #quartile of pH closest after
+
+#create survival duration variable
+
+ecmo_final7$survdays <-difftime(ecmo_final7$`Sterbezeit (0 = nicht tot)`, ecmo_final7$ecmo_implantation, unit="days")
+ecmo_final7$survdays <- as.numeric(ecmo_final7$survdays)
+ecmo_final7 <- ecmo_final7 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+log_mort <- glm(mort ~ trt + age_q4 + GSCHL + unshockable + rea + ecmo_time2 + bmi_q4 +lac_q4,
+                data = ecmo_final7, family = "binomial")
+summary(log_mort)
+exp(cbind(OR = coef(log_mort), confint(log_mort)))
+
+#Cox proportional hazard
+cox.mod <- coxph(Surv(survdays, mort) ~ trt + age_q4 + GSCHL + bmi_q4 + rea + unshockable + lac_q4 + ph_q4
+                 , data= ecmo_final7)
+
+summary(cox.mod)
+
+library(MASS)
+
+los <- glm(length_of_stay2 ~ trt + age_q4 + GSCHL + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson,data = ecmo_final7)
+summary(los)
+exp(cbind(IRR = coef(los), confint(los)))
+
+
+iculos <- glm(ICU_length_of_stay2 ~ trt + age_q4 + GSCHL + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson, data = ecmo_final7)
+summary(iculos)
+exp(cbind(IRR = coef(iculos), confint(iculos)))
+
+#resuts table
+library(jtools)
+library(huxtable)
+library(officer)
+library(flextable)
+
+res_mort <- summ(log_mort, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_los <- summ(los, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
+
+export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
+
 ```
 
 =======
