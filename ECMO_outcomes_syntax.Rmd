@@ -2956,6 +2956,72 @@ res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
 
 ```
+```{r}
+library(readxl)
+
+surviver_data <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "text", "numeric", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "text", "numeric", 
+        "text", "text", "numeric", "numeric", 
+        "numeric", "numeric", "text", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "text", "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "text", "numeric", "text", 
+        "text", "text", "text", "text", "text", 
+        "numeric", "numeric", "text"))
+View(surviver_data)
+
+library(readxl)
+surviver_med <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xlsx", 
+    sheet = "Medication", col_types = c("numeric", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric"))
+View(surviver_med)
+
+library(readxl)
+surviver_lab <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xlsx", 
+    sheet = "Lab")
+View(surviver_lab)
+
+
+surviver_all<- Reduce(
+  function(surviver_data, surviver_lab) merge(surviver_data, surviver_lab, by="id", all=F),
+    list(surviver_data, surviver_lab, surviver_med, ecmo_final7)
+)
+
+surviver_all$Datum <- as.Date("16.07.2021", format="%d.%m.%Y")
+surviver_all$age_current <- substr((as.numeric(difftime(surviver_all$Datum, surviver_all$GBDAT, unit="days")) / 365), 1,2)
+surviver_all$time_since_discharge <- as.numeric(difftime(surviver_all$Datum, surviver_all$discharge, unit="days")) 
+
+table1(~`EF - Echo (vorläufig)` + ef_admission_final + ef_discharge_final + `Herzfrequenz - EKG` +  `sys BD Ruhe`+ `dias BD Ruhe` + `max Watt - Ergo` +`Dauer - Ergo`+ `max Herfrequenz Ergo` +`max sys Blutdruck Ergo` + `max dias Blutdruck Ergo` + `Strecke - 6MWT` + `Pausen - 6MWT` + `O2 - 6MWT`+ `sys BD - 6MWT`+ `dias BD - 6MWT`+ `Herzfrequenz - 6MWT` + `Dyspnoe Borg - 6MWT` + `Zeit - TUG` + `Gehilfe - TUG`|id_new, data=surviver_all)
+
+table1(~ CPC +`TIA/Stroke ja/nein` + Konzentration + `Neues merken` + Erinnerung + Planen + `Alltag planen`+ `Gestige Leistung` + Beruf + `Beruf wiederaufgenommen` + `Arbeit wie vorher`  + Depression  + `Suizidgedanken manchmal` + `konkrete Suizidgedanken` |id_new, data=surviver_all)
+
+table1(~ `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|id_new, data=surviver_all)
+
+
+table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schweiss Herzrasen Schwindel` + Synkope + `Herzrasen Palpitation` + `Brustschmerz Anstrengung`+ Beinoedem+Nykturie +Orthopnoe +Leistungsfähigkeit + `eingeschraenkter Alltag` +`eingeschraenkter Beruf`|id_new, data=surviver_all)
+
+table1(~ Na + K + Cl + Ca + `Ca corrected` + Eisen + PO4 + Mg + Osmolalitaet + `Blut pH` + `Transferrin-Saettigung` + Kreatinin + GFR + Harnstoff + Harnsaeure + `Bilirubin ges` + Albumin + Protein + Myoglobin + Ferritin +`Cholesterin ges` + HDL + `non-HDL` + LDL + Triglyzeride + `Lipoprotein a`+ GPT + GOT + `Alk Phosphatase` + Amylase + CK + `CK-MB`+  `CK-MB Prozent` + `NT-pro BNP` + GLDH + GGT + LDH + Lipase + `freies Hb` + Hba1c + CRP + Haptoglobin + `losl Transferrin-Rezeptor`+ Transferrin + Procalcitonin + T3 + fT4 + TSH + Hb + Haematokrit + Erythrozyten + Leukozyten + Thrombozyten + MCV + MCH + MCHC + MPV + `RDW-CV` + `Neurophile absolut` + `unreife Granulozyten absolut` + `unreife Granulozyten Prozent` + `Lymphozyten absolut`+ `Monozyten absolut` + `Eosinophile absolut`+ `Basophile absolut`+ `Neurophile Prozent`+ `Lymphozyten Prozent` + `Monozyten Prozent` + `Eosinophile Prozent` + `Basophile Prozent` + Quick + INR + PTT + `CO2 - BGA`+ `pO2  - BGA`+  `Bicarbonat - BGA`+ `Basenueberschuss - BGA`+ `Standardbicarbonat  - BGA`+ `O2 Saettigung - BGA`+ HbA1c |id_new, data=surviver_all)
+
+
+
+table1(~age_current + age + campus2 + time_since_discharge + trt + rea|id_new, data=surviver_all)
+```
+
 
 =======
 >>>>>>> ffc3fb6007da8676f19150af3504b02ede338a34
