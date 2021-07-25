@@ -2819,6 +2819,8 @@ chartreview_missings <- read_excel("~/Uni/Promotion/ECMELLA/chart review/chartre
         "numeric"))
 View(chartreview_missings)
 
+chartreview_missings <- chartreview_missings %>% mutate(ph_lowest_within48h_after_ecmo_missings = replace(ph_lowest_within48h_after_ecmo_missings, which((id==98)), 7.193))
+
 ecmo_final5 <- merge(ecmo_final4, chartreview_missings[,c(1,4,5,6,7,8,9,10)], by="id", all=T)
 
 ecmo_final5$bmi <- ifelse(is.na(ecmo_final5$bmi), ecmo_final5$bmi_missings, ecmo_final5$bmi)
@@ -2954,6 +2956,37 @@ res_los <- summ(los, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 
 export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
+
+
+table1(~age + GSCHL+  bmi+ campus2 + rea + shockable + unshockable + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 + mort + cad + ef_admission_final + ef_discharge_final + ph_closest_within48h_after_ecmo + lac_closest_within48h_after_ecmo + SAVE + wscore2|trt, data=ecmo_final7  )
+
+t.test(age ~ trt, data=ecmo_final7)
+chisq.test(ecmo_final7$GSCHL, ecmo_final7$trt)
+t.test(bmi ~ trt, data=ecmo_final7)
+chisq.test(ecmo_final7$campus2, ecmo_final7$trt)
+chisq.test(ecmo_final7$rea, ecmo_final7$trt)
+chisq.test(ecmo_final7$shockable, ecmo_final7$trt)
+chisq.test(ecmo_final7$unshockable, ecmo_final7$trt)
+t.test(length_of_stay2 ~ trt, data=ecmo_final7)
+t.test(ICU_length_of_stay2 ~ trt, data=ecmo_final7)
+t.test(ecmo_time2 ~ trt, data=ecmo_final7)
+chisq.test(ecmo_final7$mort, ecmo_final7$trt)
+t.test(SAVE~ trt, data=ecmo_final7 )
+t.test(wscore2~ trt, data=ecmo_final7 )
+chisq.test(ecmo_final7$cad, ecmo_final7$trt)
+
+t.test(ph_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(ph_lowest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(lac_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(lac_highest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(ck_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(ck_highest_witin48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(ckmb_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(ckmb_highest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(trop_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(trop_highest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+t.test(crea_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
+
 
 ```
 ```{r}
