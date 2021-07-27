@@ -2974,6 +2974,9 @@ chisq.test(ecmo_final7$mort, ecmo_final7$trt)
 t.test(SAVE~ trt, data=ecmo_final7 )
 t.test(wscore2~ trt, data=ecmo_final7 )
 chisq.test(ecmo_final7$cad, ecmo_final7$trt)
+t.test(ef_admission_final~ trt, data=ecmo_final7 )
+t.test(ef_discharge_final~ trt, data=ecmo_final7)
+
 
 t.test(ph_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
 t.test(ph_lowest_within48h_after_ecmo ~ trt, data=ecmo_final7)
@@ -2988,7 +2991,34 @@ t.test(trop_highest_within48h_after_ecmo ~ trt, data=ecmo_final7)
 t.test(crea_closest_within48h_after_ecmo ~ trt, data=ecmo_final7)
 
 
+
+
+
+
 ```
+
+```{r}
+library(readxl)
+iabp_score <- read_excel("~/Uni/Promotion/ECMELLA/surviver/iabp_score.xlsx", 
+    col_types = c("numeric", "numeric", "text", 
+        "numeric", "numeric", "text", "numeric", 
+        "text", "numeric", "text", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "text", "text", "numeric", "text", 
+        "numeric", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "numeric", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "text", "numeric", 
+        "numeric", "numeric", "text"))
+View(iabp_score)
+
+ecmo_final8 <- merge(ecmo_final7, iabp_score[,c(1, 18,20,21)], by="id")
+```
+
+
 ```{r}
 library(readxl)
 
@@ -3012,6 +3042,10 @@ surviver_data <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xl
         "numeric", "text", "numeric", "text", 
         "text", "text", "text", "text", "text", 
         "numeric", "numeric", "text"))
+View(surviver_data)
+
+library(readxl)
+surviver_data <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xlsx")
 View(surviver_data)
 
 library(readxl)
@@ -3051,8 +3085,307 @@ table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schwei
 table1(~ Na + K + Cl + Ca + `Ca corrected` + Eisen + PO4 + Mg + Osmolalitaet + `Blut pH` + `Transferrin-Saettigung` + Kreatinin + GFR + Harnstoff + Harnsaeure + `Bilirubin ges` + Albumin + Protein + Myoglobin + Ferritin +`Cholesterin ges` + HDL + `non-HDL` + LDL + Triglyzeride + `Lipoprotein a`+ GPT + GOT + `Alk Phosphatase` + Amylase + CK + `CK-MB`+  `CK-MB Prozent` + `NT-pro BNP` + GLDH + GGT + LDH + Lipase + `freies Hb` + Hba1c + CRP + Haptoglobin + `losl Transferrin-Rezeptor`+ Transferrin + Procalcitonin + T3 + fT4 + TSH + Hb + Haematokrit + Erythrozyten + Leukozyten + Thrombozyten + MCV + MCH + MCHC + MPV + `RDW-CV` + `Neurophile absolut` + `unreife Granulozyten absolut` + `unreife Granulozyten Prozent` + `Lymphozyten absolut`+ `Monozyten absolut` + `Eosinophile absolut`+ `Basophile absolut`+ `Neurophile Prozent`+ `Lymphozyten Prozent` + `Monozyten Prozent` + `Eosinophile Prozent` + `Basophile Prozent` + Quick + INR + PTT + `CO2 - BGA`+ `pO2  - BGA`+  `Bicarbonat - BGA`+ `Basenueberschuss - BGA`+ `Standardbicarbonat  - BGA`+ `O2 Saettigung - BGA`+ HbA1c |id_new, data=surviver_all)
 
 
-
 table1(~age_current + age + campus2 + time_since_discharge + trt + rea|id_new, data=surviver_all)
+
+stroke <- ggplot(surviver_all, aes(x=`TIA/Stroke ja/nein`, fill=intervention)) +
+  geom_bar(width=0.5) +
+  ggtitle("Since the heart attack I experienced a stroke/ TIA")+
+  xlab("") + 
+  ylab("") +
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+      theme(plot.title = element_text(hjust = 0.5, size=12))
+  
+  
+
+concentration <-ggplot(surviver_all, aes(x=Konzentration, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5)+
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("My concentration is equally as good as before the heart attack.")+
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+new_memory <-ggplot(surviver_all, aes(x=`Neues merken`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I have problems memorizing new facts.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+old_memory <-ggplot(surviver_all, aes(x=`Erinnerung`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I have problems remembering old facts.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+   
+planing <-ggplot(surviver_all, aes(x=`Planen`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I have problems planing something and consequently implementing it. ")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=10))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none") 
+
+alltag <-ggplot(surviver_all, aes(x=`Alltag planen`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I need help organizing my daily life.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none") 
+
+mental <-ggplot(surviver_all, aes(x=`Gestige Leistung`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack my mental capacity has ...")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none") 
+
+job_start <- ggplot(surviver_all, aes(x=`Beruf wiederaufgenommen`, fill=intervention)) +
+  geom_bar(width=0.5) +
+  ggtitle("I was able to return to my job.")+
+  xlab("") + 
+  ylab("") +
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+      theme(plot.title = element_text(hjust = 0.5, size=12))
+
+work_before <-ggplot(surviver_all, aes(x=`Arbeit wie vorher`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("I can pursue my carrer as before the heart attack")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none") 
+
+
+depression <-ggplot(surviver_all, aes(x=Depression, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I experience a depressed mood, loss of intrests or reduced motivation.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+suicide1 <-ggplot(surviver_all, aes(x=`Suizidgedanken manchmal`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I sometimes think it would be better, if I was not alive anymore.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+suicide2 <-ggplot(surviver_all, aes(x=`konkrete Suizidgedanken`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Since the heart attack I have concrete suicidal thoughts.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+#heart failure
+dyspnea <-ggplot(surviver_all, aes(x=`Atemnot schwere Belastung`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Do you experience dypnea after exterion?")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+tired <-ggplot(surviver_all, aes(x=`Müdigkeit`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("I easily feel tired and exhausted.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+
+dizzy <-ggplot(surviver_all, aes(x=`Schwindel`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("I experience dizziness.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+sweat <-ggplot(surviver_all, aes(x=`Herzrasen Palpitation`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("I experience intensive sweating, dizziness and palpitations in combination.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+edema <-ggplot(surviver_all, aes(x=Beinoedem,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("I have swollen feet or ankles.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+nykturie <-ggplot(surviver_all, aes(x=Nykturie,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("During the night I need to go to the bathroom ...")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+orthopnoe <-ggplot(surviver_all, aes(x=Orthopnoe,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("When I lie down flat, I experience dyspnea.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+ fit<-ggplot(surviver_all, aes(x= Leistungsfähigkeit,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("I am equally as physically fit as before the heart attack.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+ alltag_eingesch<-ggplot(surviver_all, aes(x=`eingeschraenkter Alltag`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("My physical ability limits my daily life")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+ 
+ 
+job_eingesch<-ggplot(surviver_all, aes(x=`eingeschraenkter Beruf`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("My physical ability limits my professional life.")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+mobility<-ggplot(surviver_all, aes(x=`Mobilität - EQ`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Mobility")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+care<-ggplot(surviver_all, aes(x=`Selbstversorgung - EQ`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Self-sufficiency")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+all_day<-ggplot(surviver_all, aes(x=surviver_all$`Alltag - EQ`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Daily activites")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+pain<-ggplot(surviver_all, aes(x=surviver_all$`Schmerzen - EQ`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Pain / physical complaints")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+fear<-ggplot(surviver_all, aes(x=surviver_all$`Angst - EQ`,  y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Fear/ depression")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+surviver_graph <- ggarrange(concentration, new_memory, old_memory, planing, alltag ,ncol = 1, nrow = 5)
+surviver_graph2 <- ggarrange(mental, work_before, depression, suicide1, suicide2 ,ncol = 1, nrow = 5)
 ```
 
 
