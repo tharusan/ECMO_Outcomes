@@ -3045,24 +3045,24 @@ prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
 
 
 
-#drop missings
-match_nomiss <- ecmo_final8 %>% select(trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo) %>%
+#drop missings in matching variables in order to match
+match_nomiss <- ecmo_final8 %>% select(trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp) %>%
   na.omit()
 match_nomiss$trt <- as.factor(match_nomiss$trt)
 
-mod_match <- matchit(trt ~ age + GSCHL + bmi + rea + unshockable + lac_closest_within48h_after_ecmo + ph_closest_within48h_after_ecmo,
+mod_match <- matchit(trt ~ age + GSCHL + bmi + rea + unshockable + lac_closest_within48h_after_ecmo + ph_closest_within48h_after_ecmo + SAVE + iabp,
                      method = "nearest", data = match_nomiss)
 
 summary(mod_match)
 #plot(mod_match) 
 
 
+#select only matched patients
 dta_m <- match.data(mod_match)
 dim(dta_m)
 
 
-#plots
-
+#plot balance of matching variables
 match_age <-  ggplot(dta_m, aes(x = distance, y = age, color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
   xlab("Propensity score") + ylab("Age") + theme_bw()
 
@@ -3092,11 +3092,9 @@ with(dta_m, t.test(mort ~ trt))
 lm_treat <- lm(mort ~ trt, data = dta_m)
 summary(lm_treat)
 
-trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4
-
-SAVE + iabp
-```
-
+#Cox regression
+cox.mod_ps <- coxph(Surv(survdays, mort) ~ trt, data= dta_m)
+summary(cox.mod_ps)
 
 
 
