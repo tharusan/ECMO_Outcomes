@@ -3019,6 +3019,99 @@ ecmo_final8 <- merge(ecmo_final7, iabp_score[,c(1, 18,20,21)], by="id")
 ```
 
 
+#Propensity match
+
+```{r}
+library(MatchIt)
+
+trt_ps <- glm(trt ~ age + GSCHL + bmi + rea + unshockable + lac_closest_within48h_after_ecmo + ph_closest_within48h_after_ecmo,
+            family = binomial(), data = ecmo_final8)
+summary(trt_ps)
+
+prs_df <- data.frame(pr_score = predict(trt_ps, type = "response"),
+                     trt2 = trt_ps$model$trt)
+head(prs_df)
+
+
+
+labs <- paste("Treatment group:", c("VA-ECMO", "ECMELLA"))
+
+prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pr_score)) +
+  geom_histogram(color = "white") +
+  facet_wrap(~trt2) +
+  xlab("Probability of getting ECMELLA") +
+  theme_bw()
+
+
+
+#drop missings
+match_nomiss <- ecmo_final8 %>% select(trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo) %>%
+  na.omit()
+match_nomiss$trt <- as.factor(match_nomiss$trt)
+
+mod_match <- matchit(trt ~ age + GSCHL + bmi + rea + unshockable + lac_closest_within48h_after_ecmo + ph_closest_within48h_after_ecmo,
+                     method = "nearest", data = match_nomiss)
+
+summary(mod_match)
+#plot(mod_match) 
+
+
+dta_m <- match.data(mod_match)
+dim(dta_m)
+
+
+#plots
+
+match_age <-  ggplot(dta_m, aes(x = distance, y = age, color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("Age") + theme_bw()
+
+match_sex <-  ggplot(dta_m, aes(x = distance, y = GSCHL, color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("Sex") + theme_bw()
+
+match_bmi <-  ggplot(dta_m, aes(x = distance, y = bmi, color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("BMI") + theme_bw()
+
+match_rea <-  ggplot(dta_m, aes(x = distance, y = rea, color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("Location of cardiac arrest") + theme_bw()
+
+match_unshockable <-  ggplot(dta_m, aes(x = distance, y = unshockable, color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("Shockable vs. unshockable rhythm") + theme_bw()
+
+match_lac <-  ggplot(dta_m, aes(x = distance, y = lac_closest_within48h_after_ecmo , color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("Lactate levels") + theme_bw()
+
+match_ph <-  ggplot(dta_m, aes(x = distance, y = ph_closest_within48h_after_ecmo , color = trt)) + geom_point(alpha = 0.2, size = 1.3) + geom_smooth(method = "loess", se = F) +
+  xlab("Propensity score") + ylab("pH") + theme_bw()
+
+
+#T test
+with(dta_m, t.test(mort ~ trt))
+
+#OLS
+lm_treat <- lm(mort ~ trt, data = dta_m)
+summary(lm_treat)
+
+trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4
+
+SAVE + iabp
+```
+
+
+
+
+
+
+
+
+
+
+
+
+#ECMO Outpatient
+
+
+
 ```{r}
 library(readxl)
 
