@@ -3048,7 +3048,7 @@ prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
 #drop missings in matching variables in order to match
 match_nomiss <- ecmo_final8 %>% select(id, trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp)
 
-match_nomiss <- match_nomiss %>% select(trt, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, SAVE, iabp) %>% na.omit()
+match_nomiss <- match_nomiss %>% select(trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, survdays, SAVE, iabp) %>% na.omit()
 
 #change extreme value. Please change in main dataset
 match_nomiss[match_nomiss$id==98, "ph_closest_within48h_after_ecmo"] <- "7.193"
