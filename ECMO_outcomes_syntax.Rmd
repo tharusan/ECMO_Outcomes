@@ -3092,6 +3092,8 @@ stroke <- ggplot(surviver_all, aes(x=`TIA/Stroke ja/nein`, fill=intervention)) +
   ggtitle("Since the heart attack I experienced a stroke/ TIA")+
   xlab("") + 
   ylab("") +
+  coord_flip()+
+   scale_x_discrete(labels= c("0" = "No" , "1" = "Yes"))+
    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
       theme(plot.title = element_text(hjust = 0.5, size=12))
   
