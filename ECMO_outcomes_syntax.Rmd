@@ -3016,6 +3016,12 @@ iabp_score <- read_excel("~/Uni/Promotion/ECMELLA/surviver/iabp_score.xlsx",
 View(iabp_score)
 
 ecmo_final8 <- merge(ecmo_final7, iabp_score[,c(1, 18,20,21)], by="id")
+
+ecmo_final8 <- ecmo_final8 %>% mutate(ph_closest_within48h_after_ecmo= replace(ph_closest_within48h_after_ecmo,
+                                                                which((id=="98" & ph_closest_within48h_after_ecmo=="7193")), 7.193))
+
+ecmo_final8 <- ecmo_final8 %>% mutate(ph_lowest_within48h_after_ecmo= replace(ph_lowest_within48h_after_ecmo,
+                                                                which((id=="98" & ph_lowest_within48h_after_ecmo=="7193")), "7.193"))
 ```
 
 
@@ -3106,6 +3112,7 @@ summary(cox.mod_ps)
 
 
 #ECMO Outpatient
+
 
 
 
@@ -3310,16 +3317,15 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
    theme(legend.position="none")
 
 #heart failure
-
-dyspnea_d <- ggplot(surviver_all, aes(x=Atemnot, fill=intervention)) +
-  geom_bar(width=0.5, colour="black") +
-  ggtitle("Do you experience epsiodes of dyspnea in your daily life?")+
+dyspnea <-ggplot(surviver_all, aes(x=`Atemnot schwere Belastung`, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(1, 5))+
+  geom_point()+
+  ggtitle("Do you experience dypnea after exterion?")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
   xlab("") + 
   ylab("") +
-  coord_flip()+
-   scale_x_discrete(labels= c( "0" = "No" , "1" = "Yes"))+
-   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
-      theme(plot.title = element_text(hjust = 0.5, size=12)) +
    theme(legend.position="none")
 
 tired <-ggplot(surviver_all, aes(x=`Müdigkeit`, y=intervention, fill=intervention))+
@@ -3345,7 +3351,8 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-sweat <-ggplot(surviver_all, aes(x=`Herzrasen Palpitation`,  y=intervention, fill=intervention))+
+surviver_all$`Schweiss Herzrasen Schwindel`=as.numeric(levels(surviver_all$`Schweiss Herzrasen Schwindel`))[surviver_all$`Schweiss Herzrasen Schwindel`]
+sweat <-ggplot(surviver_all, aes(x=`Schweiss Herzrasen Schwindel`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -3355,6 +3362,47 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   xlab("") + 
   ylab("") +
    theme(legend.position="none")
+
+surviver_all$Synkope <- as.factor(surviver_all$Synkope)
+
+faint <- ggplot(surviver_all, aes(x=Synkope, fill=intervention)) +
+  geom_bar(width=0.5, colour="black") +
+  ggtitle("Did you pass out since the heart attack?")+
+  xlab("") + 
+  ylab("") +
+  coord_flip()+
+   scale_x_discrete(labels= c("0" = "No" , "1" = "Yes"))+
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+      theme(plot.title = element_text(hjust = 0.5, size=12)) +
+   theme(legend.position="none")
+
+surviver_all$`Herzrasen Palpitation` <- as.factor(surviver_all$`Herzrasen Palpitation`)
+surviver_all$`Herzrasen Palpitation` <- recode(surviver_all$`Herzrasen Palpitation`, "44257"= "1")
+
+palpitations <- ggplot(surviver_all, aes(x=`Herzrasen Palpitation`, fill=intervention)) +
+  geom_bar(width=0.5, colour="black") +
+  ggtitle("Do you experience palpitations?")+
+  xlab("") + 
+  ylab("") +
+  coord_flip()+
+   scale_x_discrete(labels= c("0" = "No" , "1" = "Yes"))+
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+      theme(plot.title = element_text(hjust = 0.5, size=12)) +
+   theme(legend.position="none")
+
+surviver_all$`Brustschmerz Anstrengung` <- as.factor(surviver_all$`Brustschmerz Anstrengung`)
+
+ap <- ggplot(surviver_all, aes(x=`Brustschmerz Anstrengung`, fill=intervention)) +
+  geom_bar(width=0.5, colour="black") +
+  ggtitle("Do you experience chest pain after exertion?")+
+  xlab("") + 
+  ylab("") +
+  coord_flip()+
+   scale_x_discrete(labels= c("0" = "No" , "1" = "Yes"))+
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+      theme(plot.title = element_text(hjust = 0.5, size=12)) +
+   theme(legend.position="none")
+
 
 edema <-ggplot(surviver_all, aes(x=Beinoedem,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
@@ -3402,7 +3450,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
 
  alltag_eingesch<-ggplot(surviver_all, aes(x=`eingeschraenkter Alltag`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
-  scale_x_continuous(limits=c(1, 5))+
+ scale_x_continuous(limits= c(1,5))+
   geom_point()+
   ggtitle("My physical ability limits my daily life")+
 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
@@ -3410,8 +3458,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   xlab("") + 
   ylab("") +
    theme(legend.position="none")
- 
- 
+
 job_eingesch<-ggplot(surviver_all, aes(x=`eingeschraenkter Beruf`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
@@ -3478,8 +3525,35 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
+eq<-ggplot(surviver_all, aes(y=`Gesundheitsskala - EQ`, x=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+   ylim(0, 100)+
+  geom_point()+
+  ggtitle("Subjective evaluation of own health")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
+surviver_all$nyha <- recode(surviver_all$`Atemnot schwere Belastung`, "1"="4", "2"="3", "3"="2", "4"="1") 
+nyha <-ggplot(surviver_all, aes(x=nyha, y=intervention, fill=intervention))+
+  geom_boxplot(width=0.5) +
+  scale_x_continuous(limits=c(0, 4))+
+  geom_point()+
+  ggtitle("Do you experience dypnea after extertion?")+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5, size=12))+
+  xlab("") + 
+  ylab("") +
+   theme(legend.position="none")
+
 surviver_graph <- ggarrange(concentration, new_memory, old_memory, planing, alltag ,ncol = 1, nrow = 5)
-surviver_graph2 <- ggarrange(mental, work_before, depression, suicide1, suicide2 ,ncol = 1, nrow = 5)
+surviver_graph2 <- ggarrange(mental, work_before, depression, suicide1, suicide2 , ncol = 1, nrow = 5)
+surviver_graph3<- ggarrange(dyspnea_d, faint, palpitations, ap, ncol=1, nrow=5)
+surviver_graph4 <- ggarrange(dizzy, sweat, tired, fit, alltag_eingesch, job_eingesch, ncol=1, nrow=6 )
+surviver_graph5 <- ggarrange(edema, nykturie, orthopnoe, ncol=1, nrow=3)
+surviver_graph6 <- ggarrange(mobility, care, all_day, pain, fear, ncol=1, nrow=5)
 ```
 
 
