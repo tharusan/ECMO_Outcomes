@@ -2531,25 +2531,25 @@ ecmo_master9$survdays <- as.numeric(ecmo_master9$survdays)
 ecmo_master9 <- ecmo_master9 %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
 
 
-log_mort <- glm(mort ~ trt + age_q4 + sex_chart + unshockable + rea + ecmo_time + bmi_q4 +lac_q4,
-                data = ecmo_master9, family = "binomial")
+log_mort <- glm(mort ~ trt + age_q4 +  unshockable + rea + iabp  ,
+                data = ecmo_final9, family = "binomial")
 summary(log_mort)
 exp(cbind(OR = coef(log_mort), confint(log_mort)))
 
 #Cox proportional hazard
-cox.mod <- coxph(Surv(survdays, mort) ~ trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4
-                 , data= ecmo_master9)
+cox.mod <- coxph(Surv(survdays, mort) ~  trt + age_q4 +  unshockable + rea + iabp
+                 , data= ecmo_final9)
 
 summary(cox.mod)
 
 library(MASS)
 
-los <- glm(length_of_stay ~ trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson,data = ecmo_master9)
+los <- glm(length_of_stay2 ~ trt + age_q4 +  unshockable + rea + iabp,  family = poisson,data = ecmo_final9)
 summary(los)
 exp(cbind(IRR = coef(los), confint(los)))
 
 
-iculos <- glm(ICU_length_of_stay ~ trt + age_q4 + sex_chart + bmi_q4 + rea + unshockable + lac_q4 + ph_q4,  family = poisson, data = ecmo_master9)
+iculos <- glm(ICU_length_of_stay2 ~ trt + age_q4 +  unshockable + rea + iabp,  family = poisson, data = ecmo_final9)
 summary(iculos)
 exp(cbind(IRR = coef(iculos), confint(iculos)))
 
@@ -3052,19 +3052,20 @@ prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
 
 
 #drop missings in matching variables in order to match
-match_nomiss <- ecmo_final8 %>% select(id, trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp)
+match_nomiss <- ecmo_final9 %>% select(id, trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
 
-match_nomiss <- match_nomiss %>% select(trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, survdays, SAVE, iabp) %>% na.omit()
+match_nomiss <- match_nomiss %>% drop_na(age, rea, unshockable, iabp)
 
 #change extreme value. Please change in main dataset
 match_nomiss[match_nomiss$id==98, "ph_closest_within48h_after_ecmo"] <- "7.193"
 
+match_nomiss$ph_closest_within48h_after_ecmo <- as.numeric(match_nomiss$ph_closest_within48h_after_ecmo)
 
 match_nomiss$trt <- as.factor(match_nomiss$trt)
 
 
 #Perform matching
-mod_match <- matchit(trt ~ age + GSCHL + bmi + rea + unshockable + lac_closest_within48h_after_ecmo + SAVE + iabp,
+mod_match <- matchit(trt ~ age + rea + unshockable  + iabp,
                      method = "nearest", data = match_nomiss)
 
 summary(mod_match)
@@ -3110,8 +3111,183 @@ cox.mod_ps <- coxph(Surv(survdays, mort) ~ trt, data= dta_m)
 summary(cox.mod_ps)
 
 
+los_ps <- glm(length_of_stay2 ~ trt,  family = poisson, data = dta_m)
+summary(los_ps)
+exp(cbind(IRR = coef(los_ps), confint(los_ps)))
 
-#ECMO Outpatient
+
+iculos_ps <- glm(ICU_length_of_stay2 ~ trt,  family = poisson, data = dta_m)
+summary(iculos_ps)
+exp(cbind(IRR = coef(iculos_ps), confint(iculos_ps)))
+
+
+#Kaplan Meier Curve matched cohort
+
+dta_m$survdays <-difftime(dta_m$`Sterbezeit (0 = nicht tot)`, dta_m$ecmo_implantation, unit="days")
+dta_m$survdays <- as.numeric(dta_m$survdays)
+
+dta_m <- dta_m %>% mutate(survdays= replace(survdays, which((survdays<0)), 50)) #survived patients = 50 days
+
+
+library(survival)
+library(ggfortify)
+km_matched <- with(dta_m, Surv(survdays, mort))
+km_trt_fit_matched <- survfit(Surv(survdays) ~ trt, data=dta_m)
+autoplot(km_trt_fit_matched)
+
+library("survminer")
+fit_matched <- survfit(Surv(survdays, mort) ~ trt, data = dta_m)
+surv_matched <- ggsurvplot(fit_matched, data = dta_m, pval = TRUE, risk.table = TRUE, risk.table.col = "strata",
+                   legend.labs = c("VA-ECMO", "ECMELLA"),size = 1, ggtheme = theme_bw(),
+                   xlim = c(0,30), xlab = "Time (days)", ylab = "Survival probability")
+
+table1_matched <- table1(~age +  GSCHL+ bmi + campus2 + rea+ shockable+ unshockable + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 + mort + SAVE + iabp + saps_chartreview +wscore2 + cad|trt, data=dta_m)
+
+t.test(age ~ trt, data=dta_m)
+chisq.test(dta_m$GSCHL, dta_m$trt )
+t.test(bmi ~ trt, data=dta_m)
+chisq.test(dta_m$campus2, dta_m$trt )
+chisq.test(dta_m$rea, dta_m$trt )
+chisq.test(dta_m$shockable, dta_m$trt )
+chisq.test(dta_m$unshockable, dta_m$trt )
+
+t.test(length_of_stay2 ~ trt, data=dta_m)
+t.test(ICU_length_of_stay2 ~ trt, data=dta_m)
+t.test(ecmo_time2 ~ trt, data=dta_m)
+chisq.test(dta_m$mort, dta_m$trt )
+t.test(SAVE ~ trt, data=dta_m)
+t.test(iabp ~ trt, data=dta_m)
+t.test(saps_chartreview ~ trt, data=dta_m)
+t.test(wscore2 ~ trt, data=dta_m)
+chisq.test(dta_m$cad, dta_m$trt )
+
+
+tablelab_matched <- table1( ~ lac_closest_within48h_after_ecmo + lac_highest_within48h_after_ecmo + ph_closest_within48h_after_ecmo + ph_lowest_within48h_after_ecmo + ck_closest_within48h_after_ecmo + ck_highest_witin48h_after_ecmo + ckmb_closest_within48h_after_ecmo  + ckmb_highest_within48h_after_ecmo  + trop_closest_within48h_after_ecmo + trop_highest_within48h_after_ecmo + crea_closest_within48h_after_ecmo| trt, data=dta_m)
+
+t.test(ph_closest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(ph_lowest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(lac_closest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(lac_highest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(ck_closest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(ck_highest_witin48h_after_ecmo ~ trt, data=dta_m)
+t.test(ckmb_closest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(ckmb_highest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(trop_closest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(trop_highest_within48h_after_ecmo ~ trt, data=dta_m)
+t.test(crea_closest_within48h_after_ecmo ~ trt, data=dta_m)
+
+````
+
+
+
+```{r}
+library(readxl)
+complications <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
+    col_types = c("numeric", "text", "skip", 
+        "skip", "skip", "skip", "skip", "skip", 
+        "numeric", "text", "numeric", "numeric", 
+        "numeric", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "numeric", "text", "text", 
+        "numeric", "text", "text", "numeric", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric"))
+View(complications)
+
+library(readxl)
+cad_missing <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
+    sheet = "cad_missing")
+View(cad_missing)
+
+cad_missing <- cad_missing %>% rename(cad_missing =cad)
+
+ecmo_final9 <- Reduce(
+  function (ecmo_final8, complications) merge(ecmo_final8, complications, all.x=T, all.y=F, by="id"), 
+  list(ecmo_final8, complications[,c(1, 21:33, 35:47 )], cad_missing[,c(1, 6)], saps_missings)
+)
+
+ecmo_final9 <- ecmo_final9 %>% mutate(rcx_timi= replace(rcx_timi,
+                                                     which((id=="14")), "2.5"))
+
+ecmo_final9 <- ecmo_final9 %>% mutate(riva_timi= replace(riva_timi,
+                                                     which((id=="14")), "2.5"))
+
+ecmo_final9$cad <- ifelse(ecmo_final9$cad=="unklar", ecmo_final9$cad_missing, ecmo_final9$cad)
+ecmo_final9[ecmo_final9$id==206, "comp_bleed"] <- "NA"
+
+ecmo_final9$comp_bleed_ic_stroke_h <- ifelse(ecmo_final9$comp_bleed_intracerebral =="1.0" | ecmo_final9$comp_stroke_h== 1, 1,0 )
+
+ecmo_final9$barc0 <- ifelse(ecmo_final9$comp_bleed=="0.0"| ecmo_final9$comp_bleed=="NA"| is.na(ecmo_final9$comp_bleed), 1, 0)
+ecmo_final9$barc2 <- ifelse(ecmo_final9$comp_bleed=="2.0", 1, 0)
+ecmo_final9$barc3a <- ifelse(ecmo_final9$comp_bleed=="3a", 1, 0)
+ecmo_final9$barc3b <- ifelse(ecmo_final9$comp_bleed=="3b", 1, 0)
+ecmo_final9$barc3c <- ifelse(ecmo_final9$comp_bleed=="3c", 1, 0)
+ecmo_final9$barc5a <- ifelse(ecmo_final9$comp_bleed=="5a", 1, 0)
+ecmo_final9$barc5b <- ifelse(ecmo_final9$comp_bleed=="5b", 1, 0)
+
+
+chisq.test(ecmo_final9$barc0, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc2, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc3a, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc3b, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc3c, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc5a, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc5b, ecmo_final9$intervention)
+
+
+
+ecmo_final9$comp_bleed_ic_stroke_h <- as.factor(ecmo_final9$comp_bleed_ic_stroke_h)
+ecmo_final9$comp_hemolysis <- as.factor(ecmo_final9$comp_hemolysis)
+ecmo_final9$comp_stroke_i <- as.factor(ecmo_final9$comp_stroke_i)
+ecmo_final9$comp_ischemia_abd <- as.factor(ecmo_final9$comp_ischemia_abd)
+ecmo_final9$comp_ischemia_leg <- as.factor(ecmo_final9$comp_ischemia_leg)
+ecmo_final9$comp_hypoxic_brain <- as.factor(ecmo_final9$comp_hypoxic_brain)
+ecmo_final9$comp_dialysis<- as.factor(ecmo_final9$comp_dialysis)
+ecmo_final9$comp_sepsis <- as.factor(ecmo_final9$comp_sepsis)
+ecmo_final9$comp_pericard_effusion <- as.factor(ecmo_final9$comp_pericard_effusion)
+ecmo_final9$comp_pericard_tamponade <- as.factor(ecmo_final9$comp_pericard_tamponade)
+ecmo_final9$comp_arrythmia <- as.factor(ecmo_final9$comp_arrythmia)
+ecmo_final9$comp_pericard <- ifelse(ecmo_final9$comp_pericard_effusion==1 | ecmo_final9$comp_pericard_tamponade==1, 1, 0 )
+
+
+table1(~ comp_bleed + comp_bleed_ic_stroke_h + comp_hemolysis + comp_stroke_i + comp_ischemia_abd + comp_ischemia_leg + comp_hypoxic_brain + comp_dialysis + comp_sepsis + comp_pericard_effusion + comp_pericard_tamponade + comp_arrythmia + amount_ek |intervention, data=ecmo_final9)
+
+chisq.test(ecmo_final9$comp_bleed_ic_stroke_h, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_hemolysis, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_stroke_i, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_ischemia_abd, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_ischemia_leg, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_hypoxic_brain, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_dialysis, ecmo_final9$intervention)
+chisq.test(ecmo_final9$sepsis, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_arrythmia, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_pericard, ecmo_final9$intervention)
+t.test(amount_ek ~ intervention, data=ecmo_final9)
+
+
+ggplot(ecmo_final9, aes(x = comp_hemolysis,  fill = intervention)) +
+    geom_bar(position = "dodge") + xlab("Hemolysis") + ylab("Frequency of patients") +
+    theme_classic(base_size = 15)
+```
+
+#Saps 2 Score
+```{r}
+library(readxl)
+saps_missings <- read_excel("D:/_download/saps_missings.xlsx", 
+    col_types = c("numeric", "numeric", "skip", 
+        "skip", "skip", "skip", "numeric"))
+View(saps_missings)
+
+
+```
+
+
+ #ECMO Outpatient
 
 
 
@@ -3263,11 +3439,14 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none") 
 
+surviver_all$`Beruf wiederaufgenommen` <- as.factor(surviver_all$`Beruf wiederaufgenommen`)
+
 job_start <- ggplot(surviver_all, aes(x=`Beruf wiederaufgenommen`, fill=intervention)) +
-  geom_bar(width=0.5) +
+  geom_bar(width=0.5, colour="black") +
   ggtitle("I was able to return to my job.")+
   xlab("") + 
   ylab("") +
+  coord_flip()+
    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
       theme(plot.title = element_text(hjust = 0.5, size=12))
 
@@ -3525,6 +3704,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
+surviver_all$`Gesundheitsskala - EQ` <- as.numeric(surviver_all$`Gesundheitsskala - EQ`)
 eq<-ggplot(surviver_all, aes(y=`Gesundheitsskala - EQ`, x=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
    ylim(0, 100)+
@@ -3536,7 +3716,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-surviver_all$nyha <- recode(surviver_all$`Atemnot schwere Belastung`, "1"="4", "2"="3", "3"="2", "4"="1") 
+surviver_all$nyha <- as.numeric(recode(surviver_all$`Atemnot schwere Belastung`, "1"="4", "2"="3", "3"="2", "4"="1"))
 nyha <-ggplot(surviver_all, aes(x=nyha, y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(0, 4))+
@@ -3551,7 +3731,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
 surviver_graph <- ggarrange(concentration, new_memory, old_memory, planing, alltag ,ncol = 1, nrow = 5)
 surviver_graph2 <- ggarrange(mental, work_before, depression, suicide1, suicide2 , ncol = 1, nrow = 5)
 surviver_graph3<- ggarrange(dyspnea_d, faint, palpitations, ap, ncol=1, nrow=5)
-surviver_graph4 <- ggarrange(dizzy, sweat, tired, fit, alltag_eingesch, job_eingesch, ncol=1, nrow=6 )
+surviver_graph4 <- ggarrange(nyha, dizzy, sweat, tired, fit, alltag_eingesch, job_eingesch, ncol=1, nrow=7 )
 surviver_graph5 <- ggarrange(edema, nykturie, orthopnoe, ncol=1, nrow=3)
 surviver_graph6 <- ggarrange(mobility, care, all_day, pain, fear, ncol=1, nrow=5)
 ```
