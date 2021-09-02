@@ -3182,7 +3182,11 @@ prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
 
 
 #drop missings in matching variables in order to match
+<<<<<<< HEAD
 match_nomiss <- ecmo_final10 %>% select(id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+=======
+match_nomiss <- ecmo_final9 %>% select(id, trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+>>>>>>> ed9563611bdd16d2755ff4255a3fd4f17bf00db5
 
 match_nomiss <- match_nomiss %>% drop_na(age, rea, unshockable, iabp)
 
@@ -3271,8 +3275,12 @@ surv_matched <- ggsurvplot(fit_matched, data = dta_m, pval = TRUE, risk.table = 
                    legend.labs = c("VA-ECMO", "ECMELLA"),size = 1, ggtheme = theme_bw(),
                    xlim = c(0,30), xlab = "Time (days)", ylab = "Survival probability")
 
+<<<<<<< HEAD
 dta_m$mort <- as.factor(dta_m$mort)
 table1_matched <- table1(~age  + GSCHL+ bmi + campus2 + rea+ shockable+ unshockable + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 + mort + SAVE + iabp + iabp_cat + saps_chartreview +wscore2 + cad|trt, data=dta_m)
+=======
+table1_matched <- table1(~age +  GSCHL+ bmi + campus2 + rea+ shockable+ unshockable + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 + mort + SAVE + iabp + saps_chartreview +wscore2 + cad|trt, data=dta_m)
+>>>>>>> ed9563611bdd16d2755ff4255a3fd4f17bf00db5
 
 t.test(age ~ trt, data=dta_m)
 chisq.test(dta_m$GSCHL, dta_m$trt )
@@ -3311,9 +3319,118 @@ t.test(crea_closest_within48h_after_ecmo ~ trt, data=dta_m)
 
 
 
+<<<<<<< HEAD
+=======
+```{r}
+library(readxl)
+complications <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
+    col_types = c("numeric", "text", "skip", 
+        "skip", "skip", "skip", "skip", "skip", 
+        "numeric", "text", "numeric", "numeric", 
+        "numeric", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "numeric", "text", "text", 
+        "numeric", "text", "text", "numeric", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric"))
+View(complications)
+
+library(readxl)
+cad_missing <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
+    sheet = "cad_missing")
+View(cad_missing)
+
+cad_missing <- cad_missing %>% rename(cad_missing =cad)
+
+ecmo_final9 <- Reduce(
+  function (ecmo_final8, complications) merge(ecmo_final8, complications, all.x=T, all.y=F, by="id"), 
+  list(ecmo_final8, complications[,c(1, 21:33, 35:47 )], cad_missing[,c(1, 6)], saps_missings)
+)
+
+ecmo_final9 <- ecmo_final9 %>% mutate(rcx_timi= replace(rcx_timi,
+                                                     which((id=="14")), "2.5"))
+
+ecmo_final9 <- ecmo_final9 %>% mutate(riva_timi= replace(riva_timi,
+                                                     which((id=="14")), "2.5"))
+
+ecmo_final9$cad <- ifelse(ecmo_final9$cad=="unklar", ecmo_final9$cad_missing, ecmo_final9$cad)
+ecmo_final9[ecmo_final9$id==206, "comp_bleed"] <- "NA"
+
+ecmo_final9$comp_bleed_ic_stroke_h <- ifelse(ecmo_final9$comp_bleed_intracerebral =="1.0" | ecmo_final9$comp_stroke_h== 1, 1,0 )
+
+ecmo_final9$barc0 <- ifelse(ecmo_final9$comp_bleed=="0.0"| ecmo_final9$comp_bleed=="NA"| is.na(ecmo_final9$comp_bleed), 1, 0)
+ecmo_final9$barc2 <- ifelse(ecmo_final9$comp_bleed=="2.0", 1, 0)
+ecmo_final9$barc3a <- ifelse(ecmo_final9$comp_bleed=="3a", 1, 0)
+ecmo_final9$barc3b <- ifelse(ecmo_final9$comp_bleed=="3b", 1, 0)
+ecmo_final9$barc3c <- ifelse(ecmo_final9$comp_bleed=="3c", 1, 0)
+ecmo_final9$barc5a <- ifelse(ecmo_final9$comp_bleed=="5a", 1, 0)
+ecmo_final9$barc5b <- ifelse(ecmo_final9$comp_bleed=="5b", 1, 0)
+
+
+chisq.test(ecmo_final9$barc0, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc2, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc3a, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc3b, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc3c, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc5a, ecmo_final9$intervention)
+chisq.test(ecmo_final9$barc5b, ecmo_final9$intervention)
+
+
+
+ecmo_final9$comp_bleed_ic_stroke_h <- as.factor(ecmo_final9$comp_bleed_ic_stroke_h)
+ecmo_final9$comp_hemolysis <- as.factor(ecmo_final9$comp_hemolysis)
+ecmo_final9$comp_stroke_i <- as.factor(ecmo_final9$comp_stroke_i)
+ecmo_final9$comp_ischemia_abd <- as.factor(ecmo_final9$comp_ischemia_abd)
+ecmo_final9$comp_ischemia_leg <- as.factor(ecmo_final9$comp_ischemia_leg)
+ecmo_final9$comp_hypoxic_brain <- as.factor(ecmo_final9$comp_hypoxic_brain)
+ecmo_final9$comp_dialysis<- as.factor(ecmo_final9$comp_dialysis)
+ecmo_final9$comp_sepsis <- as.factor(ecmo_final9$comp_sepsis)
+ecmo_final9$comp_pericard_effusion <- as.factor(ecmo_final9$comp_pericard_effusion)
+ecmo_final9$comp_pericard_tamponade <- as.factor(ecmo_final9$comp_pericard_tamponade)
+ecmo_final9$comp_arrythmia <- as.factor(ecmo_final9$comp_arrythmia)
+ecmo_final9$comp_pericard <- ifelse(ecmo_final9$comp_pericard_effusion==1 | ecmo_final9$comp_pericard_tamponade==1, 1, 0 )
+
+
+table1(~ comp_bleed + comp_bleed_ic_stroke_h + comp_hemolysis + comp_stroke_i + comp_ischemia_abd + comp_ischemia_leg + comp_hypoxic_brain + comp_dialysis + comp_sepsis + comp_pericard_effusion + comp_pericard_tamponade + comp_arrythmia + amount_ek |intervention, data=ecmo_final9)
+
+chisq.test(ecmo_final9$comp_bleed_ic_stroke_h, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_hemolysis, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_stroke_i, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_ischemia_abd, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_ischemia_leg, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_hypoxic_brain, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_dialysis, ecmo_final9$intervention)
+chisq.test(ecmo_final9$sepsis, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_arrythmia, ecmo_final9$intervention)
+chisq.test(ecmo_final9$comp_pericard, ecmo_final9$intervention)
+t.test(amount_ek ~ intervention, data=ecmo_final9)
+
+
+ggplot(ecmo_final9, aes(x = comp_hemolysis,  fill = intervention)) +
+    geom_bar(position = "dodge") + xlab("Hemolysis") + ylab("Frequency of patients") +
+    theme_classic(base_size = 15)
+```
+
+#Saps 2 Score
+```{r}
+library(readxl)
+saps_missings <- read_excel("D:/_download/saps_missings.xlsx", 
+    col_types = c("numeric", "numeric", "skip", 
+        "skip", "skip", "skip", "numeric"))
+View(saps_missings)
+
+
+```
+
+
+>>>>>>> ed9563611bdd16d2755ff4255a3fd4f17bf00db5
+
  #ECMO Outpatient
-
-
 
 
 ```{r}
