@@ -3182,11 +3182,7 @@ prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
 
 
 #drop missings in matching variables in order to match
-<<<<<<< HEAD
 match_nomiss <- ecmo_final10 %>% select(id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
-=======
-match_nomiss <- ecmo_final9 %>% select(id, trt, mort, age, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
->>>>>>> ed9563611bdd16d2755ff4255a3fd4f17bf00db5
 
 match_nomiss <- match_nomiss %>% drop_na(age, rea, unshockable, iabp)
 
@@ -3363,7 +3359,7 @@ ecmo_final9[ecmo_final9$id==206, "comp_bleed"] <- "NA"
 
 ecmo_final9$comp_bleed_ic_stroke_h <- ifelse(ecmo_final9$comp_bleed_intracerebral =="1.0" | ecmo_final9$comp_stroke_h== 1, 1,0 )
 
-ecmo_final9$barc0 <- ifelse(ecmo_final9$comp_bleed=="0.0"| ecmo_final9$comp_bleed=="NA"| is.na(ecmo_final9$comp_bleed), 1, 0)
+ecmo_final10$barc0 <- ifelse(ecmo_final10$comp_bleed=="0.0"| ecmo_final10$comp_bleed=="NA"| is.na(ecmo_final10$comp_bleed), 1, 0)
 ecmo_final9$barc2 <- ifelse(ecmo_final9$comp_bleed=="2.0", 1, 0)
 ecmo_final9$barc3a <- ifelse(ecmo_final9$comp_bleed=="3a", 1, 0)
 ecmo_final9$barc3b <- ifelse(ecmo_final9$comp_bleed=="3b", 1, 0)
@@ -3372,44 +3368,44 @@ ecmo_final9$barc5a <- ifelse(ecmo_final9$comp_bleed=="5a", 1, 0)
 ecmo_final9$barc5b <- ifelse(ecmo_final9$comp_bleed=="5b", 1, 0)
 
 
-chisq.test(ecmo_final9$barc0, ecmo_final9$intervention)
-chisq.test(ecmo_final9$barc2, ecmo_final9$intervention)
-chisq.test(ecmo_final9$barc3a, ecmo_final9$intervention)
-chisq.test(ecmo_final9$barc3b, ecmo_final9$intervention)
-chisq.test(ecmo_final9$barc3c, ecmo_final9$intervention)
-chisq.test(ecmo_final9$barc5a, ecmo_final9$intervention)
-chisq.test(ecmo_final9$barc5b, ecmo_final9$intervention)
+chisq.test(ecmo_final10$barc0, ecmo_final10$intervention)
+chisq.test(ecmo_final10$barc2, ecmo_final10$intervention)
+chisq.test(ecmo_final10$barc3a, ecmo_final10$intervention)
+chisq.test(ecmo_final10$barc3b, ecmo_final10$intervention)
+chisq.test(ecmo_final10$barc3c, ecmo_final10$intervention)
+chisq.test(ecmo_final10$barc5a, ecmo_final10$intervention)
+chisq.test(ecmo_final10$barc5b, ecmo_final10$intervention)
+
+
+ecmo_final10$comp_bleed_ic_stroke_h <- as.factor(ecmo_final10$comp_bleed_ic_stroke_h)
+ecmo_final10$comp_hemolysis <- as.factor(ecmo_final10$comp_hemolysis)
+ecmo_final10$comp_stroke_i <- as.factor(ecmo_final10$comp_stroke_i)
+ecmo_final10$comp_ischemia_abd <- as.factor(ecmo_final10$comp_ischemia_abd)
+ecmo_final10$comp_ischemia_leg <- as.factor(ecmo_final10$comp_ischemia_leg)
+ecmo_final10$comp_hypoxic_brain <- as.factor(ecmo_final10$comp_hypoxic_brain)
+ecmo_final10$comp_dialysis<- as.factor(ecmo_final10$comp_dialysis)
+ecmo_final10$comp_sepsis <- as.factor(ecmo_final10$comp_sepsis)
+ecmo_final10$comp_pericard_effusion <- as.factor(ecmo_final10$comp_pericard_effusion)
+ecmo_final10$comp_pericard_tamponade <- as.factor(ecmo_final10$comp_pericard_tamponade)
+ecmo_final10$comp_arrythmia <- as.factor(ecmo_final10$comp_arrythmia)
+ecmo_final10$comp_pericard <- ifelse(ecmo_final10$comp_pericard_effusion==1 | ecmo_final10$comp_pericard_tamponade==1, 1, 0 )
+ecmo_final10$comp_pericard <- as.factor(ecmo_final10$comp_pericard)
 
 
 
-ecmo_final9$comp_bleed_ic_stroke_h <- as.factor(ecmo_final9$comp_bleed_ic_stroke_h)
-ecmo_final9$comp_hemolysis <- as.factor(ecmo_final9$comp_hemolysis)
-ecmo_final9$comp_stroke_i <- as.factor(ecmo_final9$comp_stroke_i)
-ecmo_final9$comp_ischemia_abd <- as.factor(ecmo_final9$comp_ischemia_abd)
-ecmo_final9$comp_ischemia_leg <- as.factor(ecmo_final9$comp_ischemia_leg)
-ecmo_final9$comp_hypoxic_brain <- as.factor(ecmo_final9$comp_hypoxic_brain)
-ecmo_final9$comp_dialysis<- as.factor(ecmo_final9$comp_dialysis)
-ecmo_final9$comp_sepsis <- as.factor(ecmo_final9$comp_sepsis)
-ecmo_final9$comp_pericard_effusion <- as.factor(ecmo_final9$comp_pericard_effusion)
-ecmo_final9$comp_pericard_tamponade <- as.factor(ecmo_final9$comp_pericard_tamponade)
-ecmo_final9$comp_arrythmia <- as.factor(ecmo_final9$comp_arrythmia)
-ecmo_final9$comp_pericard <- ifelse(ecmo_final9$comp_pericard_effusion==1 | ecmo_final9$comp_pericard_tamponade==1, 1, 0 )
+table1(~ comp_bleed + comp_bleed_ic_stroke_h + comp_hemolysis + comp_stroke_i + comp_ischemia_abd + comp_ischemia_leg + comp_hypoxic_brain + comp_dialysis + comp_sepsis + comp_pericard + comp_pericard_tamponade + comp_arrythmia + amount_ek |intervention, data=ecmo_final10)
 
-
-table1(~ comp_bleed + comp_bleed_ic_stroke_h + comp_hemolysis + comp_stroke_i + comp_ischemia_abd + comp_ischemia_leg + comp_hypoxic_brain + comp_dialysis + comp_sepsis + comp_pericard_effusion + comp_pericard_tamponade + comp_arrythmia + amount_ek |intervention, data=ecmo_final9)
-
-chisq.test(ecmo_final9$comp_bleed_ic_stroke_h, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_hemolysis, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_stroke_i, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_ischemia_abd, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_ischemia_leg, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_hypoxic_brain, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_dialysis, ecmo_final9$intervention)
-chisq.test(ecmo_final9$sepsis, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_arrythmia, ecmo_final9$intervention)
-chisq.test(ecmo_final9$comp_pericard, ecmo_final9$intervention)
-t.test(amount_ek ~ intervention, data=ecmo_final9)
-
+chisq.test(ecmo_final10$comp_bleed_ic_stroke_h, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_hemolysis, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_stroke_i, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_ischemia_abd, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_ischemia_leg, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_hypoxic_brain, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_dialysis, ecmo_final10$intervention)
+chisq.test(ecmo_final10$sepsis, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_arrythmia, ecmo_final10$intervention)
+chisq.test(ecmo_final10$comp_pericard, ecmo_final10$intervention)
+t.test(amount_ek ~ intervention, data=ecmo_final10)
 
 ggplot(ecmo_final9, aes(x = comp_hemolysis,  fill = intervention)) +
     geom_bar(position = "dodge") + xlab("Hemolysis") + ylab("Frequency of patients") +
@@ -3423,6 +3419,327 @@ saps_missings <- read_excel("D:/_download/saps_missings.xlsx",
     col_types = c("numeric", "numeric", "skip", 
         "skip", "skip", "skip", "numeric"))
 View(saps_missings)
+
+
+```
+
+#Subgruppen Analysen
+```{r}
+#1. Sex
+
+female <- ecmo_final10 %>% filter(GSCHL=="F")
+female <- female %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+female <- female %>% drop_na(age, rea, unshockable, iabp)
+
+mod_match_female <- matchit(trt ~ age + rea + unshockable + iabp,
+                     method = "nearest", data = female)
+
+summary(mod_match_female)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_female <- match.data(mod_match_female)
+dim(dta_m_female)
+
+#Cox regression
+cox.mod_ps_female <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_female)
+summary(cox.mod_ps_female)
+
+
+
+male <- ecmo_final10 %>% filter(GSCHL=="M")
+male <- male %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+male <- male %>% drop_na(age, rea, unshockable, iabp)
+
+mod_match_male <- matchit(trt ~ age + rea + unshockable  + iabp,
+                     method = "nearest", data = male)
+
+summary(mod_match_male)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_male <- match.data(mod_match_male)
+dim(dta_m_male)
+
+#Cox regression
+cox.mod_ps_male <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_male)
+summary(cox.mod_ps_male)
+
+
+
+# 2. EKG
+#2a unshockable
+unshockable_0 <- ecmo_final10 %>% filter(unshockable=="0")
+unshockable_0 <- unshockable_0 %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+unshockable_0 <- unshockable_0 %>% drop_na(age, rea, iabp)
+
+mod_match_unshockable0 <- matchit(trt ~ age + rea + iabp,
+                     method = "nearest", data = unshockable_0)
+
+summary(mod_match_unshockable0)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_unshockable0 <- match.data(mod_match_unshockable0)
+dim(dta_m_unshockable0)
+
+#Cox regression
+cox.mod_ps_unshockable0 <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_unshockable0)
+summary(cox.mod_ps_unshockable0)
+
+
+unshockable_1 <- ecmo_final10 %>% filter(unshockable=="1")
+unshockable_1 <- unshockable_1 %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+unshockable_1 <- unshockable_1 %>% drop_na(age, rea, iabp)
+
+mod_match_unshockable1 <- matchit(trt ~ age + rea + iabp,
+                     method = "nearest", data = unshockable_1)
+
+summary(mod_match_unshockable1)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_unshockable1 <- match.data(mod_match_unshockable1)
+dim(dta_m_unshockable1)
+
+#Cox regression
+cox.mod_ps_unshockable1 <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_unshockable1)
+summary(cox.mod_ps_unshockable1)
+
+#2B Shockable 
+shockable_0 <- ecmo_final10 %>% filter(shockable=="0")
+shockable_0 <- unshockable_0 %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+shockable_0 <- shockable_0 %>% drop_na(age, rea, iabp)
+
+mod_match_shockable0 <- matchit(trt ~ age + rea + iabp,
+                     method = "nearest", data = shockable_0)
+
+summary(mod_match_shockable0)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_shockable0 <- match.data(mod_match_shockable0)
+dim(dta_m_shockable0)
+
+#Cox regression
+cox.mod_ps_shockable0 <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_shockable0)
+summary(cox.mod_ps_shockable0)
+
+
+shockable_1 <- ecmo_final10 %>% filter(shockable=="1")
+shockable_1 <- unshockable_1 %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+shockable_1 <- shockable_1 %>% drop_na(age, rea, iabp)
+
+mod_match_shockable1 <- matchit(trt ~ age + rea + iabp,
+                     method = "nearest", data = shockable_1)
+
+summary(mod_match_shockable1)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_shockable1 <- match.data(mod_match_shockable1)
+dim(dta_m_shockable1)
+
+#Cox regression
+cox.mod_ps_shockable1 <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_shockable1)
+summary(cox.mod_ps_shockable1)
+
+
+#3. Location 
+
+outrea <- ecmo_final10 %>% filter(rea=="Out-of-hospital")
+outrea <- outrea %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+outrea <- outrea %>% drop_na(age, unshockable, iabp)
+
+mod_match_outrea <- matchit(trt ~ age + unshockable + iabp,
+                     method = "nearest", data = outrea)
+
+summary(mod_match_outrea)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_outrea <- match.data(mod_match_outrea)
+dim(dta_m_outrea)
+
+#Cox regression
+cox.mod_ps_outrea <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_outrea)
+summary(cox.mod_ps_outrea)
+
+#In-Hospital
+
+inrea<- ecmo_final10 %>% filter(rea=="In-hospital")
+inrea <- inrea %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+inrea <- inrea %>% drop_na(age, unshockable, iabp)
+
+mod_match_inrea <- matchit(trt ~ age + unshockable + iabp,
+                     method = "nearest", data = inrea)
+
+summary(mod_match_inrea)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_inrea <- match.data(mod_match_inrea)
+dim(dta_m_inrea)
+
+#Cox regression
+cox.mod_ps_inrea <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_inrea)
+summary(cox.mod_ps_inrea)
+
+
+#4. IABP
+
+iabp.l <-  ecmo_final10 %>% filter(iabp_cat =="low")
+iabp.l <- iabp.l %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+iabp.l <- iabp.l %>% drop_na(age, unshockable, rea)
+
+mod_match_iabp.l <- matchit(trt ~ age + unshockable + rea,
+                     method = "nearest", data = iabp.l)
+
+summary(mod_match_iabp.l)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_iabp.l <- match.data(mod_match_iabp.l)
+dim(dta_m_iabp.l)
+
+#Cox regression
+cox.mod_ps_iabp.l <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_iabp.l)
+summary(cox.mod_ps_iabp.l)
+
+iabp.i <-  ecmo_final10 %>% filter(iabp_cat =="intermediate")
+iabp.i <- iabp.i %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+iabp.i <- iabp.i %>% drop_na(age, unshockable, rea)
+
+mod_match_iabp.i <- matchit(trt ~ age + unshockable + rea,
+                     method = "nearest", data = iabp.i)
+
+summary(mod_match_iabp.i)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_iabp.i <- match.data(mod_match_iabp.i)
+dim(dta_m_iabp.i)
+
+#Cox regression
+cox.mod_ps_iabp.i <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_iabp.i)
+summary(cox.mod_ps_iabp.i)
+
+
+iabp.h <-  ecmo_final10 %>% filter(iabp_cat =="high")
+iabp.h <- iabp.h %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+iabp.h <- iabp.h %>% drop_na(age, unshockable, rea)
+
+mod_match_iabp.h <- matchit(trt ~ age + unshockable + rea,
+                     method = "nearest", data = iabp.h)
+
+summary(mod_match_iabp.h)
+#plot(mod_match) 
+
+#select only matched patients
+dta_m_iabp.h <- match.data(mod_match_iabp.h)
+dim(dta_m_iabp.h)
+
+#Cox regression
+cox.mod_ps_iabp.h <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_iabp.h)
+summary(cox.mod_ps_iabp.h)
+
+
+
+#5. Alter
+ecmo_final10$age_q3 <- quantcut(ecmo_final10$age, q = 3, na.rm = TRUE) #quartile of age
+
+age.above75 <-  ecmo_final10 %>% filter(age > 75)
+age.above75 <- age.above75 %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+age.above75 <- age.above75 %>% drop_na(unshockable, rea, iabp)
+
+mod_match_age.above75 <- matchit(trt ~ iabp + unshockable + rea,
+                     method = "nearest", data = age.above75)
+
+summary(mod_match_age.above75)
+
+#select only matched patients
+dta_m_age.above75<- match.data(mod_match_age.above75)
+dim(dta_m_age.above75)
+
+#Cox regression
+cox.mod_ps_age.above75 <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_age.above75)
+summary(cox.mod_ps_age.above75)
+
+  
+
+age.below75  <- ecmo_final10 %>% filter(age < 76)
+age.below75 <- age.below75 %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+age.below75 <- age.below75 %>% drop_na(unshockable, rea, iabp)
+
+mod_match_age.below75 <- matchit(trt ~ iabp + unshockable + rea,
+                     method = "nearest", data = age.below75)
+
+summary(mod_match_age.below75)
+
+#select only matched patients
+dta_m_age.below75<- match.data(mod_match_age.below75)
+dim(dta_m_age.below75)
+
+#Cox regression
+cox.mod_ps_age.below75 <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_age.below75)
+summary(cox.mod_ps_age.below75)
+
+agelow <- ecmo_final10 %>% filter(age < 59)
+agelow <- agelow %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+agelow <- agelow %>% drop_na(unshockable, rea, iabp)
+
+mod_match_agelow <- matchit(trt ~ iabp + unshockable + rea,
+                     method = "nearest", data = agelow)
+
+summary(mod_match_agelow)
+
+#select only matched patients
+dta_m_agelow<- match.data(mod_match_agelow)
+dim(dta_m_agelow)
+
+#Cox regression
+cox.mod_ps_agelow <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_agelow)
+summary(cox.mod_ps_agelow)
+ 
+  
+ageintermediate <- ecmo_final10 %>% filter(age > 58 & age<71)
+ageintermediate <- ageintermediate %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+ageintermediate <- ageintermediate %>% drop_na(unshockable, rea, iabp)
+
+mod_match_ageintermediate<- matchit(trt ~ iabp + unshockable + rea,
+                     method = "nearest", data = ageintermediate)
+
+summary(mod_match_ageintermediate)
+
+#select only matched patients
+dta_m_ageintermediate<- match.data(mod_match_ageintermediate)
+dim(dta_m_ageintermediate)
+
+#Cox regression
+cox.mod_ps_ageintermediate <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_ageintermediate)
+summary(cox.mod_ps_ageintermediate)
+ 
+
+
+agehigh<- ecmo_final10 %>% filter(age >70)
+agehigh <- agehigh %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
+agehigh <- agehigh %>% drop_na(unshockable, rea, iabp)
+
+mod_match_agehigh<- matchit(trt ~ iabp + unshockable + rea,
+                     method = "nearest", data = agehigh)
+
+summary(mod_match_agehigh)
+
+#select only matched patients
+dta_m_agehigh<- match.data(mod_match_agehigh)
+dim(dta_m_agehigh)
+
+#Cox regression
+cox.mod_ps_agehigh <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_agehigh)
+summary(cox.mod_ps_agehigh)
+ 
+
+
 
 
 ```
