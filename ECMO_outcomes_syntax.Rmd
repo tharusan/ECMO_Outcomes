@@ -2894,7 +2894,7 @@ ecmo_final8 <- ecmo_final8 %>% mutate(ph_lowest_within48h_after_ecmo= replace(ph
 ```
 
 
-
+#complications
 ```{r}
 library(readxl)
 complications <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
@@ -3382,7 +3382,7 @@ t.test(crea_closest_within48h_after_ecmo ~ trt, data=dta_m)
 ````
 
 
-
+#Complications
 
 ```{r}
 library(readxl)
@@ -3518,7 +3518,7 @@ male <- ecmo_final10 %>% filter(GSCHL=="M")
 male <- male %>% select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview)
 male <- male %>% drop_na(age, rea, unshockable, iabp)
 
-mod_match_male <- matchit(trt ~ age + rea + unshockable  + iabp,
+mod_match_male <- MatchIt::matchit(trt ~ age + rea + unshockable  + iabp,
                      method = "nearest", data = male)
 
 summary(mod_match_male)
