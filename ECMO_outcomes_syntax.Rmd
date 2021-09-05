@@ -2808,7 +2808,8 @@ View(save_score)
 ecmo_final4 <- merge(ecmo_final3, save_score[,c(1,16)], by="id", all=T)
 
 ```
-<<<<<<< HEAD
+
+
 #Chart Review missings
 ```{r}
 library(readxl)
@@ -2864,7 +2865,7 @@ ecmo_final7$ef_discharge_final <- ifelse(is.na(ecmo_final7$ef_admission2) | is.n
 
 ```
 
-
+#IABP
 ```{r}
 library(readxl)
 iabp_score <- read_excel("~/Uni/Promotion/ECMELLA/surviver/iabp_score.xlsx", 
@@ -3319,12 +3320,11 @@ surv_matched <- ggsurvplot(fit_matched, data = dta_m, pval = TRUE, risk.table = 
                    legend.labs = c("VA-ECMO", "ECMELLA"),size = 1, ggtheme = theme_bw(),
                    xlim = c(0,30), xlab = "Time (days)", ylab = "Survival probability")
 
-<<<<<<< HEAD
+
 dta_m$mort <- as.factor(dta_m$mort)
 table1_matched <- table1(~age  + GSCHL+ bmi + campus2 + rea+ shockable+ unshockable + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 + mort + SAVE + iabp + iabp_cat + saps_chartreview +wscore2 + cad + lac_closest_within48h_after_ecmo + ph_closest_within48h_after_ecmo + ef_admission_final + ef_discharge_final|trt, data=dta_m)
-=======
-table1_matched <- table1(~age +  GSCHL+ bmi + campus2 + rea+ shockable+ unshockable + length_of_stay2 + ICU_length_of_stay2 + ecmo_time2 + impella_time2 + mort + SAVE + iabp + saps_chartreview +wscore2 + cad|trt, data=dta_m)
->>>>>>> ed9563611bdd16d2755ff4255a3fd4f17bf00db5
+
+
 
 t.test(age ~ trt, data=dta_m)
 chisq.test(dta_m$GSCHL, dta_m$trt)
@@ -3383,8 +3383,7 @@ t.test(crea_closest_within48h_after_ecmo ~ trt, data=dta_m)
 
 
 
-<<<<<<< HEAD
-=======
+
 ```{r}
 library(readxl)
 complications <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
@@ -3807,7 +3806,6 @@ cox.mod_ps_agehigh <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_agehigh)
 summary(cox.mod_ps_agehigh)
  
 
-
 #provider
 
 ecmo_final10$prov_count<- ifelse(ecmo_final10$prov1_fact=="blaschke",1, 
@@ -4052,10 +4050,7 @@ fp$Variable[subgps] <- paste("  ",fp$Variable[subgps])
 ```
 
 
-
->>>>>>> ed9563611bdd16d2755ff4255a3fd4f17bf00db5
-
- #ECMO Outpatient
+#ECMO Outpatient
 
 
 ```{r}
@@ -4501,8 +4496,4 @@ surviver_graph4 <- ggarrange(nyha, dizzy, sweat, tired, fit, alltag_eingesch, jo
 surviver_graph5 <- ggarrange(edema, nykturie, orthopnoe, ncol=1, nrow=3)
 surviver_graph6 <- ggarrange(mobility, care, all_day, pain, fear, ncol=1, nrow=5)
 ```
-
-
-=======
->>>>>>> ffc3fb6007da8676f19150af3504b02ede338a34
 
