@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 #To Dos and questions
+
 ```{r}
 #2. Chart review
 #2.1 Check all patients with "NA" in "ROSC erreicht" variable if reanimaton is 1 or 2
@@ -150,8 +151,7 @@ ecmo_master3 <- ecmo_master2 %>% filter(ppci == 0)
 #several patients without diagnoses - please check
 ```
 
-
-#crete clean variables
+\#crete clean variables
 
 ```{r}
 #campus
@@ -880,7 +880,8 @@ n <-count(ecmo_master3, ICU_length_of_stay)
 
 ```
 
-#duration of support systems 
+#duration of support systems
+
 ```{r}
 #duration of ecmo implantation
 ecmo_master3$ecmo_explantation <- as.Date(ecmo_master3$`ECMO wann ausgebaut?`)
@@ -904,6 +905,7 @@ mean(ecmo_master3$ecmo_time, na.rm=T)
 ```
 
 #Megans graphs
+
 ```{r}
 
 intervention <- ggplot(ecmo_master7, aes(x="", y= "", fill=intervention)) +
@@ -968,7 +970,6 @@ g <- ggplot(
 g
 
 ```
-
 
 ```{r}
 #create final cohort
@@ -1163,6 +1164,7 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 ```
 
 #Provider variable
+
 ```{r}
 #import data
 library(readxl)
@@ -1199,9 +1201,8 @@ hist_prov <-ggplot(ecmo_master7, aes(x= prov1_num, fill = campus, color = campus
   theme_classic()
 ```
 
-
-
 additional chart review
+
 ```{r}
 #import data
 library(readxl)
@@ -1262,9 +1263,8 @@ ecmo_master7_table1 <-  table1(~ campus2 + rea + mort + length_of_stay2 + ICU_le
 
 ```
 
-
-
 #cause of death
+
 ```{r}
 #cause of death 
 #import additional Chart Review
@@ -1350,9 +1350,8 @@ table1_death <- table1(~hypox_brain + mof + infect.inflam +bleed + cardiogenic_s
 
 ```
 
+#Decision Tree
 
-
-Decision Tree
 ```{r}
 #Decision Tree
 
@@ -1392,12 +1391,8 @@ confusionMatrix(tree.survived.predicted, test$mort)
 prp(tree)
 ```
 
+#Find new case numbers in Kalinowsky new data
 
-
-
-
-
-Find new case numbers in Kalinowsky new data
 ```{r}
 #just checking we do not accidentally miss patients
 
@@ -1493,7 +1488,6 @@ los_bp_all <- ggarrange(los_bp0, iculos_bp0,
           ncol = 1, nrow = 2)
 ```
 
-
 #mortality - Kaplan Meier curve
 
 ```{r}
@@ -1544,6 +1538,7 @@ n <- count(ecmo_master8, age)
 ```
 
 #lab values
+
 ```{r}
 library(readxl)
 lab <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_sap.xlsx", 
@@ -1784,7 +1779,8 @@ phl8_l <- phl8_l %>% dplyr::rename(ph_lowest_within48h_after_ecmo ="N2VALUE") #u
 
 ```
 
-#height&weight 
+#height&weight
+
 ```{r}
 
 library(readxl)
@@ -1890,7 +1886,8 @@ weight$weight <- ifelse(is.na(weight$time_to_weight2.x), weight$val,
 
 ```
 
-#merge to see where missings are
+\#merge to see where missings are
+
 ```{r}
 ecmo_missings <- Reduce(
   function(ecmo_master8, height) merge(ecmo_master8, height, by="id", all=T),
@@ -1904,9 +1901,8 @@ write_xlsx(ecmo_missings2,"C:/Users/HP-EliteBook-840-G3/Desktop/ecmo_missings2.x
 
 ```
 
-
-
 #Scores
+
 ```{r}
 library(readxl)
 apachec5 <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new data/from_copra5.xlsx", 
@@ -2227,6 +2223,7 @@ sapsc6.3 <- dplyr::rename(sapsc6.3,  saps_after_ecmo_c6= c_val)
 ```
 
 #Vitals
+
 ```{r}
 
 library(readxl)
@@ -2474,15 +2471,12 @@ af_c6.3 <- dplyr::rename(af_c6.3,  respiratory_rate_after_ecmo_c6 = c_val)
 
 ```
 
-
 ```{r}
 #check data
 ecmo_master3_check <- ecmo_master3 %>% filter(rosc_num == 1 &  mort == FALSE & (rea == "In-hospital" | rea == "Out-of-hospital") & (trt == 1))
 
 ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, rea, rosc, rosc_num, mort, trt, ecmo, impella)
 ```
-
-
 
 #import chart review age, sex, weight, height, lab values
 
@@ -2514,8 +2508,8 @@ ecmo_master9 <- merge(ecmo_master8, id_bmi_sex_lab2, by= "id")
 
 ```
 
-
 #mort analysis
+
 ```{r}
 library(gtools)
 ecmo_master9$age_q4 <- quantcut(ecmo_master9$age, q = 4, na.rm = TRUE) #quartile of age
@@ -2567,6 +2561,7 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 ```
 
 #final data set
+
 ```{r}
 ecmo_master10 <- Reduce(
   function(ecmo_master8, id_bmi_sex_lab2) merge(ecmo_master8, id_bmi_sex_lab2, by="id", all=T),
@@ -2581,6 +2576,7 @@ ecmo_final1<- ecmo_master10 %>% select(id, Fallnumer, Patientenummer, GBDAT, age
 ```
 
 #import new patients
+
 ```{r}
 library(readxl)
 new_patients <- read_excel("~/Uni/Promotion/ECMELLA/chart review/new_patients.xlsx", 
@@ -2632,7 +2628,9 @@ ecmo_final2$cod_main <- recode(ecmo_final2$cod_main, "SIRS" ="sirs")
 
 
 ```
+
 #Charlson Comorrbidity Index
+
 ```{r}
 #import diagnosis for charlson comorbidity index
 library(readr)
@@ -2678,7 +2676,9 @@ comorbidity_chart_review2 <-comorbidity_chart_review %>% distinct()
 ecmo_final3 <- merge(ecmo_final2, comorbidity_chart_review2, by.x="Fallnumer", by.y="FALNR")
 
 ```
-#Therapies?
+
+\#Therapies?
+
 ```{r}
 library(readr)
 therapies <- read_csv("~/Uni/Promotion/ECMELLA/chart review/new data/therapies.csv", 
@@ -2689,6 +2689,7 @@ View(therapies)
 ```
 
 #Results
+
 ```{r}
 
 library(table1)
@@ -2794,7 +2795,9 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 
 
 ```
-#Save Score
+
+\#Save Score
+
 ```{r}
 
 library(readxl)
@@ -2809,8 +2812,8 @@ ecmo_final4 <- merge(ecmo_final3, save_score[,c(1,16)], by="id", all=T)
 
 ```
 
-
 #Chart Review missings
+
 ```{r}
 library(readxl)
 chartreview_missings <- read_excel("~/Uni/Promotion/ECMELLA/chart review/chartreview_missings.xlsx", 
@@ -2866,6 +2869,7 @@ ecmo_final7$ef_discharge_final <- ifelse(is.na(ecmo_final7$ef_admission2) | is.n
 ```
 
 #IABP
+
 ```{r}
 library(readxl)
 iabp_score <- read_excel("~/Uni/Promotion/ECMELLA/surviver/iabp_score.xlsx", 
@@ -2893,8 +2897,8 @@ ecmo_final8 <- ecmo_final8 %>% mutate(ph_lowest_within48h_after_ecmo= replace(ph
                                                                 which((id=="98" & ph_lowest_within48h_after_ecmo=="7193")), "7.193"))
 ```
 
-
 #complications
+
 ```{r}
 library(readxl)
 complications <- read_excel("~/Uni/Promotion/ECMELLA/chart review/iabp_score(1).xlsx", 
@@ -2991,6 +2995,7 @@ ggplot(ecmo_final9, aes(x = comp_hemolysis,  fill = intervention)) +
 ```
 
 #Saps 2 Score
+
 ```{r}
 library(readxl)
 saps_missings <- read_excel("D:/_download/saps_missings.xlsx", 
@@ -3001,8 +3006,8 @@ View(saps_missings)
 
 ```
 
-
 #exclude specific patients
+
 ```{r}
 #id= 130: skurk: aortendissektion 
 #id=413: chronischer RCA Verschluss -> kein akuter Infarkt
@@ -3057,6 +3062,15 @@ bb2_surv <- ggplot(ef_survived, aes(y=ef_discharge_final, color=intervention)) +
     geom_boxplot()
 
 graph_ef_surv <- ggarrange(bb1_surv, bb2_surv, ncol=1, nrow=2,  labels = c("1a. LVEF at first re-occurence of circulation", "1b. LVEF at ICU discharge"))
+
+table1(~ ef_admission_final + ef_discharge_final|trt, data=ef_survived)
+hist(ef_survived$ef_admission_final)
+shapiro.test(ef_survived$ef_admission_final)
+wilcox.test(ef_admission_final ~ trt, data=ef_survived)
+hist(ef_survived$ef_discharge_final)
+shapiro.test(ef_survived$ef_discharge_final)
+wilcox.test(ef_discharge_final ~ trt, data=ef_survived)
+t.test(ef_discharge_final ~ trt, data=ef_survived)
 
 table1(~ SAVE + wscore2 + saps_closest_within72h_after_ecmo +apache_closest_within72h_after_ecmo + cad |trt, data=ecmo_final10)
 
@@ -3178,7 +3192,9 @@ chisq.test(ecmo_final10$cad2, ecmo_final10$trt)
 chisq.test(ecmo_final10$cad3, ecmo_final10$trt)
 hist(ecmo_final10$ef_admission_final)
 wilcox.test(ef_admission_final ~ trt, data=ecmo_final10, exact=F)
+shapiro.test(ecmo_final10$ef_admission_final)
 hist(ecmo_final10$ef_discharge_final)
+shapiro.test(ecmo_final10$ef_discharge_final)
 wilcox.test(ef_discharge_final ~ trt, data=ecmo_final10, exact=F)
 chisq.test(ecmo_final10$iabplow, ecmo_final10$trt)
 chisq.test(ecmo_final10$iabpintermediate, ecmo_final10$trt)
@@ -3200,8 +3216,6 @@ t.test(trop_highest_within48h_after_ecmo ~ trt, data=ecmo_final10)
 t.test(crea_closest_within48h_after_ecmo ~ trt, data=ecmo_final10)
 
 ```
-
-
 
 #Propensity match
 
@@ -3379,8 +3393,7 @@ t.test(trop_closest_within48h_after_ecmo ~ trt, data=dta_m)
 t.test(trop_highest_within48h_after_ecmo ~ trt, data=dta_m)
 t.test(crea_closest_within48h_after_ecmo ~ trt, data=dta_m)
 
-````
-
+```
 
 #Complications
 
@@ -3480,6 +3493,7 @@ ggplot(ecmo_final9, aes(x = comp_hemolysis,  fill = intervention)) +
 ```
 
 #Saps 2 Score
+
 ```{r}
 library(readxl)
 saps_missings <- read_excel("D:/_download/saps_missings.xlsx", 
@@ -3491,6 +3505,7 @@ View(saps_missings)
 ```
 
 #Subgruppen Analysen
+
 ```{r}
 #1. Sex
 
@@ -3843,7 +3858,7 @@ ecmo_final10$prov_count<- ifelse(ecmo_final10$prov1_fact=="blaschke",1,
 provider <- ecmo_final10 %>% dplyr::select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview, prov1_fact, prov_count)
 provider <- provider %>% drop_na(prov_count)
 
-mod_match_provider<- matchit(trt ~ age+ iabp + unshockable + rea+ prov1_fact,
+mod_match_provider<- matchit(trt ~ age+ iabp + unshockable + rea+ prov_count,
                      method = "nearest", data = provider)
 
 summary(mod_match_provider)
@@ -4043,7 +4058,7 @@ summary(cox.mod_ps_sapshigh)
 #ph
 ecmo_final10$lac_q3- quantcut(ecmo_final10$ph_closest_within48h_after_ecmo, q = 3, na.rm = TRUE) #quartile of age
 
-phlow <- ecmo_final10 %>% filter(ph_closest_within48h_after_ecmo <7)
+phlow <- ecmo_final10 %>% filter(ph_closest_within48h_after_ecmo <7.20)
 phlow <- phlow %>% dplyr::select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview, prov1_fact, ph_q3)
 phlow <- phlow %>% drop_na(age, rea, unshockable, iabp)
 
@@ -4099,7 +4114,7 @@ summary(cox.mod_ps_phhigh)
 
 ecmo_final10$lac_q3 <- quantcut(ecmo_final10$lac_closest_within48h_after_ecmo, q = 3, na.rm = TRUE)
 
-laclow <- ecmo_final10 %>% filter(lac_closest_within48h_after_ecmo <= 80)
+laclow <- ecmo_final10 %>% filter(lac_closest_within48h_after_ecmo <=75)
 laclow <- laclow %>% dplyr::select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview, prov1_fact, ph_q3)
 laclow <- laclow %>% drop_na(age, rea, unshockable, iabp)
 
@@ -4135,7 +4150,7 @@ cox.mod_ps_lacint <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_lacint)
 summary(cox.mod_ps_lacint)
 
 
-lachigh <- ecmo_final10 %>% filter(lac_closest_within48h_after_ecmo >= 120)
+lachigh <- ecmo_final10 %>% filter(lac_closest_within48h_after_ecmo > 75)
 lachigh <- lachigh %>% dplyr::select (id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview, prov1_fact, ph_q3)
 lachigh <- lachigh %>% drop_na(age, rea, unshockable, iabp)
 
@@ -4190,17 +4205,86 @@ dim(dta_m_trophigh)
 cox.mod_ps_trophigh <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_trophigh)
 summary(cox.mod_ps_trophigh)
 
+#year
+year.early <- ecmo_final10 %>% filter(year == 2016| year==2017 | year==2018)
+mod_match_year.early<- matchit(trt ~ age+ iabp + unshockable + rea,
+                     method = "nearest", data = year.early)
+
+summary(mod_match_year.early)
+
+#select only matched patients
+dta_m_year.early<- match.data(mod_match_year.early)
+dim(dta_m_year.early)
+
+#Cox regression
+cox.mod_ps_year.early <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_year.early)
+summary(cox.mod_ps_year.early)
+
+
+
+year.late <- ecmo_final10 %>% filter(year == 2019| year==2020 | year==2021)
+mod_match_year.late<- matchit(trt ~ age+ iabp + unshockable + rea,
+                     method = "nearest", data = year.late)
+
+summary(mod_match_year.late)
+
+#select only matched patients
+dta_m_year.late<- match.data(mod_match_year.late)
+dim(dta_m_year.late)
+
+#Cox regression
+cox.mod_ps_year.late <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_year.late)
+summary(cox.mod_ps_year.late)
+
+
+#BMI 
+bmilow <- ecmo_final10 %>% filter(bmi <=25)
+mod_match_bmilow<- matchit(trt ~ age+ iabp + unshockable + rea,
+                     method = "nearest", data = bmilow)
+
+summary(mod_match_bmilow)
+
+#select only matched patients
+dta_m_bmilow<- match.data(mod_match_bmilow)
+dim(dta_m_bmilow)
+
+#Cox regression
+cox.mod_ps_bmilow <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_bmilow)
+summary(cox.mod_ps_bmilow)
+
+
+
+bmihigh <- ecmo_final10 %>% filter(bmi >25)
+mod_match_bmihigh<- matchit(trt ~ age+ iabp + unshockable + rea,
+                     method = "nearest", data = bmihigh)
+
+summary(mod_match_bmihigh)
+
+#select only matched patients
+dta_m_bmihigh<- match.data(mod_match_bmihigh)
+dim(dta_m_bmihigh)
+
+#Cox regression
+cox.mod_ps_bmihigh <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_bmihigh)
+summary(cox.mod_ps_bmihigh)
+
 
 ```
+
 #Forrest plot
+
 ```{r}
 library(readxl)
 forestplot <- read_excel("C:/Users/HP-EliteBook-840-G3/Desktop/forestplot.xlsx")
 View(forestplot)
 
-subgps <- c(3,4,7,8,11,12,15,16,19,20,21,24,25,28,29,30,33,34,35,38,39)
+subgps <- c(3,4,7,8,11,12,15,16,19,20,21,24,25,28,29,30,33,34,35,38,39, 42,43,46,47, 50, 51, 54,55)
 forestplot$Variable[subgps] <- paste("  ",forestplot$Variable[subgps]) 
 forestplot$CI <- ifelse(!is.na(forestplot$`Point Estimate`), paste(forestplot$`Point Estimate`, " [", forestplot$Low,"-",forestplot$High,"] ",sep=""), NA)
+forestplot$Low <- as.numeric(substr(forestplot$Low, 1, 4))
+forestplot$High <- as.numeric(substr(forestplot$High, 1, 4))
+forestplot$`Point Estimate` <- as.numeric(substr(forestplot$`Point Estimate`, 1, 4))
+
 
 
 tabletext <- cbind(c("Subgroup","\n",forestplot$Variable), 
@@ -4212,17 +4296,12 @@ forestplot_graph <- forestplot(labeltext=tabletext, graph.pos=3,
            mean=c(NA,NA, forestplot$`Point Estimate`), 
            lower=c(NA,NA, forestplot$Low), upper=c(NA,NA,forestplot$High),
            title="Mortality",
-           xlab="    <--- Favors ECMELLA         Favors VA-ECMO--->",
+           xlab="    🢀Favors ECMELLA          Favors VA-ECMO 🢂",
            new_page=T,
            graphwidth = unit(80, "mm"),
            xlog=T,
-           is.summary=c(T, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, F, T, F, F, F, T, F, F, F, F, T, F, F, F, F, T, F, F, T ),
-           hrzl_lines=list("3" = gpar(lwd=1.5, col="gray50"), 
-                          "6" = gpar(lwd=50, lineend="butt", columns=c(2:5), col="#99999922"),
-                          "14" = gpar(lwd=50, lineend="butt", columns=c(2:5), col="#99999922"),
-                          "22" = gpar(lwd=62, lineend="butt", columns=c(2:5), col="#99999922"),
-                          "31" = gpar(lwd=60, lineend="butt", columns=c(2:5), col="#99999922"),
-                          "40" = gpar(lwd=50, lineend="butt", columns=c(2:5), col="#99999922")),
+           is.summary=c(T, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, F, T, F, F, F, T, F, F, F, F, T, F, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T, F, F, F, T ),
+           hrzl_lines=list("3" = gpar(lwd=1.5, col="gray50")),
            txt_gp=fpTxtGp(label=gpar(cex=0.75, fontface=1),
                               ticks=gpar(cex=0.75),
                               xlab=gpar(cex = 0.8),
@@ -4230,15 +4309,18 @@ forestplot_graph <- forestplot(labeltext=tabletext, graph.pos=3,
            col=fpColors(box="royalblue", lines="royalblue", zero = "gray30"),
            zero=1, cex=0.5, lineheight = "auto", boxsize=0.5, colgap=unit(1, "mm"),
            lwd.ci=0.5, ci.vertices=TRUE, ci.vertices.height = 0.3)
-dev.off()
+
 
 ```
 
 
+
+
+
 #ECMO Outpatient
 
-
 ```{r}
+#import
 library(readxl)
 
 surviver_data <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xlsx", 
@@ -4282,30 +4364,142 @@ surviver_lab <- read_excel("~/Uni/Promotion/ECMELLA/surviver/ECMO Outpatient.xls
     sheet = "Lab")
 View(surviver_lab)
 
+#merge dataframes together
 
 surviver_all<- Reduce(
   function(surviver_data, surviver_lab) merge(surviver_data, surviver_lab, by="id", all=F),
     list(surviver_data, surviver_lab, surviver_med, ecmo_final7)
 )
 
-surviver_all$Datum <- as.Date("16.07.2021", format="%d.%m.%Y")
+#date of examination
+surviver_all$Datum <- ifelse(surviver_all$Name=="Rieder" | surviver_all$Name=="Cengiz","21.07.2021", ifelse(surviver_all$Name=="Koch", "30.07.2021", 
+ifelse(surviver_all$Name=="Dietz"| surviver_all$Name=="Hagemann" |surviver_all$Name=="Coskun", "02.08.2021",
+       ifelse(surviver_all$Name=="Lademann", "27.08.2021", 
+              ifelse(surviver_all$Name=="Robinson", "13.08.2021", "16.07.2021")))))
+surviver_all$Datum <- as.Date(surviver_all$Datum, format="%d.%m.%Y")
+
+#adapt variable type
 surviver_all$age_current <- substr((as.numeric(difftime(surviver_all$Datum, surviver_all$GBDAT, unit="days")) / 365), 1,2)
 surviver_all$time_since_discharge <- as.numeric(difftime(surviver_all$Datum, surviver_all$discharge, unit="days")) 
+surviver_all$`EF - Echo (vorläufig)` <- as.numeric(surviver_all$`EF - Echo (vorläufig)`)
+surviver_all$`sys BD Ruhe` <- as.numeric(surviver_all$`sys BD Ruhe`)
+surviver_all$`dias BD Ruhe` <- as.numeric(surviver_all$`dias BD Ruhe`)
+surviver_all$`Strecke - 6MWT` <- as.numeric(surviver_all$`Strecke - 6MWT`)
+surviver_all$`Pausen - 6MWT` <- as.numeric(surviver_all$`Pausen - 6MWT`)
+surviver_all$`O2 - 6MWT` <- as.numeric(surviver_all$`O2 - 6MWT`)
+surviver_all$`sys BD - 6MWT` <- as.numeric(surviver_all$`sys BD - 6MWT`)
+surviver_all$`dias BD - 6MWT` <- as.numeric(surviver_all$`dias BD - 6MWT`)
+surviver_all$`Herzfrequenz - 6MWT` <- as.numeric(surviver_all$`Herzfrequenz - 6MWT`)
+surviver_all$`Dyspnoe Borg - 6MWT` <- as.numeric(surviver_all$`Dyspnoe Borg - 6MWT`)
+surviver_all$`EF - Echo (vorläufig)` <- ifelse(surviver_all$Name=="Dietz", 40, surviver_all$`EF - Echo (vorläufig)`)
+surviver_all$`Strecke - 6MWT` <- ifelse(surviver_all$Name=="Baumgart", 0, surviver_all$`Strecke - 6MWT`)
 
-table1(~`EF - Echo (vorläufig)` + ef_admission_final + ef_discharge_final + `Herzfrequenz - EKG` +  `sys BD Ruhe`+ `dias BD Ruhe` + `max Watt - Ergo` +`Dauer - Ergo`+ `max Herfrequenz Ergo` +`max sys Blutdruck Ergo` + `max dias Blutdruck Ergo` + `Strecke - 6MWT` + `Pausen - 6MWT` + `O2 - 6MWT`+ `sys BD - 6MWT`+ `dias BD - 6MWT`+ `Herzfrequenz - 6MWT` + `Dyspnoe Borg - 6MWT` + `Zeit - TUG` + `Gehilfe - TUG`|id_new, data=surviver_all)
+#normal ef?
+surviver_all$EF_norm <- as.factor(ifelse(surviver_all$`EF - Echo (vorläufig)` >=50, 1, 0 ))
+chisq.test(surviver_all$EF_norm, surviver_all$trt)
 
-table1(~ CPC +`TIA/Stroke ja/nein` + Konzentration + `Neues merken` + Erinnerung + Planen + `Alltag planen`+ `Gestige Leistung` + Beruf + `Beruf wiederaufgenommen` + `Arbeit wie vorher`  + Depression  + `Suizidgedanken manchmal` + `konkrete Suizidgedanken` |id_new, data=surviver_all)
+#adapt gender, wrong coding
+surviver_all$GSCHL <- ifelse(surviver_all$GSCHL=="M", "M", "M")
 
-table1(~ `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|id_new, data=surviver_all)
+#exclude patients
+  #example 1: immobilidty
+    surviver_all2 <- surviver_all %>% filter(!id_new==7)
+    
+  #example 2: all patients with wheelchair and hospital stay longer than x
+    surviver_all3 <- surviver_all %>% filter(!id_new==7 & time_since_discharge <1000)
+
+#results
+table1(~age_current + age +time_since_discharge +  GSCHL + length_of_stay2 + ICU_length_of_stay2  +rea|trt, data=surviver_all3)
+
+table1(~`EF - Echo (vorläufig)` + EF_norm +ef_admission_final + ef_discharge_final + `Herzfrequenz - EKG` +  `sys BD Ruhe`+ `dias BD Ruhe` + `Sauerstoff Ruhe` + `max Watt - Ergo` +`Dauer - Ergo`+ `max Herfrequenz Ergo` +`max sys Blutdruck Ergo` + `max dias Blutdruck Ergo` + `Strecke - 6MWT` + `Pausen - 6MWT` + `O2 - 6MWT`+ `sys BD - 6MWT`+ `dias BD - 6MWT`+ `Herzfrequenz - 6MWT` + `Dyspnoe Borg - 6MWT` + `Zeit - TUG` + `Gehilfe - TUG`|trt, data=surviver_all3)
+
+#tests
+t.test(surviver_all3$age_current ~ surviver_all3$trt)
+shapiro.test(surviver_all$`EF - Echo (vorläufig)`)
+t.test(surviver_all3$`EF - Echo (vorläufig)` ~ surviver_all3$trt, paired=F)
+wilcox.test(`EF - Echo (vorläufig)` ~ trt, data=surviver_all2)
+
+t.test(surviver_all3$`max Watt - Ergo` ~ surviver_all3$trt)
+wilcox.test(surviver_all2$`max Watt - Ergo` ~ surviver_all2$trt)
+
+t.test(surviver_all2$`Dauer - Ergo` ~ surviver_all2$trt)
+wilcox.test(surviver_all2$`Dauer - Ergo` ~ surviver_all2$trt)
+
+shapiro.test(surviver_all3$`Strecke - 6MWT`)
+t.test(surviver_all2$`Strecke - 6MWT` ~surviver_all2$trt )
+
+2surviver_all$`MMST Gesamt` <-as.numeric(surviver_all$`MMST Gesamt`)
+wilcox.test(surviver_all2$`MMST Gesamt`~ surviver_all2$trt)
+
+surviver_all$`TIA/Stroke ja/nein` <- as.factor(surviver_all$`TIA/Stroke ja/nein`)
+surviver_all$Konzentration <- as.factor(surviver_all$Konzentration)
+surviver_all$`Neues merken` <- as.factor(surviver_all$`Neues merken`)
+surviver_all$Erinnerung <- as.factor(surviver_all$Erinnerung)
+surviver_all$Planen <- as.factor(surviver_all$Planen)
+surviver_all$`Alltag planen` <- as.factor(surviver_all$`Alltag planen`)
+surviver_all$`Gestige Leistung` <- as.factor(surviver_all$`Gestige Leistung`)
+surviver_all$`Beruf wiederaufgenommen` <- as.factor(surviver_all$`Beruf wiederaufgenommen`)
+surviver_all$`Arbeit wie vorher` <- as.factor(surviver_all$`Arbeit wie vorher`)
+surviver_all$Depression <- as.factor(surviver_all$Depression)
+surviver_all$`Suizidgedanken manchmal` <- as.factor(surviver_all$`Suizidgedanken manchmal`)
+surviver_all$`konkrete Suizidgedanken` <- as.factor(surviver_all$`konkrete Suizidgedanken`)
 
 
-table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schweiss Herzrasen Schwindel` + Synkope + `Herzrasen Palpitation` + `Brustschmerz Anstrengung`+ Beinoedem+Nykturie +Orthopnoe +Leistungsfähigkeit + `eingeschraenkter Alltag` +`eingeschraenkter Beruf`|id_new, data=surviver_all)
+table1(~ CPC +`TIA/Stroke ja/nein` + Konzentration + `Neues merken` + Erinnerung + Planen + `Alltag planen`+ `Gestige Leistung` + Beruf + `Beruf wiederaufgenommen` + `Arbeit wie vorher`  + Depression  + `Suizidgedanken manchmal` + `konkrete Suizidgedanken` |trt, data=surviver_all2)
 
-table1(~ Na + K + Cl + Ca + `Ca corrected` + Eisen + PO4 + Mg + Osmolalitaet + `Blut pH` + `Transferrin-Saettigung` + Kreatinin + GFR + Harnstoff + Harnsaeure + `Bilirubin ges` + Albumin + Protein + Myoglobin + Ferritin +`Cholesterin ges` + HDL + `non-HDL` + LDL + Triglyzeride + `Lipoprotein a`+ GPT + GOT + `Alk Phosphatase` + Amylase + CK + `CK-MB`+  `CK-MB Prozent` + `NT-pro BNP` + GLDH + GGT + LDH + Lipase + `freies Hb` + Hba1c + CRP + Haptoglobin + `losl Transferrin-Rezeptor`+ Transferrin + Procalcitonin + T3 + fT4 + TSH + Hb + Haematokrit + Erythrozyten + Leukozyten + Thrombozyten + MCV + MCH + MCHC + MPV + `RDW-CV` + `Neurophile absolut` + `unreife Granulozyten absolut` + `unreife Granulozyten Prozent` + `Lymphozyten absolut`+ `Monozyten absolut` + `Eosinophile absolut`+ `Basophile absolut`+ `Neurophile Prozent`+ `Lymphozyten Prozent` + `Monozyten Prozent` + `Eosinophile Prozent` + `Basophile Prozent` + Quick + INR + PTT + `CO2 - BGA`+ `pO2  - BGA`+  `Bicarbonat - BGA`+ `Basenueberschuss - BGA`+ `Standardbicarbonat  - BGA`+ `O2 Saettigung - BGA`+ HbA1c |id_new, data=surviver_all)
+surviver_all2$`MMST Gesamt` <- as.numeric(surviver_all2$`MMST Gesamt`)
+surviver_all2$`Gesundheitsskala - EQ` <- as.numeric(surviver_all2$`Gesundheitsskala - EQ`)
+table1(~ CCI + `MMST Gesamt`+  `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|trt, data=surviver_all2)
+
+surviver_all$Atemnot <- as.factor(surviver_all$Atemnot)
+surviver_all$`Atemnot schwere Belastung` <- as.factor(surviver_all$`Atemnot schwere Belastung`)
+surviver_all$Müdigkeit <- as.factor(surviver_all$Müdigkeit)
+surviver_all$Schwindel <- as.factor(surviver_all$Schwindel)
+surviver_all$`Schweiss Herzrasen Schwindel` <- as.factor(surviver_all$`Schweiss Herzrasen Schwindel`)
+surviver_all$Synkope <- as.factor(surviver_all$Synkope)
+surviver_all$`Herzrasen Palpitation` <- as.factor(surviver_all$`Herzrasen Palpitation`)
+surviver_all$`Brustschmerz Anstrengung` <- as.factor(surviver_all$`Brustschmerz Anstrengung`)
+surviver_all$Beinoedem <- as.factor(surviver_all$Beinoedem)
+surviver_all$Nykturie <- as.factor(surviver_all$Nykturie)
+surviver_all$Orthopnoe <- as.factor(surviver_all$Orthopnoe)
+surviver_all$Leistungsfähigkeit <- as.factor(surviver_all$Leistungsfähigkeit)
+surviver_all$`eingeschraenkter Alltag` <- as.factor(surviver_all$`eingeschraenkter Alltag`)
+surviver_all$`eingeschraenkter Beruf` <- as.factor(surviver_all$`eingeschraenkter Beruf`)
+
+table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schweiss Herzrasen Schwindel` + Synkope + `Herzrasen Palpitation` + `Brustschmerz Anstrengung`+ Beinoedem+Nykturie +Orthopnoe +Leistungsfähigkeit + `eingeschraenkter Alltag` +`eingeschraenkter Beruf`|trt, data=surviver_all2)
 
 
-table1(~age_current + age + campus2 + time_since_discharge + trt + rea|id_new, data=surviver_all)
+surviver_all$GFR <- as.numeric(surviver_all$GFR)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Harnstoff <- as.numeric(surviver_all$Harnstoff)
+surviver_all$Harnsaeure <- as.numeric(surviver_all$Harnsaeure)
+surviver_all$GPT <- as.numeric(surviver_all$GPT)
+surviver_all$GOT <- as.numeric(surviver_all$GOT)
+surviver_all$`Alk Phosphatase` <- as.numeric(surviver_all$`Alk Phosphatase`)
+surviver_all$GGT <- as.numeric(surviver_all$GGT)
+surviver_all$`Bilirubin ges`  <- as.numeric(surviver_all$`Bilirubin ges` )
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
 
+
+table1(~ Na + K + Cl + Ca + `Ca corrected` + Eisen + PO4 + Mg + Osmolalitaet + `Blut pH` + `Transferrin-Saettigung` + Kreatinin + GFR + Harnstoff + Harnsaeure + `Bilirubin ges` + Albumin + Protein + Myoglobin + Ferritin +`Cholesterin ges` + HDL + `non-HDL` + LDL + Triglyzeride + `Lipoprotein a`+ GPT + GOT + `Alk Phosphatase` + Amylase + CK + `CK-MB`+  `CK-MB Prozent` + `NT-pro BNP` + GLDH + GGT + LDH + Lipase + `freies Hb` + Hba1c + CRP + Haptoglobin + `losl Transferrin-Rezeptor`+ Transferrin + Procalcitonin + T3 + fT4 + TSH + Hb + Haematokrit + Erythrozyten + Leukozyten + Thrombozyten + MCV + MCH + MCHC + MPV + `RDW-CV` + `Neurophile absolut` + `unreife Granulozyten absolut` + `unreife Granulozyten Prozent` + `Lymphozyten absolut`+ `Monozyten absolut` + `Eosinophile absolut`+ `Basophile absolut`+ `Neurophile Prozent`+ `Lymphozyten Prozent` + `Monozyten Prozent` + `Eosinophile Prozent` + `Basophile Prozent` + Quick + INR + PTT + `CO2 - BGA`+ `pO2  - BGA`+  `Bicarbonat - BGA`+ `Basenueberschuss - BGA`+ `Standardbicarbonat  - BGA`+ `O2 Saettigung - BGA`+ HbA1c |trt, data=surviver_all)
+
+surviver_all$age_current <- as.numeric(surviver_all$age_current)
+table1(~age_current + age + campus2 + time_since_discharge + trt + rea|trt, data=surviver_all)
+
+#weitere Analysen
+summary(ef <-glm.nb(`EF - Echo (vorläufig)` ~ trt +age_current , data=surviver_all))
+exp(cbind(IRR = coef(ef), confint(ef)))
+
+summary(ergo <- glm.nb(`max Watt - Ergo` ~ trt +age_current , data=surviver_all))
+exp(cbind(IRR = coef(ergo), confint(ergo)))
+
+summary(walk <- glm.nb(`Strecke - 6MWT` ~ trt +age_current , data=surviver_all2))
+exp(cbind(IRR = coef(walk), confint(walk)))
+
+#graphs
 stroke <- ggplot(surviver_all, aes(x=`TIA/Stroke ja/nein`, fill=intervention)) +
   geom_bar(width=0.5, colour="black") +
   ggtitle("Since the heart attack I experienced a stroke/ TIA")+
@@ -4442,7 +4636,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
    theme(legend.position="none")
 
 #heart failure
-dyspnea <-ggplot(surviver_all, aes(x=`Atemnot schwere Belastung`, y=intervention, fill=intervention))+
+dyspnea <-ggplot(surviver_all2, aes(x=`Atemnot schwere Belastung`, y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -4595,7 +4789,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-mobility<-ggplot(surviver_all, aes(x=`Mobilität - EQ`,  y=intervention, fill=intervention))+
+mobility<-ggplot(surviver_all2, aes(x=`Mobilität - EQ`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -4606,7 +4800,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-care<-ggplot(surviver_all, aes(x=`Selbstversorgung - EQ`,  y=intervention, fill=intervention))+
+care<-ggplot(surviver_all2, aes(x=`Selbstversorgung - EQ`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -4617,7 +4811,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-all_day<-ggplot(surviver_all, aes(x=surviver_all$`Alltag - EQ`,  y=intervention, fill=intervention))+
+all_day<-ggplot(surviver_all2, aes(x=`Alltag - EQ`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -4628,7 +4822,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-pain<-ggplot(surviver_all, aes(x=surviver_all$`Schmerzen - EQ`,  y=intervention, fill=intervention))+
+pain<-ggplot(surviver_all2, aes(x=`Schmerzen - EQ`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -4639,7 +4833,7 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   ylab("") +
    theme(legend.position="none")
 
-fear<-ggplot(surviver_all, aes(x=surviver_all$`Angst - EQ`,  y=intervention, fill=intervention))+
+fear<-ggplot(surviver_all2, aes(x=`Angst - EQ`,  y=intervention, fill=intervention))+
   geom_boxplot(width=0.5) +
   scale_x_continuous(limits=c(1, 5))+
   geom_point()+
@@ -4680,5 +4874,5 @@ surviver_graph3<- ggarrange(dyspnea_d, faint, palpitations, ap, ncol=1, nrow=5)
 surviver_graph4 <- ggarrange(nyha, dizzy, sweat, tired, fit, alltag_eingesch, job_eingesch, ncol=1, nrow=7 )
 surviver_graph5 <- ggarrange(edema, nykturie, orthopnoe, ncol=1, nrow=3)
 surviver_graph6 <- ggarrange(mobility, care, all_day, pain, fear, ncol=1, nrow=5)
+annotate_figure(surviver_graph6, bottom=text_grob("No problems                                                                    Extreme problems", size=10, hjust=0.42)) #(550x600)
 ```
-
