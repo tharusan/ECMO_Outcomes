@@ -4313,6 +4313,29 @@ forestplot_graph <- forestplot(labeltext=tabletext, graph.pos=3,
 
 ```
 
+#falsification endpoint
+```{r}
+ecmo_final10$cod_sirs <- ifelse(ecmo_final10$cod_main=="sirs", 1, 0)
+ecmo_final10$cod_bleed <- ifelse(ecmo_final10$cod_main=="bleed", 1, 0)
+ecmo_final10$cod_sirs_bleed <-  ifelse(ecmo_final10$cod_bleed=="1" | ecmo_final10$cod_sirs=="1", 1, 0)
+ecmo_final10$cod_mod <- ifelse(ecmo_final10$cod_main=="mod", 1, 0)
+ecmo_final10$cod_hbd <- ifelse(ecmo_final10$cod_main=="hbd", 1, 0)
+ecmo_final10$cod_cs <- ifelse(ecmo_final10$cod_main=="cs", 1, 0)
+ecmo_final10$cod_sirs_bleed_mod <-  ifelse(ecmo_final10$cod_bleed=="1" | ecmo_final10$cod_sirs=="1" | ecmo_final10$cod_mod=="1", 1, 0)
+ecmo_final10$cod_sirs_bleed_mod_hbd <-  ifelse(ecmo_final10$cod_bleed=="1" | ecmo_final10$cod_sirs=="1" | ecmo_final10$cod_mod=="1" | ecmo_final10$cod_hbd=="1", 1, 0)
+
+coxph(Surv(survdays, cod_sirs) ~  trt, data= ecmo_final10)
+coxph(Surv(survdays, cod_bleed) ~  trt, data= ecmo_final10)
+coxph(Surv(survdays, cod_sirs_bleed) ~  trt, data= ecmo_final10)
+coxph(Surv(survdays, cod_mod) ~ trt , data= ecmo_final10)
+coxph(Surv(survdays, cod_hbd) ~ trt , data= ecmo_final10)
+coxph(Surv(survdays, cod_cs) ~  trt, data= ecmo_final10)
+summary(coxph(Surv(survdays, cod_sirs_bleed_mod) ~  trt, data= ecmo_final10))
+
+summary(coxph(Surv(survdays, cod_sepsis) ~  trt, data= ecmo_final11))
+
+  
+```
 
 
 
@@ -4417,18 +4440,17 @@ table1(~`EF - Echo (vorläufig)` + EF_norm +ef_admission_final + ef_discharge_fi
 t.test(surviver_all3$age_current ~ surviver_all3$trt)
 shapiro.test(surviver_all$`EF - Echo (vorläufig)`)
 t.test(surviver_all3$`EF - Echo (vorläufig)` ~ surviver_all3$trt, paired=F)
-wilcox.test(`EF - Echo (vorläufig)` ~ trt, data=surviver_all2)
 
+shapiro.test(surviver_all3$`max Watt - Ergo`)
 t.test(surviver_all3$`max Watt - Ergo` ~ surviver_all3$trt)
-wilcox.test(surviver_all2$`max Watt - Ergo` ~ surviver_all2$trt)
 
-t.test(surviver_all2$`Dauer - Ergo` ~ surviver_all2$trt)
-wilcox.test(surviver_all2$`Dauer - Ergo` ~ surviver_all2$trt)
+shapiro.test(surviver_all3$`Dauer - Ergo`)
+t.test(surviver_all3$`Dauer - Ergo` ~ surviver_all3$trt)
 
 shapiro.test(surviver_all3$`Strecke - 6MWT`)
-t.test(surviver_all2$`Strecke - 6MWT` ~surviver_all2$trt )
+t.test(surviver_all3$`Strecke - 6MWT` ~surviver_all3$trt )
 
-2surviver_all$`MMST Gesamt` <-as.numeric(surviver_all$`MMST Gesamt`)
+surviver_all$`MMST Gesamt` <-as.numeric(surviver_all$`MMST Gesamt`)
 wilcox.test(surviver_all2$`MMST Gesamt`~ surviver_all2$trt)
 
 surviver_all$`TIA/Stroke ja/nein` <- as.factor(surviver_all$`TIA/Stroke ja/nein`)
@@ -4449,7 +4471,7 @@ table1(~ CPC +`TIA/Stroke ja/nein` + Konzentration + `Neues merken` + Erinnerung
 
 surviver_all2$`MMST Gesamt` <- as.numeric(surviver_all2$`MMST Gesamt`)
 surviver_all2$`Gesundheitsskala - EQ` <- as.numeric(surviver_all2$`Gesundheitsskala - EQ`)
-table1(~ CCI + `MMST Gesamt`+  `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|trt, data=surviver_all2)
+table1(~ CCI + `MMST Gesamt`+  `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|trt, data=surviver_all3)
 
 surviver_all$Atemnot <- as.factor(surviver_all$Atemnot)
 surviver_all$`Atemnot schwere Belastung` <- as.factor(surviver_all$`Atemnot schwere Belastung`)
@@ -4466,7 +4488,7 @@ surviver_all$Leistungsfähigkeit <- as.factor(surviver_all$Leistungsfähigkeit)
 surviver_all$`eingeschraenkter Alltag` <- as.factor(surviver_all$`eingeschraenkter Alltag`)
 surviver_all$`eingeschraenkter Beruf` <- as.factor(surviver_all$`eingeschraenkter Beruf`)
 
-table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schweiss Herzrasen Schwindel` + Synkope + `Herzrasen Palpitation` + `Brustschmerz Anstrengung`+ Beinoedem+Nykturie +Orthopnoe +Leistungsfähigkeit + `eingeschraenkter Alltag` +`eingeschraenkter Beruf`|trt, data=surviver_all2)
+table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schweiss Herzrasen Schwindel` + Synkope + `Herzrasen Palpitation` + `Brustschmerz Anstrengung`+ Beinoedem+Nykturie +Orthopnoe +Leistungsfähigkeit + `eingeschraenkter Alltag` +`eingeschraenkter Beruf`|trt, data=surviver_all3)
 
 
 surviver_all$GFR <- as.numeric(surviver_all$GFR)
