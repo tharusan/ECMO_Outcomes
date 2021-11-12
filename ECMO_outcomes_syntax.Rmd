@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #To Dos and questions
 
+
 ```{r}
 #2. Chart review
 #2.1 Check all patients with "NA" in "ROSC erreicht" variable if reanimaton is 1 or 2
@@ -151,8 +152,7 @@ ecmo_master3 <- ecmo_master2 %>% filter(ppci == 0)
 #several patients without diagnoses - please check
 ```
 
-\#crete clean variables
-
+#create clean variables
 ```{r}
 #campus
 
@@ -880,8 +880,8 @@ n <-count(ecmo_master3, ICU_length_of_stay)
 
 ```
 
-#duration of support systems
 
+#duration of support systems
 ```{r}
 #duration of ecmo implantation
 ecmo_master3$ecmo_explantation <- as.Date(ecmo_master3$`ECMO wann ausgebaut?`)
@@ -1263,8 +1263,8 @@ ecmo_master7_table1 <-  table1(~ campus2 + rea + mort + length_of_stay2 + ICU_le
 
 ```
 
-#cause of death
 
+#cause of death
 ```{r}
 #cause of death 
 #import additional Chart Review
@@ -1489,6 +1489,7 @@ los_bp_all <- ggarrange(los_bp0, iculos_bp0,
 ```
 
 #mortality - Kaplan Meier curve
+
 
 ```{r}
 ecmo_final10$survdays <-difftime(ecmo_final10$`Sterbezeit (0 = nicht tot)`, ecmo_final10$ecmo_implantation, unit="days")
@@ -1886,7 +1887,7 @@ weight$weight <- ifelse(is.na(weight$time_to_weight2.x), weight$val,
 
 ```
 
-\#merge to see where missings are
+#merge to see where missings are
 
 ```{r}
 ecmo_missings <- Reduce(
@@ -2480,6 +2481,7 @@ ecmo_master3_check <- ecmo_master3_check %>% select(Fallnumer, Patientenummer, r
 
 #import chart review age, sex, weight, height, lab values
 
+
 ```{r}
 #downloaded clean sheet from Gooogle sheets - imported age and lab values as numeric
 library(readxl)
@@ -2560,7 +2562,9 @@ res_iculos <- summ(iculos, exp = TRUE, confint = TRUE, digits = 3, scale = TRUE)
 export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{conf.low}, {conf.high}]", scale = TRUE, to.file = "docx", file.name = "primaryoutcomes.docx")
 ```
 
+
 #final data set
+
 
 ```{r}
 ecmo_master10 <- Reduce(
@@ -2576,6 +2580,8 @@ ecmo_final1<- ecmo_master10 %>% select(id, Fallnumer, Patientenummer, GBDAT, age
 ```
 
 #import new patients
+
+
 
 ```{r}
 library(readxl)
@@ -2630,6 +2636,7 @@ ecmo_final2$cod_main <- recode(ecmo_final2$cod_main, "SIRS" ="sirs")
 ```
 
 #Charlson Comorrbidity Index
+
 
 ```{r}
 #import diagnosis for charlson comorbidity index
@@ -2796,7 +2803,7 @@ export_summs(log_mort, los, iculos, exp = TRUE, digits = 3,  error_format = "[{c
 
 ```
 
-\#Save Score
+#Save Score
 
 ```{r}
 
@@ -2813,6 +2820,7 @@ ecmo_final4 <- merge(ecmo_final3, save_score[,c(1,16)], by="id", all=T)
 ```
 
 #Chart Review missings
+
 
 ```{r}
 library(readxl)
@@ -2898,6 +2906,7 @@ ecmo_final8 <- ecmo_final8 %>% mutate(ph_lowest_within48h_after_ecmo= replace(ph
 ```
 
 #complications
+
 
 ```{r}
 library(readxl)
@@ -4395,6 +4404,7 @@ surviver_all<- Reduce(
 )
 
 #date of examination
+
 surviver_all$Datum <- ifelse(surviver_all$Name=="Rieder" | surviver_all$Name=="Cengiz","21.07.2021", ifelse(surviver_all$Name=="Koch", "30.07.2021", 
 ifelse(surviver_all$Name=="Dietz"| surviver_all$Name=="Hagemann" |surviver_all$Name=="Coskun", "02.08.2021",
        ifelse(surviver_all$Name=="Lademann", "27.08.2021", 
@@ -4402,6 +4412,7 @@ ifelse(surviver_all$Name=="Dietz"| surviver_all$Name=="Hagemann" |surviver_all$N
 surviver_all$Datum <- as.Date(surviver_all$Datum, format="%d.%m.%Y")
 
 #adapt variable type
+
 surviver_all$age_current <- substr((as.numeric(difftime(surviver_all$Datum, surviver_all$GBDAT, unit="days")) / 365), 1,2)
 surviver_all$time_since_discharge <- as.numeric(difftime(surviver_all$Datum, surviver_all$discharge, unit="days")) 
 surviver_all$`EF - Echo (vorläufig)` <- as.numeric(surviver_all$`EF - Echo (vorläufig)`)
@@ -4444,6 +4455,66 @@ t.test(surviver_all3$`EF - Echo (vorläufig)` ~ surviver_all3$trt, paired=F)
 shapiro.test(surviver_all3$`max Watt - Ergo`)
 t.test(surviver_all3$`max Watt - Ergo` ~ surviver_all3$trt)
 
+surviver_all$EF_norm <- ifelse(surviver_all$`EF - Echo (vorläufig)` >=50, 1, 0 )
+surviver_all$EF_norm <- as.factor(surviver_all$EF_norm)
+chisq.test(surviver_all$EF_norm, surviver_all$trt)
+
+surviver_all$GSCHL <- ifelse(surviver_all$GSCHL=="M", "M", "M")
+surviver_all2 <- surviver_all %>% filter(!id_new==7)
+
+table1(~age_current + age +time_since_discharge +  GSCHL + length_of_stay2 + ICU_length_of_stay2  +rea|trt, data=surviver_all)
+
+table1(~`EF - Echo (vorläufig)` + EF_norm +ef_admission_final + ef_discharge_final + `Herzfrequenz - EKG` +  `sys BD Ruhe`+ `dias BD Ruhe` + `Sauerstoff Ruhe` + `max Watt - Ergo` +`Dauer - Ergo`+ `max Herfrequenz Ergo` +`max sys Blutdruck Ergo` + `max dias Blutdruck Ergo` + `Strecke - 6MWT` + `Pausen - 6MWT` + `O2 - 6MWT`+ `sys BD - 6MWT`+ `dias BD - 6MWT`+ `Herzfrequenz - 6MWT` + `Dyspnoe Borg - 6MWT` + `Zeit - TUG` + `Gehilfe - TUG`|trt, data=surviver_all2)
+
+t.test(surviver_all$`EF - Echo (vorläufig)` ~ surviver_all$trt)
+wilcox.test(`EF - Echo (vorläufig)` ~ trt, data=surviver_all)
+
+t.test(surviver_all$`max Watt - Ergo` ~ surviver_all$trt)
+wilcox.test(surviver_all2$`max Watt - Ergo` ~ surviver_all2$trt)
+
+t.test(surviver_all$`Dauer - Ergo` ~ surviver_all$trt)
+wilcox.test(surviver_all2$`Dauer - Ergo` ~ surviver_all2$trt)
+
+surviver_all$`MMST Gesamt` <-as.numeric(surviver_all$`MMST Gesamt`)
+wilcox.test(surviver_all2$`MMST Gesamt`~ surviver_all2$trt)
+
+surviver_all$`TIA/Stroke ja/nein` <- as.factor(surviver_all$`TIA/Stroke ja/nein`)
+surviver_all$Konzentration <- as.factor(surviver_all$Konzentration)
+surviver_all$`Neues merken` <- as.factor(surviver_all$`Neues merken`)
+surviver_all$Erinnerung <- as.factor(surviver_all$Erinnerung)
+surviver_all$Planen <- as.factor(surviver_all$Planen)
+surviver_all$`Alltag planen` <- as.factor(surviver_all$`Alltag planen`)
+surviver_all$`Gestige Leistung` <- as.factor(surviver_all$`Gestige Leistung`)
+surviver_all$`Beruf wiederaufgenommen` <- as.factor(surviver_all$`Beruf wiederaufgenommen`)
+surviver_all$`Arbeit wie vorher` <- as.factor(surviver_all$`Arbeit wie vorher`)
+surviver_all$Depression <- as.factor(surviver_all$Depression)
+surviver_all$`Suizidgedanken manchmal` <- as.factor(surviver_all$`Suizidgedanken manchmal`)
+surviver_all$`konkrete Suizidgedanken` <- as.factor(surviver_all$`konkrete Suizidgedanken`)
+
+
+table1(~ CPC +`TIA/Stroke ja/nein` + Konzentration + `Neues merken` + Erinnerung + Planen + `Alltag planen`+ `Gestige Leistung` + Beruf + `Beruf wiederaufgenommen` + `Arbeit wie vorher`  + Depression  + `Suizidgedanken manchmal` + `konkrete Suizidgedanken` |trt, data=surviver_all2)
+
+surviver_all2$`MMST Gesamt` <- as.numeric(surviver_all2$`MMST Gesamt`)
+surviver_all2$`Gesundheitsskala - EQ` <- as.numeric(surviver_all2$`Gesundheitsskala - EQ`)
+table1(~ CCI + `MMST Gesamt`+  `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|trt, data=surviver_all2)
+
+surviver_all$Atemnot <- as.factor(surviver_all$Atemnot)
+surviver_all$`Atemnot schwere Belastung` <- as.factor(surviver_all$`Atemnot schwere Belastung`)
+surviver_all$Müdigkeit <- as.factor(surviver_all$Müdigkeit)
+surviver_all$Schwindel <- as.factor(surviver_all$Schwindel)
+surviver_all$`Schweiss Herzrasen Schwindel` <- as.factor(surviver_all$`Schweiss Herzrasen Schwindel`)
+surviver_all$Synkope <- as.factor(surviver_all$Synkope)
+surviver_all$`Herzrasen Palpitation` <- as.factor(surviver_all$`Herzrasen Palpitation`)
+surviver_all$`Brustschmerz Anstrengung` <- as.factor(surviver_all$`Brustschmerz Anstrengung`)
+surviver_all$Beinoedem <- as.factor(surviver_all$Beinoedem)
+surviver_all$Nykturie <- as.factor(surviver_all$Nykturie)
+surviver_all$Orthopnoe <- as.factor(surviver_all$Orthopnoe)
+surviver_all$Leistungsfähigkeit <- as.factor(surviver_all$Leistungsfähigkeit)
+surviver_all$`eingeschraenkter Alltag` <- as.factor(surviver_all$`eingeschraenkter Alltag`)
+surviver_all$`eingeschraenkter Beruf` <- as.factor(surviver_all$`eingeschraenkter Beruf`)
+
+table1(~ Atemnot + `Atemnot schwere Belastung` + Müdigkeit +Schwindel + `Schweiss Herzrasen Schwindel` + Synkope + `Herzrasen Palpitation` + `Brustschmerz Anstrengung`+ Beinoedem+Nykturie +Orthopnoe +Leistungsfähigkeit + `eingeschraenkter Alltag` +`eingeschraenkter Beruf`|trt, data=surviver_all2)
+
 shapiro.test(surviver_all3$`Dauer - Ergo`)
 t.test(surviver_all3$`Dauer - Ergo` ~ surviver_all3$trt)
 
@@ -4472,6 +4543,26 @@ table1(~ CPC +`TIA/Stroke ja/nein` + Konzentration + `Neues merken` + Erinnerung
 surviver_all2$`MMST Gesamt` <- as.numeric(surviver_all2$`MMST Gesamt`)
 surviver_all2$`Gesundheitsskala - EQ` <- as.numeric(surviver_all2$`Gesundheitsskala - EQ`)
 table1(~ CCI + `MMST Gesamt`+  `Barthel Index` + `Mod Ranking Scale` +  `Mobilität - EQ` + `Selbstversorgung - EQ` + `Alltag - EQ` + `Schmerzen - EQ` +`Angst - EQ` + `Gesundheitsskala - EQ`|trt, data=surviver_all3)
+
+surviver_all$GFR <- as.numeric(surviver_all$GFR)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Harnstoff <- as.numeric(surviver_all$Harnstoff)
+surviver_all$Harnsaeure <- as.numeric(surviver_all$Harnsaeure)
+surviver_all$GPT <- as.numeric(surviver_all$GPT)
+surviver_all$GOT <- as.numeric(surviver_all$GOT)
+surviver_all$`Alk Phosphatase` <- as.numeric(surviver_all$`Alk Phosphatase`)
+surviver_all$GGT <- as.numeric(surviver_all$GGT)
+surviver_all$`Bilirubin ges`  <- as.numeric(surviver_all$`Bilirubin ges` )
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+surviver_all$Kreatinin <- as.numeric(surviver_all$Kreatinin)
+
+
+table1(~ Na + K + Cl + Ca + `Ca corrected` + Eisen + PO4 + Mg + Osmolalitaet + `Blut pH` + `Transferrin-Saettigung` + Kreatinin + GFR + Harnstoff + Harnsaeure + `Bilirubin ges` + Albumin + Protein + Myoglobin + Ferritin +`Cholesterin ges` + HDL + `non-HDL` + LDL + Triglyzeride + `Lipoprotein a`+ GPT + GOT + `Alk Phosphatase` + Amylase + CK + `CK-MB`+  `CK-MB Prozent` + `NT-pro BNP` + GLDH + GGT + LDH + Lipase + `freies Hb` + Hba1c + CRP + Haptoglobin + `losl Transferrin-Rezeptor`+ Transferrin + Procalcitonin + T3 + fT4 + TSH + Hb + Haematokrit + Erythrozyten + Leukozyten + Thrombozyten + MCV + MCH + MCHC + MPV + `RDW-CV` + `Neurophile absolut` + `unreife Granulozyten absolut` + `unreife Granulozyten Prozent` + `Lymphozyten absolut`+ `Monozyten absolut` + `Eosinophile absolut`+ `Basophile absolut`+ `Neurophile Prozent`+ `Lymphozyten Prozent` + `Monozyten Prozent` + `Eosinophile Prozent` + `Basophile Prozent` + Quick + INR + PTT + `CO2 - BGA`+ `pO2  - BGA`+  `Bicarbonat - BGA`+ `Basenueberschuss - BGA`+ `Standardbicarbonat  - BGA`+ `O2 Saettigung - BGA`+ HbA1c |trt, data=surviver_all)
+
+surviver_all$age_current <- as.numeric(surviver_all$age_current)
+table1(~age_current + age + campus2 + time_since_discharge + trt + rea|trt, data=surviver_all)
 
 surviver_all$Atemnot <- as.factor(surviver_all$Atemnot)
 surviver_all$`Atemnot schwere Belastung` <- as.factor(surviver_all$`Atemnot schwere Belastung`)
