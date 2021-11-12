@@ -3324,7 +3324,6 @@ exp(cbind(IRR = coef(iculos_ps), confint(iculos_ps)))
 
 
 #Kaplan Meier Curve matched cohort
-
 dta_m$survdays <-difftime(dta_m$`Sterbezeit (0 = nicht tot)`, dta_m$ecmo_implantation, unit="days")
 dta_m$survdays <- as.numeric(dta_m$survdays)
 
