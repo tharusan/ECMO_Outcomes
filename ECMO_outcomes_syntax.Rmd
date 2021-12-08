@@ -3253,7 +3253,7 @@ prs_df %>% mutate(trt2 = ifelse(trt2 == 1, labs[1], labs[2])) %>%
 
 
 #drop missings in matching variables in order to match
-match_nomiss <- ecmo_final10 %>% dplyr::select(id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview, , ef_admission_final, ef_discharge_final, cad0, cad1, cad2, cad3, iabplow, iabpintermediate, iabphigh)
+match_nomiss <- ecmo_final10 %>% dplyr::select(id, trt, mort, age, age_q4, GSCHL, bmi, rea, unshockable, lac_closest_within48h_after_ecmo, ph_closest_within48h_after_ecmo, survdays, SAVE, iabp, length_of_stay2, ICU_length_of_stay2, ecmo_implantation, `Sterbezeit (0 = nicht tot)`, campus2, shockable, ecmo_time2, impella_time2, SAVE, iabp, iabp_cat, wscore2, cad, ph_lowest_within48h_after_ecmo, lac_highest_within48h_after_ecmo, ck_closest_within48h_after_ecmo, ck_highest_witin48h_after_ecmo, ckmb_closest_within48h_after_ecmo, ckmb_highest_within48h_after_ecmo, trop_closest_within48h_after_ecmo, trop_highest_within48h_after_ecmo, crea_closest_within48h_after_ecmo, saps_chartreview, , ef_admission_final, ef_discharge_final, cad0, cad1, cad2, cad3, iabplow, iabpintermediate, iabphigh, cod_main, ph_closest_within48h_before_ecmo, ph_lowest_within48h_before_ecmo,  lac_closest_within48h_before_ecmo, lac_highest_within48h_before_ecmo, ck_closest_within48h_before_ecmo, ck_highest_within48h_before_ecmo, ckmb_closest_within48h_before_ecmo, ckmb_highest_within48h_before_ecmo, trop_closest_within48h_before_ecmo, trop_highest_within48h_before_ecmo, crea_closest_within48h_before_ecmo)
 
 match_nomiss <- match_nomiss %>% drop_na(age, rea, unshockable, iabp)
 
@@ -4275,6 +4275,76 @@ dim(dta_m_bmihigh)
 #Cox regression
 cox.mod_ps_bmihigh <- coxph(Surv(survdays, mort) ~ trt, data= dta_m_bmihigh)
 summary(cox.mod_ps_bmihigh)
+
+
+
+
+dta_m$cod_sirs <- ifelse(dta_m$cod_main=="sirs", 1, 0)
+dta_m$cod_bleed <- ifelse(dta_m$cod_main=="bleed", 1, 0)
+dta_m$cod_mod <- ifelse(dta_m$cod_main=="mod", 1, 0)
+dta_m$cod_hbd <- ifelse(dta_m$cod_main=="hbd", 1, 0)
+dta_m$cod_cs <- ifelse(dta_m$cod_main=="cs", 1, 0)
+
+chisq.test(dta_m$cod_cs, dta_m$trt)
+chisq.test(dta_m$cod_mod, dta_m$trt)
+chisq.test(dta_m$cod_hbd, dta_m$trt)
+chisq.test(dta_m$cod_bleed, dta_m$trt)
+chisq.test(dta_m$cod_sirs, dta_m$trt)
+```
+
+
+```{r}
+hist(dta_m$ph_closest_within48h_after_ecmo)
+t.test(dta_m$ph_closest_within48h_after_ecmo ~ dta_m$trt)
+hist(dta_m$ph_lowest_within48h_after_ecmo)
+t.test(dta_m$ph_lowest_within48h_after_ecmo ~ dta_m$trt)
+hist(dta_m$lac_closest_within48h_after_ecmo)
+t.test(dta_m$lac_closest_within48h_after_ecmo~ dta_m$trt)
+hist(dta_m$lac_highest_within48h_after_ecmo)
+t.test(dta_m$lac_highest_within48h_after_ecmo~dta_m$trt)
+hist(dta_m$ck_closest_within48h_after_ecmo)
+wilcox.test(dta_m$ck_closest_within48h_after_ecmo ~dta_m$trt)
+hist(dta_m$ck_highest_witin48h_after_ecmo)
+wilcox.test(dta_m$ck_highest_witin48h_after_ecmo ~dta_m$trt)
+hist(dta_m$ckmb_closest_within48h_after_ecmo)
+wilcox.test(dta_m$ckmb_closest_within48h_after_ecmo~dta_m$trt)
+hist(dta_m$ckmb_highest_within48h_after_ecmo)
+wilcox.test(dta_m$ckmb_highest_within48h_after_ecmo ~dta_m$trt)
+hist(dta_m$trop_closest_within48h_after_ecmo)
+wilcox.test(dta_m$trop_closest_within48h_after_ecmo ~ dta_m$trt)
+hist(dta_m$trop_highest_within48h_after_ecmo)
+wilcox.test(dta_m$trop_highest_within48h_after_ecmo ~ dta_m$trt)
+hist(dta_m$crea_closest_within48h_after_ecmo)
+t.test(dta_m$crea_closest_within48h_after_ecmo~dta_m$trt)
+
+
+hist(dta_m$ph_closest_within48h_before_ecmo)
+wilcox.test(dta_m$ph_closest_within48h_after_ecmo ~ dta_m$trt)
+hist(dta_m$ph_lowest_within48h_before_ecmo)
+wilcox.test(dta_m$ph_lowest_within48h_before_ecmo ~ dta_m$trt)
+hist(dta_m$lac_closest_within48h_before_ecmo)
+wilcox.test(dta_m$lac_closest_within48h_before_ecmo~ dta_m$trt)
+hist(dta_m$lac_highest_within48h_before_ecmo)
+wilcox.test(dta_m$lac_highest_within48h_before_ecmo ~ dta_m$trt)
+
+hist(dta_m$ck_closest_within48h_before_ecmo)
+wilcox.test(dta_m$ck_closest_within48h_before_ecmo ~dta_m$trt)
+hist(dta_m$ck_highest_within48h_before_ecmo)
+wilcox.test(dta_m$ck_highest_within48h_before_ecmo ~dta_m$trt)
+hist(dta_m$ckmb_closest_within48h_before_ecmo)
+wilcox.test(dta_m$ckmb_closest_within48h_before_ecmo ~dta_m$trt)
+hist(dta_m$ckmb_highest_within48h_before_ecmo)
+wilcox.test(dta_m$ckmb_highest_within48h_before_ecmo ~dta_m$trt)
+
+hist(dta_m$trop_closest_within48h_before_ecmo)
+wilcox.test(dta_m$trop_closest_within48h_before_ecmo ~ dta_m$trt)
+hist(dta_m$trop_highest_within48h_before_ecmo)
+wilcox.test(dta_m$trop_highest_within48h_before_ecmo ~ dta_m$trt)
+hist(dta_m$crea_closest_within48h_before_ecmo)
+t.test(dta_m$crea_closest_within48h_before_ecmo~dta_m$trt)
+
+
+
 
 
 ```
